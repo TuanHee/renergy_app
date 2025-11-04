@@ -46,6 +46,23 @@ class LoginScreenView extends StatelessWidget {
                 ),
                 const SizedBox(height: 48),
                 
+                // Divider
+                const Row(
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Login or Sign up',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
                 // Google Sign-In Button
                 ElevatedButton.icon(
                   onPressed: () {
