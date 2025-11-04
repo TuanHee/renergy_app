@@ -7,75 +7,61 @@ class ChargingStationScreenView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.share, color: Colors.white),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Header bar
-            Container(
-              height: 120,
-              color: const Color(0xFFD32F2F),
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.share, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Container(
+            //   height: 120,
+            //   color: const Color(0xFFD32F2F),
+            //   child: SafeArea(
+            //     bottom: false,
+            //     child: Padding(
+            //       padding: const EdgeInsets.all(16.0),
+            //       child: Row(
+            //         children: [
+            //           IconButton(
+            //             onPressed: () => Navigator.pop(context),
+            //             icon: const Icon(Icons.arrow_back, color: Colors.white),
+            //           ),
+            //           const Spacer(),
+                      
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
             // Charging station image
-            Stack(
-              children: [
-                Container(
-                  height: 200,
-                  width: double.infinity,
-                  color: Colors.grey.shade300,
-                  child: const Center(
-                    child: Icon(Icons.image, size: 80, color: Colors.grey),
-                  ),
-                ),
-                // Status bar overlay at bottom of image
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.6),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _statusItem(Icons.check_circle, 'Open', Colors.green),
-                        _statusItem(Icons.location_on, '3.9 km', Colors.white70),
-                        _statusItem(Icons.ev_station, '2', Colors.white70),
-                        _statusItem(Icons.check, 'Available', Colors.green),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            Container(
+              height: 200,
+              width: double.infinity,
+              color: Colors.grey.shade300,
+              child: const Center(
+                child: Icon(Icons.image, size: 80, color: Colors.grey),
+              ),
+            ),
+            // Status bar overlay at bottom of image
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _statusItem(Icons.check_circle, 'Open', Colors.green),
+                  _statusItem(Icons.location_on, '3.9 km', Colors.green),
+                  _statusItem(Icons.ev_station, '2', Colors.green),
+                  _statusItem(Icons.check, 'Available', Colors.green),
+                ],
+              ),
             ),
 
             // Station information
