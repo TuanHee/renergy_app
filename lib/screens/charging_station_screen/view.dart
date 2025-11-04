@@ -8,6 +8,7 @@ class ChargingStationScreenView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        
         actions: [
           IconButton(
             onPressed: () {},
