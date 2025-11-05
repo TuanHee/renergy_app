@@ -1,14 +1,54 @@
 import 'package:flutter/material.dart';
 
-class ChargingStationScreenView extends StatelessWidget {
+class ChargingStationScreenView extends StatefulWidget {
   const ChargingStationScreenView({super.key});
+
+  @override
+  State<ChargingStationScreenView> createState() => _ChargingStationScreenViewState();
+}
+
+class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
+  final ScrollController _scrollController = ScrollController();
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final scrollOffset = _scrollController.offset;
+    final imageHeight = 250.0;
+    
+    // Gradually increase opacity as user scrolls past the image
+    final newOpacity = (scrollOffset / imageHeight).clamp(0.0, 1.0);
+    if (_opacity != newOpacity) {
+      setState(() {
+        _opacity = newOpacity;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        
+        backgroundColor: Color(0xFFD32F2F).withValues(alpha: _opacity),
+        elevation: _opacity > 0 ? 4 : 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () {},
@@ -17,34 +57,13 @@ class ChargingStationScreenView extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header bar
-            // Container(
-            //   height: 120,
-            //   color: const Color(0xFFD32F2F),
-            //   child: SafeArea(
-            //     bottom: false,
-            //     child: Padding(
-            //       padding: const EdgeInsets.all(16.0),
-            //       child: Row(
-            //         children: [
-            //           IconButton(
-            //             onPressed: () => Navigator.pop(context),
-            //             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            //           ),
-            //           const Spacer(),
-                      
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
             // Charging station image
             Container(
-              height: 200,
+              height: 250,
               width: double.infinity,
               color: Colors.grey.shade300,
               child: const Center(
@@ -58,8 +77,8 @@ class ChargingStationScreenView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _statusItem(Icons.check_circle, 'Open', Colors.green),
-                  _statusItem(Icons.location_on, '3.9 km', Colors.green),
-                  _statusItem(Icons.ev_station, '2', Colors.green),
+                  _statusItem(Icons.location_on, '3.9 km', Colors.black),
+                  _statusItem(Icons.ev_station, '2', Colors.black),
                   _statusItem(Icons.check, 'Available', Colors.green),
                 ],
               ),
@@ -291,7 +310,7 @@ class ChargingStationScreenView extends StatelessWidget {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, -2),
               ),
@@ -373,8 +392,8 @@ class ChargingStationScreenView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withValues(alpha: 0.1),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -419,7 +438,7 @@ class ChargingStationScreenView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: const Text(
