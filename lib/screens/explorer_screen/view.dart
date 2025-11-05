@@ -9,70 +9,28 @@ class ExplorerScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'RECHARGE',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.0,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.notifications_none, color: Colors.white),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Map background and header
           Column(
             children: [
-              // Header bar
-              Container(
-                height: 110,
-                color: const Color(0xFFD32F2F),
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                // Logo placeholder
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'R',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'RECHARGE',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.notifications_none, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              // Map area
               Expanded(
                 child: Stack(
                   children: [
@@ -93,7 +51,7 @@ class ExplorerScreenView extends StatelessWidget {
                         children: [
                           _circleIconButton(Icons.refresh),
                           const SizedBox(height: 12),
-                          _circleIconButton(Icons.settings),
+                          _circleIconButton(Icons.gps_fixed),
                         ],
                       ),
                     ),
@@ -278,9 +236,9 @@ class _StationItem extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      _chip(label: 'Public', color: const Color(0xFF0BB07B)),
+                      MyBadge(label: 'Public', color: const Color(0xFF0BB07B)),
                       const SizedBox(width: 8),
-                      _chip(label: 'Showroom', color: Colors.black87, dark: true),
+                      MyBadge(label: 'Showroom', color: Colors.black87, dark: true),
                       const Spacer(),
                       const Icon(Icons.star_border, color: Colors.grey),
                     ],
@@ -329,25 +287,6 @@ class _StationItem extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _chip({required String label, required Color color, bool dark = false}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: dark ? Colors.black : color.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(6),
-      border: Border.all(color: dark ? Colors.black : color.withOpacity(0.2)),
-    ),
-    child: Text(
-      label,
-      style: TextStyle(
-        color: dark ? Colors.white : color,
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  );
 }
 
 Widget _circleIconButton(IconData icon) {
