@@ -1,10 +1,5 @@
 import 'package:get/get.dart';
-import 'package:renergy_app/screens/login_screen/login_screen.dart';
-import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
-import 'package:renergy_app/screens/charging_screen/charging_screen.dart';
-import 'package:renergy_app/screens/bookmark_screen/bookmark_screen.dart';
-import 'package:renergy_app/screens/account_screen/account_screen.dart';
-import 'package:renergy_app/screens/charging_station_screen/charging_station_screen.dart';
+import 'package:renergy_app/screens/screens.dart';
 
 class AppRoutes {
   // Route names
@@ -50,6 +45,7 @@ class AppRoutes {
         name: chargingStation,
         page: () => const ChargingStationScreenView(),
         transition: Transition.fadeIn,
+        binding: ChargingStationBinding(),
       ),
     ];
   }
