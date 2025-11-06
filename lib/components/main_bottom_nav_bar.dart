@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:renergy_app/routes/app_routes.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 
 class MainBottomNavBar extends StatelessWidget {
   final int currentIndex;

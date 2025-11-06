@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/components/components.dart';
-import 'package:renergy_app/routes/app_routes.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 
 class ExplorerScreenView extends StatelessWidget {
   const ExplorerScreenView({super.key});
