@@ -3,6 +3,7 @@ import 'package:renergy_app/screens/screens.dart';
 
 class AppRoutes {
   // Route names
+  static const String splash = '/splash';
   static const String login = '/login';
   static const String explorer = '/explorer';
   static const String charging = '/charging';
@@ -11,11 +12,17 @@ class AppRoutes {
   static const String chargingStation = '/charging-station';
 
   // Initial route
-  static const String initial = explorer;
+  static const String initial = splash;
 
   // Get all routes
   static List<GetPage> getPages() {
     return [
+      GetPage(
+        name: splash,
+        page: () => const SplashScreenView(),
+        transition: Transition.fadeIn,
+        binding: SplashBinding(),
+      ),
       GetPage(
         name: login,
         page: () => const LoginScreenView(),
@@ -25,11 +32,13 @@ class AppRoutes {
         name: explorer,
         page: () => const ExplorerScreenView(),
         transition: Transition.fadeIn,
+        binding: ExplorerBinding(),
       ),
       GetPage(
         name: charging,
         page: () => const ChargingScreenView(),
         transition: Transition.fadeIn,
+        binding: ChargingBinding(),
       ),
       GetPage(
         name: bookmark,
@@ -43,9 +52,9 @@ class AppRoutes {
       ),
       GetPage(
         name: chargingStation,
-        page: () => const ChargingStationScreenView(),
+        page: () => const StationScreenView(),
         transition: Transition.fadeIn,
-        binding: ChargingStationBinding(),
+        binding: StationBinding(),
       ),
     ];
   }

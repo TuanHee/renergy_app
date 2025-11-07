@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/constants/enums.dart';
+import 'package:renergy_app/common/models/bay.dart';
 import 'package:renergy_app/components/components.dart';
-import 'package:renergy_app/screens/charging_station_screen/charging_station_screen.dart';
+import 'package:renergy_app/screens/station_screen/station_screen.dart';
 
-class ChargingStationScreenView extends StatefulWidget {
-  const ChargingStationScreenView({super.key});
+class StationScreenView extends StatefulWidget {
+  const StationScreenView({super.key});
 
   @override
-  State<ChargingStationScreenView> createState() => _ChargingStationScreenViewState();
+  State<StationScreenView> createState() => _StationScreenViewState();
 }
 
-class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
+class _StationScreenViewState extends State<StationScreenView> {
   final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
 
@@ -42,8 +44,16 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ChargingStationController>(
+    return GetBuilder<StationController>(
       builder: (controller) {
+        if (controller.isLoading) {
+          return Scaffold(
+            body: const Center(child: CircularProgressIndicator(
+              color: Colors.red,
+            )),
+          );
+        }
+
         return Scaffold(
           backgroundColor: Colors.white,
           extendBodyBehindAppBar: true,
@@ -91,7 +101,7 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                       // Tags
                       Row(
                         children: [
-                          MyBadge(label: 'Public', color: Colors.grey),
+                          MyBadge(label: '${controller.station.type![0].toUpperCase()}${controller.station.type!.substring(1)}', color: const Color(0xFF0BB07B)),
                           const SizedBox(width: 8),
                           MyBadge(label: 'Showroom', color: Colors.black87),
                         ],
@@ -100,7 +110,7 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
         
                       // Title
                       Text(
-                        controller.stationName!,
+                        controller.station.name!,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -110,7 +120,7 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
         
                       // Address
                       Text(
-                        controller.address!,
+                        '${controller.station.address1!} ${controller.station.address2!}',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -128,11 +138,13 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                         ),
                       ),
                       const SizedBox(height: 12),
-        
-                      _chargingBayCard(controller, 'BAY01', '40kW DC', true),
-                      const SizedBox(height: 8),
-                      _chargingBayCard(controller, 'BAY02', '40kW DC', true),
-                      const SizedBox(height: 24),
+
+
+                      for (Bay bay in controller.station.bays!)...[
+                        _chargingBayCard(controller, bay),
+                        const SizedBox(height: 8),
+                      ],
+                      const SizedBox(height: 16),
         
                       // Promo Code Section
                       const Text(
@@ -180,7 +192,7 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      DropdownButtonFormField<String>(
+                      DropdownButtonFormField<int>(
                         decoration: InputDecoration(
                           hintText: 'No car selected',
                           border: OutlineInputBorder(
@@ -189,8 +201,17 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                           filled: true,
                           fillColor: Colors.grey.shade50,
                         ),
-                        items: const [],
-                        onChanged: (_) {},
+                        items: const [
+                          DropdownMenuItem<int>(
+                            value: 1,
+                            child: Text('ABC 123'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.selectCar(value);
+                          }
+                        },
                       ),
                       const SizedBox(height: 24),
         
@@ -343,7 +364,7 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               side: const BorderSide(color: Colors.red),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             ),
                           ),
@@ -351,15 +372,17 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: controller.selectedBay != null && controller.selectedCar != null ? controller.unlockBay : null,
                             icon: const Icon(Icons.lock_open),
                             label: const Text('Unlock Now'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey.shade300,
-                              foregroundColor: Colors.grey.shade600,
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: Colors.grey.shade500,
+                              disabledForegroundColor: Colors.grey.shade200,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             ),
                           ),
@@ -388,69 +411,113 @@ class _ChargingStationScreenViewState extends State<ChargingStationScreenView> {
     );
   }
 
-  Widget _chargingBayCard(ChargingStationController controller, String bayNumber, String power, bool available) {
-    final isSelected = controller.selectedBay == bayNumber;
+  Widget _chargingBayCard(StationController controller, Bay bay) {
+    final isSelected = controller.selectedBay == bay.id!;
     
     return InkWell(
-      onTap: () => controller.selectBay(bayNumber),
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      onTap: () => bay.status == BayStatus.available ? controller.selectBay(bay.id!) : null,
       borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          color: isSelected ? Colors.red.withValues(alpha: 0.05) : Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(5),
           border: Border.all(
             color: isSelected ? Colors.red : Colors.grey.shade200,
-            width: isSelected ? 2 : 1,
+            width: 1,
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Radio<String>(
-              value: bayNumber,
-              groupValue: controller.selectedBay,
-              onChanged: (value) {
-                if (value != null) {
-                  controller.selectBay(value);
-                }
-              },
-              activeColor: Colors.red,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    bayNumber,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          bay.name!,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '${bay.port!.outputPower}kW ${bay.port!.currentType}',
+                      ),
+                    ],
+                  ),                  
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: bay.status == BayStatus.available ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    power,
-                    style: TextStyle(color: Colors.grey.shade600),
+                    child: Text(
+                      bay.status?.value.toUpperCase() ?? '',
+                      style: TextStyle(
+                        color: bay.status == BayStatus.available ? Colors.green.shade700 : Colors.red.shade700,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: ClipRect(
+                child: isSelected
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: Colors.grey.shade200),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Radio<int>(
+                                  value: bay.id!,
+                                  groupValue: controller.selectedBay,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      controller.selectBay(value);
+                                    }
+                                  },
+                                  activeColor: Colors.red,
+                                ),
+                                SizedBox(width: 8,),
+                                Icon(Icons.ev_station, size: 16, color: Colors.grey.shade600),
+                                SizedBox(width: 16),
+                                Text(bay.port!.portType ?? 'Unknown'),
+                              ],
+                            ),
+                            Text('RM 0.99 / Kwh')
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
               ),
-              child: const Text(
-                'AVAILABLE',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+            )
           ],
         ),
       ),

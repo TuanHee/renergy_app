@@ -1,78 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/components/components.dart';
+import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatelessWidget {
   const ExplorerScreenView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'RECHARGE',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.0,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Map background and header
-          Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    Container(
-                      color: const Color(0xFFE9EEF4),
-                      child: const Center(
-                        child: Text(
-                          'Map Placeholder',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ),
-                    // Map floating controls (right side)
-                    Positioned(
-                      right: 12,
-                      top: 20,
-                      child: Column(
-                        children: [
-                          _circleIconButton(Icons.refresh),
-                          const SizedBox(height: 12),
-                          _circleIconButton(Icons.gps_fixed),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+    return GetBuilder<ExplorerController>(
+      builder: (controller) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'RECHARGE',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.0,
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none, color: Colors.white),
               ),
             ],
           ),
-          // Draggable bottom sheet
-          _BottomSheetPanel(),
-        ],
-      ),
-      // Bottom navigation bar
-      bottomNavigationBar: MainBottomNavBar(
-        currentIndex: 0,
-      ),
+          body: Stack(
+            children: [
+              // Map background and header
+              Column(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Container(
+                          color: const Color(0xFFE9EEF4),
+                          child: const Center(
+                            child: Text(
+                              'Map Placeholder',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                        // Map floating controls (right side)
+                        Positioned(
+                          right: 12,
+                          top: 20,
+                          child: Column(
+                            children: [
+                              _circleIconButton(Icons.refresh),
+                              const SizedBox(height: 12),
+                              _circleIconButton(Icons.gps_fixed),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // Draggable bottom sheet
+              _BottomSheetPanel(controller: controller),
+            ],
+          ),
+          // Bottom navigation bar
+          bottomNavigationBar: MainBottomNavBar(
+            currentIndex: 0,
+          ),
+        );
+      }
     );
   }
 }
 
 class _BottomSheetPanel extends StatelessWidget {
+  final ExplorerController controller;
+
+  const _BottomSheetPanel({required this.controller});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -178,14 +188,34 @@ class _BottomSheetPanel extends StatelessWidget {
                 const SizedBox(height: 12),
                 // Station list
                 Expanded(
-                  child: ListView.separated(
-                    padding: EdgeInsets.zero,
-                    controller: scrollController,
-                    itemCount: 5,
-                    separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade200),
-                    itemBuilder: (context, index) {
-                      return _StationItem(index: index);
-                    },
+                  child: RefreshIndicator(
+                    onRefresh: controller.fetchStations,
+                    child: controller.stations.isEmpty
+                        ? ListView(
+                            padding: EdgeInsets.zero,
+                            controller: scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: const [
+                              SizedBox(height: 60),
+                              Center(
+                                child: Text(
+                                  'No charging stations found',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                              ),
+                            ],
+                          )
+                        : ListView.separated(
+                            padding: EdgeInsets.zero,
+                            controller: scrollController,
+                            itemCount: controller.stations.length,
+                            separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade200),
+                            itemBuilder: (context, index) {
+                              return _StationItem(
+                                station: controller.stations[index],
+                              );
+                            },
+                          ),
                   ),
                 ),
               ],
@@ -198,9 +228,9 @@ class _BottomSheetPanel extends StatelessWidget {
 }
 
 class _StationItem extends StatelessWidget {
-  final int index;
+  final Station station;
   
-  const _StationItem({required this.index});
+  const _StationItem({required this.station});
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +238,7 @@ class _StationItem extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Get.toNamed(AppRoutes.chargingStation);
+        Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -236,7 +266,7 @@ class _StationItem extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      MyBadge(label: 'Public', color: const Color(0xFF0BB07B)),
+                      MyBadge(label: '${station.type![0].toUpperCase()}${station.type!.substring(1)}', color: const Color(0xFF0BB07B)),
                       const SizedBox(width: 8),
                       MyBadge(label: 'Showroom', color: Colors.black87, dark: true),
                       const Spacer(),
@@ -244,13 +274,13 @@ class _StationItem extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Crest Austin Sales Gallery',
+                  Text(
+                    station.name!,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Inside Crest@Austin Sales Gallery Car Park',
+                    station.shortDescription!,
                     style: TextStyle(color: muted, fontSize: 13),
                   ),
                   const SizedBox(height: 8),
@@ -262,9 +292,9 @@ class _StationItem extends StatelessWidget {
                       const SizedBox(width: 12),
                       Icon(Icons.ev_station, size: 16, color: muted),
                       const SizedBox(width: 4),
-                      Text('2', style: TextStyle(color: muted)),
+                      Text(station.bays!.length.toString(), style: TextStyle(color: muted)),
                       const SizedBox(width: 12),
-                      Text('Available', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+                      Text(station.isActive ? 'Available' : 'Unavailable', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600)),
                       const SizedBox(width: 4),
                       const Icon(Icons.bolt, size: 16, color: Colors.green),
                     ],

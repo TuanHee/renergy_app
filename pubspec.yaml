@@ -37,6 +37,8 @@ dependencies:
   get: ^4.7.2
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.1
+  dio: ^5.9.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
