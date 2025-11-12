@@ -118,9 +118,8 @@ class ChargingScreenView extends StatelessWidget {
                             const Divider(height: 32),
                             _buildDetailRow(Icons.attach_money, 'Cost (RM)', '0.99 / h'),
                             const Divider(height: 32),
-                          _buildDetailRow(Icons.battery_std, 'Battery (%)', controller.chargingStats?.meter?.soc != null ? '${controller.chargingStats!.meter!.soc}%' : '-'),
+                            _buildDetailRow(Icons.battery_std, 'Battery (%)', controller.chargingStats?.meter?.soc != null ? '${controller.chargingStats!.meter!.soc}%' : '-'),
                             const SizedBox(height: 16),
-                            
                           ],
                         ),
                       ),
