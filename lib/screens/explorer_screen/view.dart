@@ -243,7 +243,12 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: widget.controller.fetchStations,
-                    child: widget.controller.stations.isEmpty
+                    child: widget.controller.isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        :
+                    widget.controller.stations.isEmpty
                         ? ListView(
                             padding: EdgeInsets.zero,
                             controller: scrollController,

@@ -56,15 +56,11 @@ class ChargingController extends GetxController {
     final minutes = diff.inMinutes.remainder(60);
     final seconds = diff.inSeconds.remainder(60);
 
-    if (diff.inSeconds <= 0) {
-      timer.cancel();
-    }
-
     if (chargingStats?.status == ChargingStatsStatus.charging) {
       timer.cancel();
     }
 
-    return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    return '${minutes < 0 ? 'Idle Time (RM 1/5 mins):' : ''} ${twoDigits(minutes.abs())}:${twoDigits(seconds.abs())}';
   }
 
   Future<void> getChargingStats(Timer timer) async {
