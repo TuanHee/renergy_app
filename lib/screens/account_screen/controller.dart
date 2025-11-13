@@ -20,9 +20,5 @@ class AccountController extends GetxController {
       update();
     }
   }
-
-  Future<void> addPaymentMethod() async {
-    
-  }
 }
 
