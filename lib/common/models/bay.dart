@@ -9,7 +9,6 @@ class Bay {
   bool isActive;
   bool isInstalled;
   BayStatus? status;
-  bool hasParkingLock;
   String? parkingLockSerialNumber;
   String? createdAt;
   String? updatedAt;
@@ -22,7 +21,6 @@ class Bay {
     this.isActive = false,
     this.isInstalled = false,
     this.status,
-    this.hasParkingLock = false,
     this.parkingLockSerialNumber,
     this.createdAt,
     this.updatedAt,
@@ -37,7 +35,6 @@ class Bay {
       isActive: json['is_active'] == null ? false : bool.parse(json['is_active'].toString()),
       isInstalled: json['is_installed'] == null ? false : bool.parse(json['is_installed'].toString()),
       status: json['status'] == null ? null : BayStatus.fromString(json['status']),
-      hasParkingLock: json['has_parking_lock'] == null ? false : bool.parse(json['has_parking_lock'].toString()),
       parkingLockSerialNumber: json['parking_lock_serial_number'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],

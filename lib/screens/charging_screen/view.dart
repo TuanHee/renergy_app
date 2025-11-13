@@ -45,7 +45,12 @@ class ChargingScreenView extends StatelessWidget {
                     )
                   ),
                   const SizedBox(height: 16),
-                  Center(child: Text('Please connect the port to your vehicle', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
+                  Center(child: Column(
+                    children: [
+                      Text('Please connect the port to your vehicle within 15 minutes.\nIdle fees might apply after grace period.', 
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center,),
+                    ],
+                  )),
                   const SizedBox(height: 16),
                   OutlinedButton(onPressed: controller.cancelPending, child: const Text('Cancel')),
                 ],
