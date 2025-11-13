@@ -10,6 +10,8 @@ class AppRoutes {
   static const String bookmark = '/bookmark';
   static const String account = '/account';
   static const String chargingStation = '/charging-station';
+  static const String plugInLoading = '/plug-in-loading';
+  static const String chargeProcessing = '/charge-processing';
 
   // Initial route
   static const String initial = splash;
@@ -56,6 +58,18 @@ class AppRoutes {
         page: () => const StationScreenView(),
         transition: Transition.fadeIn,
         binding: StationBinding(),
+      ),
+      GetPage(
+        name: plugInLoading,
+        page: () => const PlugInLoadingScreenView(),
+        transition: Transition.fadeIn,
+        binding: PlugInLoadingBinding(),
+      ),
+      GetPage(
+        name: chargeProcessing,
+        page: () => const ChargeProcessingScreenView(),
+        transition: Transition.fadeIn,
+        binding: ChargeProcessingBinding(),
       ),
     ];
   }
