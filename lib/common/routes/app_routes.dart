@@ -49,6 +49,7 @@ class AppRoutes {
         name: account,
         page: () => const AccountScreenView(),
         transition: Transition.fadeIn,
+        binding: AccountBinding(),
       ),
       GetPage(
         name: chargingStation,

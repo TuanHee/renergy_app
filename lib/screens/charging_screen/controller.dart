@@ -48,7 +48,7 @@ class ChargingController extends GetxController {
         chargingStats = ChargingStats.fromJson(res.data['data']['charging_stats']);
 
         if (chargingStats!.status == ChargingStatsStatus.charging) {
-          inspect(chargingStats!.status);
+          inspect(chargingStats);
 
           status = ChargingStatus.charging;
         }
@@ -64,9 +64,9 @@ class ChargingController extends GetxController {
       }
       update();
     } catch (e) {
+      timer.cancel();
       print(e);
       Get.snackbar('Error', 'Failed to get charging stats', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white,);
-      timer.cancel();
     }
   }
 

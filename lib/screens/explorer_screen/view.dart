@@ -78,19 +78,63 @@ class ExplorerScreenView extends StatelessWidget {
   }
 }
 
-class _BottomSheetPanel extends StatelessWidget {
+class _BottomSheetPanel extends StatefulWidget {
   final ExplorerController controller;
 
   const _BottomSheetPanel({required this.controller});
+
+  @override
+  State<_BottomSheetPanel> createState() => _BottomSheetPanelState();
+}
+
+class _BottomSheetPanelState extends State<_BottomSheetPanel> {
+  static const double _collapsedSize = 0.35;
+  static const double _expandedSize = 0.70;
+
+  late final DraggableScrollableController _sheetController;
+  double _currentSize = _collapsedSize;
+
+  @override
+  void initState() {
+    super.initState();
+    _sheetController = DraggableScrollableController();
+    _sheetController.addListener(_handleSheetSizeChanged);
+  }
+
+  @override
+  void dispose() {
+    _sheetController.removeListener(_handleSheetSizeChanged);
+    _sheetController.dispose();
+    super.dispose();
+  }
+
+  void _handleSheetSizeChanged() {
+    final sheetSize = _sheetController.size;
+    if ((sheetSize - _currentSize).abs() > 0.001) {
+      setState(() {
+        _currentSize = sheetSize;
+      });
+    }
+  }
+
+  Future<void> _toggleSheet() async {
+    final targetSize = _currentSize < (_collapsedSize + _expandedSize) / 2 ? _expandedSize : _collapsedSize;
+    await _sheetController.animateTo(
+      targetSize,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.35,
-      minChildSize: 0.35,
-      maxChildSize: 0.70,
+      controller: _sheetController,
+      initialChildSize: _collapsedSize,
+      minChildSize: _collapsedSize,
+      maxChildSize: _expandedSize,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
@@ -113,14 +157,23 @@ class _BottomSheetPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Drag handle
-                Center(
+                InkWell(
+                  focusColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  onTap: () {
+                    _toggleSheet();
+                  },
                   child: Container(
-                    width: 32,
-                    height: 4,
-                    margin: const EdgeInsets.only(top: 12, bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(4),
+                    margin: const EdgeInsets.only(top: 8, bottom: 16),
+                    child: Center(
+                      child: Icon(
+                        _currentSize <= (_collapsedSize + _expandedSize) / 2
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        color: Colors.red.shade700,
+                        size: 24
+                      ),
                     ),
                   ),
                 ),
@@ -189,8 +242,8 @@ class _BottomSheetPanel extends StatelessWidget {
                 // Station list
                 Expanded(
                   child: RefreshIndicator(
-                    onRefresh: controller.fetchStations,
-                    child: controller.stations.isEmpty
+                    onRefresh: widget.controller.fetchStations,
+                    child: widget.controller.stations.isEmpty
                         ? ListView(
                             padding: EdgeInsets.zero,
                             controller: scrollController,
@@ -208,11 +261,11 @@ class _BottomSheetPanel extends StatelessWidget {
                         : ListView.separated(
                             padding: EdgeInsets.zero,
                             controller: scrollController,
-                            itemCount: controller.stations.length,
+                            itemCount: widget.controller.stations.length,
                             separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade200),
                             itemBuilder: (context, index) {
                               return _StationItem(
-                                station: controller.stations[index],
+                                station: widget.controller.stations[index],
                               );
                             },
                           ),
