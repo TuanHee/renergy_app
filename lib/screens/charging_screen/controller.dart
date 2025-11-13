@@ -14,6 +14,9 @@ class ChargingController extends GetxController {
   ChargingStats? chargingStats;
   Order? order;
   String callStatus = 'start';
+  String pendingIdleTime = '';
+  Timer? idleTimer;
+  Timer? chargingTimer;
 
   @override
   void onInit() {
@@ -34,10 +37,34 @@ class ChargingController extends GetxController {
   Future<void> pullingData() async {
     callStatus = 'start';
     update();
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
+    idleTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      pendingIdleTime = getPendingIdleTime(timer);
+      update();
+    });
+    chargingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       await getChargingStats(timer);
     });
     update();
+  }
+
+  String getPendingIdleTime(Timer timer) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final createdAt = DateTime.parse(order!.createdAt!);
+    final idleEndTime = createdAt.add(const Duration(minutes: 15));
+    final now = DateTime.now();
+    final diff = idleEndTime.difference(now);
+    final minutes = diff.inMinutes.remainder(60);
+    final seconds = diff.inSeconds.remainder(60);
+
+    if (diff.inSeconds <= 0) {
+      timer.cancel();
+    }
+
+    if (chargingStats?.status == ChargingStatsStatus.charging) {
+      timer.cancel();
+    }
+
+    return '${twoDigits(minutes)}:${twoDigits(seconds)}';
   }
 
   Future<void> getChargingStats(Timer timer) async {
@@ -84,6 +111,23 @@ class ChargingController extends GetxController {
       backgroundColor: Colors.red,
       colorText: Colors.white,
       );
+    }
+  }
+
+  Future<void> cancelPending() async{
+    try {
+      final res = await Api().delete(Endpoints.order(order!.id!));
+
+      if (res.data['status'] == 200) {
+        idleTimer?.cancel();
+        chargingTimer?.cancel();
+        status = ChargingStatus.none;
+        update();
+      }
+
+    } catch (e) {
+      print(e);
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white,);
     }
   }
 }

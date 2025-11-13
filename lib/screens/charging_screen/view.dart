@@ -37,9 +37,17 @@ class ChargingScreenView extends StatelessWidget {
                       ),
                   ),
                   const SizedBox(height: 16),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300), 
+                    child: Text(
+                      controller.pendingIdleTime,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                    )
+                  ),
+                  const SizedBox(height: 16),
                   Center(child: Text('Please connect the port to your vehicle', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600), textAlign: TextAlign.center,)),
                   const SizedBox(height: 16),
-                  OutlinedButton(onPressed: () {}, child: const Text('Cancel')),
+                  OutlinedButton(onPressed: controller.cancelPending, child: const Text('Cancel')),
                 ],
               ),
             );

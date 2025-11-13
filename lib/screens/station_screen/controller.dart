@@ -54,7 +54,7 @@ class StationController extends GetxController {
   Future<void> unlockBay() async {
     try {
       final res = await Api().post(
-        Endpoints.order, 
+        Endpoints.orders, 
         data:{
           'bay_id': selectedBay!,
           'vehicle_id': selectedCar!,

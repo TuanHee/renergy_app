@@ -35,13 +35,13 @@ class ExplorerController extends GetxController {
       } else {
         errorMessage = res.data['message'] ?? 'Failed to fetch stations';
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       errorMessage = e.toString();
-      log('ExplorerController.fetchStations error: $e', stackTrace: stackTrace);
+      print('ExplorerController.fetchStations error: $e');
+    } finally {
+      isLoading = false;
+      update();
     }
-
-    isLoading = false;
-    update();
   }
 
   int getAvailableBayCount(Station station) {
