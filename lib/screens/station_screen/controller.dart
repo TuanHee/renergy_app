@@ -64,7 +64,7 @@ class StationController extends GetxController {
 
       if (res.data['status'] == 200) {
         Order order = Order.fromJson(res.data['data']['order']);
-        Get.offAllNamed(AppRoutes.charging, arguments: order);
+        Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
       } else {
         Get.snackbar(
           'Error',

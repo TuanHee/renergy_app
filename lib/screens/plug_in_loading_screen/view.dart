@@ -190,10 +190,10 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                       Row(
                         children: [
                           Expanded(
-                            child: _buildInfoItem('Charger ID', 'CH-A042'),
+                            child: _buildInfoItem('Charger ID', controller.order!.chargerId!.toString()),
                           ),
                           Expanded(
-                            child: _buildInfoItem('Power Output', '50 kW'),
+                            child: _buildInfoItem('Station', '${controller.order!.station!.name ?? 'N/A'}'),
                           ),
                         ],
                       ),
@@ -201,9 +201,9 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                       Row(
                         children: [
                           Expanded(
-                            child: _buildInfoItem('Location', 'Station 3'),
+                            child: _buildInfoItem('Power Output', '${controller.order!.bay!.port!.outputPower} kW'),
                           ),
-                          Expanded(child: _buildInfoItem('Type', 'CCS2')),
+                          Expanded(child: _buildInfoItem('Type', '${controller.order!.bay!.port!.portType}')),
                         ],
                       ),
                     ],

@@ -10,14 +10,16 @@ import 'package:renergy_app/components/components.dart';
 class PlugInLoadingController extends GetxController {
   Order? order;
   String status = 'ready';
-  int remainSecond = 10 * 60;
+  int remainSecond = 15 * 60;
 
   Timer? remainSecondTimer;
+  Timer? apiTimer;
 
   @override
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order;
+    print(order?.toJson());
 
     pollPlugStatus();
     countDownWaitingTime();
@@ -46,17 +48,22 @@ class PlugInLoadingController extends GetxController {
 
   void pollPlugStatus() async {
     try {
-      Timer.periodic(const Duration(seconds: 2), (timer) async {
-        if (status == ChargingStatus.charging.name || status == ChargingStatus.stopped.name) {
+      apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+        if (status == ChargingStatus.charging.name) {
+          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
+          remainSecondTimer?.cancel();
+          timer.cancel();
+          return;
+        }
+
+        if (status == ChargingStatus.stopped.name) {
+          Get.offAllNamed(AppRoutes.charging, arguments: order);
+          remainSecondTimer?.cancel();
           timer.cancel();
           return;
         }
 
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
-
-        Get.log(
-          'Polling charger status: ${res.data['data']['charging_stats']['status']}',
-        );
 
         if (res.data['status'] == 400) {
           final data = res.data['data'];
@@ -65,9 +72,8 @@ class PlugInLoadingController extends GetxController {
             status = data['charging_stats']['status'];
           }
         }
-      });
 
-      Get.offAllNamed(AppRoutes.chargeProcessing);
+      });
     } catch (e, stackTrace) {
       Get.log('Error: $e, stackTrace: $stackTrace');
     }
@@ -79,6 +85,7 @@ class PlugInLoadingController extends GetxController {
 
       if (res.data['status'] == 200) {
         remainSecondTimer?.cancel();
+        apiTimer?.cancel();
         status = ChargingStatus.stopped.name;
         update();
       }

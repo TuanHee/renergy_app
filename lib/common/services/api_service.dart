@@ -262,7 +262,14 @@ class Api {
       if (e.response?.statusCode == 401) {
         // StorageService.to.remove(storageAccessToken);
       }
-      throw e.message.toString();
+
+      if(e.message is String){
+        throw e.message.toString();
+      }
+      else{
+         throw 'e.message type error: ${e.message.runtimeType}';
+      }
+      
     } catch (e) {
       throw e.toString();
     }
