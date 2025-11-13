@@ -9,6 +9,10 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
+  - fiuu-mobile-xdk-cocoapods (3.34.7)
+  - fiuu_mobile_xdk_flutter (1.0.1):
+    - fiuu-mobile-xdk-cocoapods (~> 3.34.7)
+    - Flutter
   - Flutter (1.0.0)
   - google_sign_in_ios (0.0.1):
     - Flutter
@@ -45,6 +49,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - fiuu_mobile_xdk_flutter (from `.symlinks/plugins/fiuu_mobile_xdk_flutter/ios`)
   - Flutter (from `Flutter`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -54,6 +59,7 @@ SPEC REPOS:
   trunk:
     - AppAuth
     - AppCheckCore
+    - fiuu-mobile-xdk-cocoapods
     - GoogleSignIn
     - GoogleUtilities
     - GTMAppAuth
@@ -61,6 +67,8 @@ SPEC REPOS:
     - PromisesObjC
 
 EXTERNAL SOURCES:
+  fiuu_mobile_xdk_flutter:
+    :path: ".symlinks/plugins/fiuu_mobile_xdk_flutter/ios"
   Flutter:
     :path: Flutter
   google_sign_in_ios:
@@ -73,6 +81,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
+  fiuu-mobile-xdk-cocoapods: c6eb91dfca51f10a692baf61dec40f5f715c46f5
+  fiuu_mobile_xdk_flutter: 5de6662a52f2f3e7f5862bf14620fb4de87248ce
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   google_sign_in_ios: 055d43c4754f2860a53decd5133b78d05615fffd
   GoogleSignIn: c7f09cfbc85a1abf69187be091997c317cc33b77
@@ -83,6 +93,6 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
   sign_in_with_apple: f3bf75217ea4c2c8b91823f225d70230119b8440
 
-PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+PODFILE CHECKSUM: 1857a7cdb7dfafe45f2b0e9a9af44644190f7506
 
 COCOAPODS: 1.16.2
