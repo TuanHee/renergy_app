@@ -193,6 +193,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<int>(
+                        initialValue: controller.selectedCar,
                         decoration: InputDecoration(
                           hintText: 'No car selected',
                           border: OutlineInputBorder(
