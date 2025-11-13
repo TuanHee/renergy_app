@@ -26,6 +26,7 @@ class StationController extends GetxController {
     isLoading = true;
     await initStation();
     isLoading = false;
+    selectCar(1);
     update();
   }
 

@@ -36,7 +36,9 @@ class AccountScreenView extends StatelessWidget {
                               _AccountActionTile(
                                 icon: Icons.credit_card,
                                 label: 'Payment Method',
-                                onTap: controller.addPaymentMethod,
+                                onTap: () {
+                                  // TODO: Implement payment method navigation
+                                },
                               ),
                               const SizedBox(height: 12),
                               const _AccountActionTile(
