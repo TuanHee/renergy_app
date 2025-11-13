@@ -58,6 +58,27 @@ class OrderLine {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'order_id': orderId,
+      'orderable_type': orderableType,
+      'orderable_id': orderableId,
+      'quantity': quantity,
+      'uom': uom,
+      'unit_price': unitPrice,
+      'subtotal_amount': subtotalAmount,
+      'discount_percentage': discountPercentage,
+      'discount_amount': discountAmount,
+      'tax_percentage': taxPercentage,
+      'tax_amount': taxAmount,
+      'net_amount': netAmount,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'orderable': orderable?.toJson(),
+    };
+  }
+
   static List<OrderLine> listFromJson(dynamic json) {
     return json == null ? [] : List<OrderLine>.from(json.map((x) => OrderLine.fromJson(x)));
   }

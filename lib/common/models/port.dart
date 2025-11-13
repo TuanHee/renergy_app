@@ -44,6 +44,23 @@ class Port {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'charger_id': chargerId,
+      'bay_id': bayId,
+      'connector_id': connectorId,
+      'output_power': outputPower,
+      'output_current': outputCurrent,
+      'current_type': currentType,
+      'port_type': portType,
+      'status': status,
+      'is_active': isActive,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
+  }
+
   static List<Port> listFromJson(dynamic json) {
     return json == null ? [] : List<Port>.from(json.map((x) => Port.fromJson(x)));
   }

@@ -47,6 +47,24 @@ class ChargingTransaction {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'id_tag': idTag,
+      'charger_port_id': chargerPortId,
+      'status': status,
+      'started_at': startedAt,
+      'stopped_at': stoppedAt,
+      'stop_reason': stopReason,
+      'duration_minutes': durationMinutes,
+      'meter_start_value': meterStartValue,
+      'meter_stop_value': meterStopValue,
+      'usage': usage,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
+  }
+
   static List<ChargingTransaction> listFromJson(dynamic json) {
     return json == null ? [] : List<ChargingTransaction>.from(json.map((x) => ChargingTransaction.fromJson(x)));
   }

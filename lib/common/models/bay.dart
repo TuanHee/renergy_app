@@ -42,6 +42,21 @@ class Bay {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'station_id': stationId,
+      'name': name,
+      'is_active': isActive,
+      'is_installed': isInstalled,
+      'status': status?.toString().split('.').last,
+      'parking_lock_serial_number': parkingLockSerialNumber,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'port': port?.toJson(),
+    };
+  }
+
   static List<Bay> listFromJson(dynamic json) {
     return json == null ? [] : List<Bay>.from(json.map((x) => Bay.fromJson(x)));
   }

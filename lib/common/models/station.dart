@@ -67,6 +67,30 @@ class Station {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'company_id': companyId,
+      'name': name,
+      'type': type,
+      'short_description': shortDescription,
+      'description': description,
+      'is_active': isActive,
+      'address1': address1,
+      'address2': address2,
+      'state': state,
+      'country_id': countryId,
+      'latitude': latitude,
+      'longitude': longitude,
+      'max_current': maxCurrent,
+      'is_allow_reserve': isAllowReserve,
+      'fee_set_id': feeSetId,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'bays': bays?.map((b) => b.toJson()).toList(),
+    };
+  }
+
   static List<Station> listFromJson(dynamic json) {
     return json == null ? [] : List<Station>.from(json.map((x) => Station.fromJson(x)));
   }
