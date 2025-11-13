@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 import 'controller.dart';
 
-class PlugInLoadingBinding extends Bindings {
+class ChargeProcessingBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(PlugInLoadingController());
+    Get.put(ChargeProcessingController(
+    ));
   }
 }
+

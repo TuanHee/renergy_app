@@ -1,40 +1,34 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
+import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/components.dart';
 
 class PlugInLoadingController extends GetxController {
-  int chargerId;
-  int powerOutput;
-  String location;
-  String type;
+  Order? order;
   String status = 'ready';
   int remainSecond = 10 * 60;
+
+  Timer? remainSecondTimer;
 
   @override
   void onInit() async {
     super.onInit();
+    order = Get.arguments as Order;
+
     pollPlugStatus();
     countDownWaitingTime();
     update();
   }
 
-  PlugInLoadingController({
-    required this.chargerId,
-    required this.powerOutput,
-    required this.location,
-    required this.type,
-  });
-
   void countDownWaitingTime() {
     DateTime now = DateTime.now();
     DateTime endTime = now.add(Duration(seconds: remainSecond));
 
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    remainSecondTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (status == ChargingStatus.stopped.name || status == ChargingStatus.charging.name) {
         timer.cancel();
         return;
@@ -58,7 +52,7 @@ class PlugInLoadingController extends GetxController {
           return;
         }
 
-        final res = await Api().get(Endpoints.chargingStats(chargerId));
+        final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
         Get.log(
           'Polling charger status: ${res.data['data']['charging_stats']['status']}',
@@ -75,17 +69,22 @@ class PlugInLoadingController extends GetxController {
 
       Get.offAllNamed(AppRoutes.chargeProcessing);
     } catch (e, stackTrace) {
-      Get.log('pollChargerStatus error: $e, stackTrace: $stackTrace');
+      Get.log('Error: $e, stackTrace: $stackTrace');
     }
   }
 
-  void cancelCharge() async {
+ Future<void> cancelPending() async{
     try {
-      await Api().post(Endpoints.stopCharging(chargerId));
-      status = ChargingStatus.stopped.name;
-      Get.offAllNamed(AppRoutes.explorer);
-    } catch (e, stackTrace) {
-      Get.log('cancelCharging error: $e, stackTrace: $stackTrace');
+      final res = await Api().delete(Endpoints.order(order!.id!));
+
+      if (res.data['status'] == 200) {
+        remainSecondTimer?.cancel();
+        status = ChargingStatus.stopped.name;
+        update();
+      }
+
+    } catch (e) {
+      Snackbar.showError('Error ${ e.toString()}',Get.context!);
     }
   }
 }

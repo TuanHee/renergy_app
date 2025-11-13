@@ -51,7 +51,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.find<PlugInLoadingController>().cancelCharge();
+              Get.find<PlugInLoadingController>().cancelPending();
               Snackbar.showSuccess('Charging session stopped', context);
             },
             child: const Text('Stop', style: TextStyle(color: Colors.red)),
