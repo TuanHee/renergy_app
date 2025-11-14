@@ -29,17 +29,19 @@ class ChargeProcessingController extends GetxController {
 
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
-        chargingStats = ChargingStats.fromJson(res.data['data']['charging_stats']);
-
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
 
           if (data['charging_stats']['status'] is String) {
             status = data['charging_stats']['status'];
           }
+
+          chargingStats = ChargingStats.fromJson(
+            res.data['data']['charging_stats'],
+          );
+          update();
         }
       }
-
     } catch (e, stackTrace) {
       errorMessage = 'Error: $e, stackTrace: $stackTrace';
       update();
@@ -50,7 +52,7 @@ class ChargeProcessingController extends GetxController {
     final res = await Api().post(Endpoints.stopCharging(order!.id!));
 
     if (res.data['status'] == 200) {
-      Snackbar.showSuccess(res.data['data']['status'],Get.context!);
+      Snackbar.showSuccess(res.data['data']['status'], Get.context!);
       update();
     } else {
       errorMessage = res.data['message'] ?? 'Failed to stop charging';
@@ -58,4 +60,3 @@ class ChargeProcessingController extends GetxController {
     }
   }
 }
-

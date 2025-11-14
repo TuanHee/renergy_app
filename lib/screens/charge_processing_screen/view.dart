@@ -86,258 +86,260 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {},
-                    ),
-                    const Text(
-                      'Charging',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
+          child: GetBuilder<ChargeProcessingController>(
+            builder: (controller) => Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(height: 20),
-                      
-                      // Battery Level Display
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Pulsing background
-                          AnimatedBuilder(
-                            animation: _pulseAnimation,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _pulseAnimation.value * 0.3,
-                                child: Container(
-                                  width: 200,
-                                  height: 200,
-                                  decoration: const BoxDecoration(
-                                    color: Color.fromARGB(255, 53, 220, 38), // red-600
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          
-                          // Main circle
-                          Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // Progress indicator
-                                SizedBox(
-                                  width: 160,
-                                  height: 160,
-                                  child: CircularProgressIndicator(
-                                    value: (controller.chargingStats?.meter?.soc ?? 0) / 100.0,
-                                    strokeWidth: 8,
-                                    backgroundColor: const Color.fromARGB(255, 226, 254, 226),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(
-                                      Color.fromARGB(255, 82, 240, 34), // red-600
-                                    ),
-                                  ),
-                                ),
-                                
-                                // Battery percentage
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${(controller.chargingStats?.meter?.soc ?? 0).toStringAsFixed(0)}%',
-                                      style: const TextStyle(
-                                        fontSize: 42,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1F2937),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    AnimatedBuilder(
-                                      animation: _pulseAnimation,
-                                      builder: (context, child) {
-                                        return Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.bolt,
-                                              size: 16,
-                                              color: Color.lerp(
-                                                const Color.fromARGB(255, 40, 230, 56),
-                                                const Color.fromARGB(255, 68, 239, 82),
-                                                _pulseAnimation.value,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            const Text(
-                                              'Charging',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Color(0xFF6B7280),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {},
                       ),
-                      
-                      const SizedBox(height: 40),
-                      
-                      // Charging Stats Cards
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.speed,
-                              label: 'Port Type',
-                              value: controller.order?.bay?.port?.portType ?? '-',
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.access_time,
-                              label: 'Output Power (kW)',
-                              value: '${controller.order!.bay!.port!.outputPower} kW',
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 12),
-                      
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.battery_charging_full,
-                              label: 'Energy Added',
-                              value: '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.attach_money,
-                              label: 'Current Cost',
-                              value: 'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Session Details
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Session Details',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1F2937),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _buildDetailRow('Charger ID', controller.order!.chargerId!.toString()),
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Location', controller.order!.station!.name!),
-                            const SizedBox(height: 12),
-                            _buildDetailRow('Start Time', controller.chargingStats?.startAt ?? ''),
-                            const SizedBox(height: 12),
-                            // _buildDetailRow('Rate', '\$${controller.order!.!.toStringAsFixed(2)}/kWh'),
-                            _buildDetailRow('Rate (RM)', '0.99/kWh'),
-                          ],
+                      const Text(
+                        'Charging',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Stop Charging Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: _stopCharging,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFFDC2626),
-                            side: const BorderSide(color: Color(0xFFDC2626), width: 2),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Stop Charging',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        onPressed: () {},
                       ),
-                      
-                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
-              ),
-            ],
+                
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        
+                        // Battery Level Display
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Pulsing background
+                            AnimatedBuilder(
+                              animation: _pulseAnimation,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _pulseAnimation.value * 0.3,
+                                  child: Container(
+                                    width: 200,
+                                    height: 200,
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromARGB(255, 53, 220, 38), // red-600
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            
+                            // Main circle
+                            Container(
+                              width: 180,
+                              height: 180,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // Progress indicator
+                                  SizedBox(
+                                    width: 160,
+                                    height: 160,
+                                    child: CircularProgressIndicator(
+                                      value: (controller.chargingStats?.meter?.soc ?? 0) / 100.0,
+                                      strokeWidth: 8,
+                                      backgroundColor: const Color.fromARGB(255, 226, 254, 226),
+                                      valueColor: const AlwaysStoppedAnimation<Color>(
+                                        Color.fromARGB(255, 82, 240, 34), // red-600
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  // Battery percentage
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${(controller.chargingStats?.meter?.soc ?? 0).toStringAsFixed(0)}%',
+                                        style: const TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF1F2937),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      AnimatedBuilder(
+                                        animation: _pulseAnimation,
+                                        builder: (context, child) {
+                                          return Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.bolt,
+                                                size: 16,
+                                                color: Color.lerp(
+                                                  const Color.fromARGB(255, 40, 230, 56),
+                                                  const Color.fromARGB(255, 68, 239, 82),
+                                                  _pulseAnimation.value,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              const Text(
+                                                'Charging',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Color(0xFF6B7280),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Charging Stats Cards
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.speed,
+                                label: 'Port Type',
+                                value: controller.order?.bay?.port?.portType ?? '-',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.access_time,
+                                label: 'Output Power (kW)',
+                                value: '${controller.order!.bay!.port!.outputPower} kW',
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.battery_charging_full,
+                                label: 'Energy Added',
+                                value: '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatCard(
+                                icon: Icons.attach_money,
+                                label: 'Current Cost',
+                                value: 'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Session Details
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Session Details',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1F2937),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _buildDetailRow('Charger ID', controller.order!.chargerId!.toString()),
+                              const SizedBox(height: 12),
+                              _buildDetailRow('Location', controller.order!.station!.name!),
+                              const SizedBox(height: 12),
+                              _buildDetailRow('Start Time', controller.chargingStats?.startAt ?? ''),
+                              const SizedBox(height: 12),
+                              // _buildDetailRow('Rate', '\$${controller.order!.!.toStringAsFixed(2)}/kWh'),
+                              _buildDetailRow('Rate (RM)', '0.99/kWh'),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Stop Charging Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: _stopCharging,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFDC2626),
+                              side: const BorderSide(color: Color(0xFFDC2626), width: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Stop Charging',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
