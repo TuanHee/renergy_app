@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'controller.dart';
 
-class ChargeProcessingBinding extends Bindings {
+class CardBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(CardController(

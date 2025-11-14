@@ -6,6 +6,7 @@ class AppTheme {
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFD32F2F),
+          iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
             color: Colors.white,
             fontSize: 18,

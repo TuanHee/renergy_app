@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/screens/account_screen/account_screen.dart';
 
@@ -37,7 +38,7 @@ class AccountScreenView extends StatelessWidget {
                                 icon: Icons.credit_card,
                                 label: 'Payment Method',
                                 onTap: () {
-                                  // TODO: Implement payment method navigation
+                                  Get.toNamed(AppRoutes.card);
                                 },
                               ),
                               const SizedBox(height: 12),
@@ -89,6 +90,7 @@ class AccountScreenView extends StatelessWidget {
                                   child: const Text(
                                     'Logout',
                                     style: TextStyle(
+                                      color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -96,15 +98,23 @@ class AccountScreenView extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              TextButton(
-                                onPressed: () {
-                                  // TODO: Implement account deletion
-                                },
-                                child: const Text(
-                                  'Delete Account',
-                                  style: TextStyle(
-                                    color: Color(0xFF666666),
-                                    fontWeight: FontWeight.w600,
+                              Container(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    // TODO: Implement account deletion
+                                  },
+                                  child: const Text(
+                                    'Delete Account',
+                                    style: TextStyle(
+                                      color: Color(0xFF666666),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),

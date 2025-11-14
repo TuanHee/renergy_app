@@ -7,3 +7,4 @@ export 'account_screen/account_screen.dart';
 export 'station_screen/station_screen.dart';
 export 'plug_in_loading_screen/plug_in_loading_screen.dart';
 export 'charge_processing_screen/charge_processing_screen.dart';
+export 'card_screen/card_screen.dart';
