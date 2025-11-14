@@ -42,9 +42,12 @@ class AccountScreenView extends StatelessWidget {
                                 },
                               ),
                               const SizedBox(height: 12),
-                              const _AccountActionTile(
+                              _AccountActionTile(
                                 icon: Icons.directions_car,
                                 label: 'My Car',
+                                onTap: () {
+                                  Get.toNamed(AppRoutes.car);
+                                },
                               ),
                               const SizedBox(height: 12),
                               const _AccountActionTile(

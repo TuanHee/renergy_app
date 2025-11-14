@@ -14,6 +14,7 @@ class AppRoutes {
   static const String chargeProcessing = '/charge-processing';
   static const String card = '/card';
   static const String recharge = '/recharge';
+  static const String car = '/car';
   static const String addCar = '/add-car';
 
   // Initial route
@@ -85,6 +86,12 @@ class AppRoutes {
         page: () => const RechargeScreenView(),
         transition: Transition.fadeIn,
         binding: RechargeBinding(),
+      ),
+      GetPage(
+        name: car,
+        page: () => const CarScreenView(),
+        transition: Transition.fadeIn,
+        binding: CarBinding(),
       ),
       GetPage(
         name: addCar,
