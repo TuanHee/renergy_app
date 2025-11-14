@@ -48,14 +48,14 @@ class PlugInLoadingController extends GetxController {
   void pollPlugStatus() async {
     try {
       apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-        if (status == ChargingStatus.charging.name) {
-          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
+        if (status == ChargingStatus.charging.value) {
           remainSecondTimer?.cancel();
           timer.cancel();
+          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
           return;
         }
 
-        if (status == ChargingStatus.stopped.name) {
+        if (status == ChargingStatus.stopped.value) {
           Get.offAllNamed(AppRoutes.charging, arguments: order);
           remainSecondTimer?.cancel();
           timer.cancel();
@@ -75,6 +75,7 @@ class PlugInLoadingController extends GetxController {
       });
     } catch (e, stackTrace) {
       errorMessage = 'Error: $e, stackTrace: $stackTrace';
+      Get.log(errorMessage);
       update();
     }
   }
@@ -88,6 +89,7 @@ class PlugInLoadingController extends GetxController {
         apiTimer?.cancel();
         status = ChargingStatus.stopped.name;
         update();
+        Get.offAllNamed(AppRoutes.charging);
       }
 
     } catch (e, stackTrace) {
