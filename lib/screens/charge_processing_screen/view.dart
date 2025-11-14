@@ -261,7 +261,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             child: _buildStatCard(
                               icon: Icons.attach_money,
                               label: 'Current Cost',
-                              value: 'RM ${controller.chargingStats!.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
+                              value: 'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
                             ),
                           ),
                         ],
