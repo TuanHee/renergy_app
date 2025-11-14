@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../components/main_bottom_nav_bar.dart';
 import '../../components/snackbar.dart';
 import 'controller.dart';
 
@@ -69,6 +70,9 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       Snackbar.showError(controller.errorMessage, context);
     }
     return Scaffold(
+      bottomNavigationBar: const MainBottomNavBar(
+        currentIndex: 1,
+      ),
       body: SafeArea(
         child: Center(
           child: Container(

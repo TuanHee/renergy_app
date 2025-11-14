@@ -58,3 +58,22 @@ enum ChargingStatsStatus {
     return null;
   }
 }
+
+enum ParkingStatus {
+  available('Available'),
+  reserved('Reserved'),
+  unavailable('Unavailable');
+
+  const ParkingStatus(this.value);
+  final String value;
+
+  static ParkingStatus? fromString(String? value) {
+    if (value == null) return null;
+    for (ParkingStatus status in ParkingStatus.values) {
+      if (status.value == value) {
+        return status;
+      }
+    }
+    return null;
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:renergy_app/components/main_bottom_nav_bar.dart';
 import '../../components/snackbar.dart';
 import 'controller.dart';
 
@@ -72,8 +73,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ChargeProcessingController>();
     return Scaffold(
+      bottomNavigationBar: const MainBottomNavBar(
+        currentIndex: 1,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
