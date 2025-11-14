@@ -5,12 +5,12 @@ import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
-import 'package:renergy_app/components/components.dart';
 
 class PlugInLoadingController extends GetxController {
   Order? order;
   String status = 'ready';
   int remainSecond = 15 * 60;
+  String errorMessage = '';
 
   Timer? remainSecondTimer;
   Timer? apiTimer;
@@ -19,7 +19,6 @@ class PlugInLoadingController extends GetxController {
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order;
-    print(order?.toJson());
 
     pollPlugStatus();
     countDownWaitingTime();
@@ -65,7 +64,7 @@ class PlugInLoadingController extends GetxController {
 
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
-        if (res.data['status'] == 400) {
+        if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
 
           if (data['charging_stats']['status'] is String) {
@@ -75,7 +74,8 @@ class PlugInLoadingController extends GetxController {
 
       });
     } catch (e, stackTrace) {
-      Get.log('Error: $e, stackTrace: $stackTrace');
+      errorMessage = 'Error: $e, stackTrace: $stackTrace';
+      update();
     }
   }
 
@@ -90,8 +90,9 @@ class PlugInLoadingController extends GetxController {
         update();
       }
 
-    } catch (e) {
-      Snackbar.showError('Error ${ e.toString()}',Get.context!);
+    } catch (e, stackTrace) {
+      errorMessage = 'Error: $e, stackTrace: $stackTrace';
+      update();
     }
   }
 }

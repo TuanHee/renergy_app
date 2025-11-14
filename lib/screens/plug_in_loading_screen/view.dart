@@ -64,6 +64,10 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PlugInLoadingController>();
+
+    if(controller.errorMessage.isNotEmpty){
+      Snackbar.showError(controller.errorMessage, context);
+    }
     return Scaffold(
       body: SafeArea(
         child: Center(
