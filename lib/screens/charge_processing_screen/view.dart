@@ -17,14 +17,6 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
   late AnimationController _progressController;
   late Animation<double> _pulseAnimation;
   
-  double _batteryLevel = 45.0;
-  double _chargingSpeed = 48.5;
-  String _timeRemaining = '1h 25m';
-  double _energyAdded = 12.3;
-  double _cost = 4.92;
-  
-  Timer? _updateTimer;
-
   @override
   void initState() {
     super.initState();
@@ -51,7 +43,6 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
   void dispose() {
     _pulseController.dispose();
     _progressController.dispose();
-    _updateTimer?.cancel();
     super.dispose();
   }
 
@@ -81,6 +72,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ChargeProcessingController>();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -173,7 +165,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                   width: 160,
                                   height: 160,
                                   child: CircularProgressIndicator(
-                                    value: _batteryLevel / 100,
+                                    value: (controller.chargingStats?.meter?.soc ?? 0) / 100.0,
                                     strokeWidth: 8,
                                     backgroundColor: const Color.fromARGB(255, 226, 254, 226),
                                     valueColor: const AlwaysStoppedAnimation<Color>(
@@ -187,7 +179,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '${_batteryLevel.toStringAsFixed(0)}%',
+                                      '${(controller.chargingStats?.meter?.soc ?? 0).toStringAsFixed(0)}%',
                                       style: const TextStyle(
                                         fontSize: 42,
                                         fontWeight: FontWeight.bold,
@@ -238,16 +230,16 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                           Expanded(
                             child: _buildStatCard(
                               icon: Icons.speed,
-                              label: 'Charging Speed',
-                              value: '${_chargingSpeed.toStringAsFixed(1)} kW',
+                              label: 'Port Type',
+                              value: controller.order?.bay?.port?.portType ?? '-',
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildStatCard(
                               icon: Icons.access_time,
-                              label: 'Time Remaining',
-                              value: _timeRemaining,
+                              label: 'Output Power (kW)',
+                              value: '${controller.order!.bay!.port!.outputPower} kW',
                             ),
                           ),
                         ],
@@ -261,7 +253,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             child: _buildStatCard(
                               icon: Icons.battery_charging_full,
                               label: 'Energy Added',
-                              value: '${_energyAdded.toStringAsFixed(1)} kWh',
+                              value: '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -269,7 +261,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             child: _buildStatCard(
                               icon: Icons.attach_money,
                               label: 'Current Cost',
-                              value: '\$${_cost.toStringAsFixed(2)}',
+                              value: 'RM ${controller.chargingStats!.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
                             ),
                           ),
                         ],
@@ -303,13 +295,14 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               ),
                             ),
                             const SizedBox(height: 16),
-                            _buildDetailRow('Charger ID', 'CH-A042'),
+                            _buildDetailRow('Charger ID', controller.order!.chargerId!.toString()),
                             const SizedBox(height: 12),
-                            _buildDetailRow('Location', 'Station 3, Bay 2'),
+                            _buildDetailRow('Location', controller.order!.station!.name!),
                             const SizedBox(height: 12),
-                            _buildDetailRow('Start Time', '2:45 PM'),
+                            _buildDetailRow('Start Time', controller.chargingStats?.startAt ?? ''),
                             const SizedBox(height: 12),
-                            _buildDetailRow('Rate', '\$0.40/kWh'),
+                            // _buildDetailRow('Rate', '\$${controller.order!.!.toStringAsFixed(2)}/kWh'),
+                            _buildDetailRow('Rate (RM)', '0.99/kWh'),
                           ],
                         ),
                       ),
