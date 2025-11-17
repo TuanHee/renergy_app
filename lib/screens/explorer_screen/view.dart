@@ -328,7 +328,11 @@ class _StationItem extends StatelessWidget {
                       const SizedBox(width: 8),
                       MyBadge(label: 'Showroom', color: Colors.black87, dark: true),
                       const Spacer(),
-                      const Icon(Icons.star_border, color: Colors.grey),
+                      InkWell(
+                        onTap: () {
+                        },
+                        child: const Icon(Icons.star_border, color: Colors.grey),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
