@@ -51,14 +51,9 @@ class ChargeProcessingController extends GetxController {
 
   Future<void> stopCharging() async {
     final res = await Api().post(Endpoints.stopCharging(order!.id!));
-
-    if (res.data['status'] == 200) {
-      Snackbar.showSuccess(res.data['data']['status'], Get.context!);
-      update();
-      Get.offAllNamed(AppRoutes.recharge);
-    } else {
-      errorMessage = res.data['message'] ?? 'Failed to stop charging';
-      update();
+    
+    if (res.data['status'] != 200) {
+      throw 'Stop Charging Error: ${res.data['status']}';
     }
   }
 }

@@ -20,7 +20,6 @@ class PlugInLoadingController extends GetxController {
     super.onInit();
     order = Get.arguments as Order;
 
-    pollPlugStatus();
     countDownWaitingTime();
     update();
   }

@@ -17,8 +17,8 @@ class ChargingStats {
   factory ChargingStats.fromJson(Map<String, dynamic> json) {
     return ChargingStats(
       status: ChargingStatsStatus.fromString(json['status']),
-      startAt: json['start_at'],
-      stopAt: json['stop_at'],
+      startAt: json['started_at'],
+      stopAt: json['stopped_at'],
       meter: json['meter'] == null ? null : Meter.fromJson(json['meter']),
     );
   }

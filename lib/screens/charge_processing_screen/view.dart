@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/main_bottom_nav_bar.dart';
 import '../../components/snackbar.dart';
 import 'controller.dart';
@@ -9,7 +10,8 @@ class ChargeProcessingScreenView extends StatefulWidget {
   const ChargeProcessingScreenView({Key? key}) : super(key: key);
 
   @override
-  State<ChargeProcessingScreenView> createState() => _ChargeProcessingScreenState();
+  State<ChargeProcessingScreenView> createState() =>
+      _ChargeProcessingScreenState();
 }
 
 class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
@@ -17,28 +19,27 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
   late AnimationController _pulseController;
   late AnimationController _progressController;
   late Animation<double> _pulseAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Pulse animation for charging indicator
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-    
+
     // Progress animation
     _progressController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
   }
-
 
   @override
   void dispose() {
@@ -52,7 +53,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Stop Charging?'),
-        content: const Text('Are you sure you want to stop the charging session?'),
+        content: const Text(
+          'Are you sure you want to stop the charging session?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -60,9 +63,14 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
           ),
           TextButton(
             onPressed: () {
+              try {
+                Get.find<ChargeProcessingController>().stopCharging();
+                Snackbar.showSuccess('Charging session stopped', context);
+              } catch (e) {
+                Snackbar.showError(e.toString(), context);
+              }
               Navigator.pop(context);
-              Get.find<ChargeProcessingController>().stopCharging();
-              Snackbar.showSuccess('Charging session stopped', context);
+              Get.toNamed(AppRoutes.recharge);
             },
             child: const Text('Stop', style: TextStyle(color: Colors.red)),
           ),
@@ -74,9 +82,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const MainBottomNavBar(
-        currentIndex: 1,
-      ),
+      bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -116,14 +122,14 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                     ],
                   ),
                 ),
-                
+
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        
+
                         // Battery Level Display
                         Stack(
                           alignment: Alignment.center,
@@ -138,14 +144,19 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                     width: 200,
                                     height: 200,
                                     decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 53, 220, 38), // red-600
+                                      color: Color.fromARGB(
+                                        255,
+                                        53,
+                                        220,
+                                        38,
+                                      ), // red-600
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                 );
                               },
                             ),
-                            
+
                             // Main circle
                             Container(
                               width: 180,
@@ -169,15 +180,32 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                     width: 160,
                                     height: 160,
                                     child: CircularProgressIndicator(
-                                      value: (controller.chargingStats?.meter?.soc ?? 0) / 100.0,
+                                      value:
+                                          (controller
+                                                  .chargingStats
+                                                  ?.meter
+                                                  ?.soc ??
+                                              0) /
+                                          100.0,
                                       strokeWidth: 8,
-                                      backgroundColor: const Color.fromARGB(255, 226, 254, 226),
-                                      valueColor: const AlwaysStoppedAnimation<Color>(
-                                        Color.fromARGB(255, 82, 240, 34), // red-600
+                                      backgroundColor: const Color.fromARGB(
+                                        255,
+                                        226,
+                                        254,
+                                        226,
                                       ),
+                                      valueColor:
+                                          const AlwaysStoppedAnimation<Color>(
+                                            Color.fromARGB(
+                                              255,
+                                              82,
+                                              240,
+                                              34,
+                                            ), // red-600
+                                          ),
                                     ),
                                   ),
-                                  
+
                                   // Battery percentage
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -201,8 +229,18 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                                 Icons.bolt,
                                                 size: 16,
                                                 color: Color.lerp(
-                                                  const Color.fromARGB(255, 40, 230, 56),
-                                                  const Color.fromARGB(255, 68, 239, 82),
+                                                  const Color.fromARGB(
+                                                    255,
+                                                    40,
+                                                    230,
+                                                    56,
+                                                  ),
+                                                  const Color.fromARGB(
+                                                    255,
+                                                    68,
+                                                    239,
+                                                    82,
+                                                  ),
                                                   _pulseAnimation.value,
                                                 ),
                                               ),
@@ -225,9 +263,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Charging Stats Cards
                         Row(
                           children: [
@@ -235,7 +273,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               child: _buildStatCard(
                                 icon: Icons.speed,
                                 label: 'Port Type',
-                                value: controller.order?.bay?.port?.portType ?? '-',
+                                value:
+                                    controller.order?.bay?.port?.portType ??
+                                    '-',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -243,21 +283,23 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               child: _buildStatCard(
                                 icon: Icons.access_time,
                                 label: 'Output Power (kW)',
-                                value: '${controller.order!.bay!.port!.outputPower} kW',
+                                value:
+                                    '${controller.order!.bay!.port!.outputPower} kW',
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         Row(
                           children: [
                             Expanded(
                               child: _buildStatCard(
                                 icon: Icons.battery_charging_full,
                                 label: 'Energy Added',
-                                value: '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
+                                value:
+                                    '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -265,14 +307,15 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               child: _buildStatCard(
                                 icon: Icons.attach_money,
                                 label: 'Current Cost',
-                                value: 'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
+                                value:
+                                    'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Session Details
                         Container(
                           decoration: BoxDecoration(
@@ -299,20 +342,29 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _buildDetailRow('Charger ID', controller.order!.chargerId!.toString()),
+                              _buildDetailRow(
+                                'Charger ID',
+                                controller.order!.chargerId!.toString(),
+                              ),
                               const SizedBox(height: 12),
-                              _buildDetailRow('Location', controller.order!.station!.name!),
+                              _buildDetailRow(
+                                'Location',
+                                controller.order!.station!.name!,
+                              ),
                               const SizedBox(height: 12),
-                              _buildDetailRow('Start Time', controller.chargingStats?.startAt ?? ''),
+                              _buildDetailRow(
+                                'Start Time',
+                                controller.chargingStats?.startAt ?? '',
+                              ),
                               const SizedBox(height: 12),
                               // _buildDetailRow('Rate', '\$${controller.order!.!.toStringAsFixed(2)}/kWh'),
                               _buildDetailRow('Rate (RM)', '0.99/kWh'),
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Stop Charging Button
                         SizedBox(
                           width: double.infinity,
@@ -320,7 +372,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             onPressed: _stopCharging,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: const Color(0xFFDC2626),
-                              side: const BorderSide(color: Color(0xFFDC2626), width: 2),
+                              side: const BorderSide(
+                                color: Color(0xFFDC2626),
+                                width: 2,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -335,7 +390,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 32),
                       ],
                     ),
@@ -376,13 +431,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             color: const Color(0xFFDC2626), // red-600
           ),
           const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
           const SizedBox(height: 4),
           Text(
             value,
@@ -401,13 +450,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
         Text(
           value,
           style: const TextStyle(

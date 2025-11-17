@@ -40,10 +40,6 @@ class RechargeScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<RechargeController>();
-    if (controller.errorMessage != null) {
-      Snackbar.showError('Error: ${controller.errorMessage}', context);
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -100,9 +96,7 @@ class RechargeScreenView extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Action buttons
-                Row(
-                  children: [
-                    Expanded(
+                SizedBox.expand(
                       child: ElevatedButton(
                         onPressed: () => _startRecharge(context),
                         style: ElevatedButton.styleFrom(
@@ -116,8 +110,6 @@ class RechargeScreenView extends StatelessWidget {
                         child: const Text('Recharge'),
                       ),
                     ),
-                  ],
-                ),
                 const SizedBox(height: 12),
                 Text(
                   'Need assistance? Contact support.',

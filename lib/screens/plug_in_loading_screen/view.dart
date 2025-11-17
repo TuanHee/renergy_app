@@ -28,12 +28,24 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       begin: 0.3,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      _fetchPlugStatus();
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _fetchPlugStatus() {
+    try {
+      Get.find<PlugInLoadingController>().pollPlugStatus();
+    } catch (e) {
+      Snackbar.showError('Charging session stopped Error: $e', context);
+    }
   }
 
   void _stopCharging() {
@@ -52,8 +64,15 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Get.find<PlugInLoadingController>().cancelPending();
-              Snackbar.showSuccess('Charging session stopped', context);
+              try {
+                Get.find<PlugInLoadingController>().cancelPending();
+                Snackbar.showSuccess('Charging session stopped', context);
+              } catch (e) {
+                Snackbar.showError(
+                  'Charging session stopped Error: $e',
+                  context,
+                );
+              }
             },
             child: const Text('Stop', style: TextStyle(color: Colors.red)),
           ),
@@ -65,14 +84,8 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PlugInLoadingController>();
-
-    if(controller.errorMessage.isNotEmpty){
-      Snackbar.showError(controller.errorMessage, context);
-    }
     return Scaffold(
-      bottomNavigationBar: const MainBottomNavBar(
-        currentIndex: 1,
-      ),
+      bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: SafeArea(
         child: Center(
           child: Container(
@@ -99,7 +112,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                     children: [
                       const SizedBox(width: 16),
                       Icon(Icons.power, size: 48, color: Colors.green[300]),
-          
+
                       AnimatedBuilder(
                         animation: _pulseAnimation,
                         builder: (context, child) {
@@ -125,7 +138,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                           );
                         },
                       ),
-          
+
                       Icon(
                         Icons.directions_car,
                         size: 48,
@@ -134,7 +147,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                     ],
                   ),
                 ),
-          
+
                 // Title
                 const Text(
                   'Ready to Charge',
@@ -145,7 +158,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   ),
                 ),
                 const SizedBox(height: 12),
-          
+
                 // Subtitle
                 Text(
                   'Please connect the port to your vehicle within 15 minutes.\nIdle fees might apply after grace period.',
@@ -153,7 +166,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 32),
-          
+
                 // Status Indicator
                 AnimatedBuilder(
                   animation: _pulseAnimation,
@@ -185,7 +198,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   },
                 ),
                 const SizedBox(height: 32),
-          
+
                 // Charger Info Card
                 Container(
                   decoration: BoxDecoration(
@@ -198,10 +211,16 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                       Row(
                         children: [
                           Expanded(
-                            child: _buildInfoItem('Charger ID', controller.order!.chargerId!.toString()),
+                            child: _buildInfoItem(
+                              'Charger ID',
+                              controller.order!.chargerId!.toString(),
+                            ),
                           ),
                           Expanded(
-                            child: _buildInfoItem('Station', '${controller.order!.station!.name ?? 'N/A'}'),
+                            child: _buildInfoItem(
+                              'Station',
+                              '${controller.order!.station!.name ?? 'N/A'}',
+                            ),
                           ),
                         ],
                       ),
@@ -209,16 +228,24 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                       Row(
                         children: [
                           Expanded(
-                            child: _buildInfoItem('Power Output', '${controller.order!.bay!.port!.outputPower} kW'),
+                            child: _buildInfoItem(
+                              'Power Output',
+                              '${controller.order!.bay!.port!.outputPower} kW',
+                            ),
                           ),
-                          Expanded(child: _buildInfoItem('Type', '${controller.order!.bay!.port!.portType}')),
+                          Expanded(
+                            child: _buildInfoItem(
+                              'Type',
+                              '${controller.order!.bay!.port!.portType}',
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
-          
+
                 // Waiting Time
                 GetBuilder<PlugInLoadingController>(
                   builder: (controller) => Text(
@@ -227,7 +254,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   ),
                 ),
                 const SizedBox(height: 4),
-          
+
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
@@ -253,7 +280,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   ),
                 ),
                 const SizedBox(height: 6),
-          
+
                 // Help Text
                 Text(
                   'Having trouble? Contact support',

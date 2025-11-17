@@ -9,7 +9,6 @@ import 'package:renergy_app/common/services/api_service.dart';
 
 class RechargeController extends GetxController {
   bool isLoading = true;
-  String? errorMessage;
 
   Timer? apiTimer;
   Timer? remainSecondTimer;
@@ -56,7 +55,6 @@ class RechargeController extends GetxController {
   }
 
   void pollParkingStatus() async {
-    try {
       apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
         if (status == ParkingStatus.unavailable.value) {
           remainSecondTimer?.cancel();
@@ -76,10 +74,6 @@ class RechargeController extends GetxController {
         // }
 
       });
-    } catch (e, stackTrace) {
-      errorMessage = 'Error: $e, stackTrace: $stackTrace';
-      update();
-    }
   }
 
   
