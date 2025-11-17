@@ -10,8 +10,8 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
   - fiuu-mobile-xdk-cocoapods (3.34.7)
-  - fiuu_mobile_xdk_flutter (1.0.1):
-    - fiuu-mobile-xdk-cocoapods (~> 3.34.7)
+  - fiuu_mobile_xdk_flutter (0.0.1):
+    - fiuu-mobile-xdk-cocoapods (~> 3.34.3)
     - Flutter
   - Flutter (1.0.0)
   - google_sign_in_ios (0.0.1):
@@ -82,7 +82,7 @@ SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   fiuu-mobile-xdk-cocoapods: c6eb91dfca51f10a692baf61dec40f5f715c46f5
-  fiuu_mobile_xdk_flutter: 5de6662a52f2f3e7f5862bf14620fb4de87248ce
+  fiuu_mobile_xdk_flutter: 797c8994c630a3655dcf1a6b92fb806e62be5b35
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   google_sign_in_ios: 055d43c4754f2860a53decd5133b78d05615fffd
   GoogleSignIn: c7f09cfbc85a1abf69187be091997c317cc33b77
