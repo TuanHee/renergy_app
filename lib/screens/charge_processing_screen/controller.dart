@@ -27,12 +27,7 @@ class ChargeProcessingController extends GetxController {
       if(order?.id == null){
         return;
       }
-      Timer.periodic(const Duration(seconds: 2), (timer) async {
-        if (status != ChargingStatus.charging.name) {
-          timer.cancel();
-          return;
-        }
-
+      Timer.periodic(const Duration(seconds: 1), (timer) async {
         try {
           final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
@@ -48,6 +43,7 @@ class ChargeProcessingController extends GetxController {
             );
             update();
           }
+          print('Status: ${chargingStats?.status} ');
 
           if (chargingStats?.status == ChargingStatsStatus.completed) {
             timer.cancel();
