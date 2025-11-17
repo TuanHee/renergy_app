@@ -70,7 +70,6 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                 Snackbar.showError(e.toString(), context);
               }
               Navigator.pop(context);
-              Get.toNamed(AppRoutes.recharge);
             },
             child: const Text('Stop', style: TextStyle(color: Colors.red)),
           ),
@@ -284,7 +283,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.access_time,
                                 label: 'Output Power (kW)',
                                 value:
-                                    '${controller.order!.bay!.port!.outputPower} kW',
+                                    '${controller.order?.bay?.port?.outputPower ?? 0} kW',
                               ),
                             ),
                           ],
@@ -344,20 +343,21 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               const SizedBox(height: 16),
                               _buildDetailRow(
                                 'Charger ID',
-                                controller.order!.chargerId!.toString(),
+                                controller.order?.chargerId != null
+                                    ? controller.order!.chargerId!.toString()
+                                    : '-',
                               ),
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Location',
-                                controller.order!.station!.name!,
+                                controller.order?.station?.name ?? '-',
                               ),
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Start Time',
-                                controller.chargingStats?.startAt ?? '',
+                                controller.chargingStats?.startAt ?? '-',
                               ),
                               const SizedBox(height: 12),
-                              // _buildDetailRow('Rate', '\$${controller.order!.!.toStringAsFixed(2)}/kWh'),
                               _buildDetailRow('Rate (RM)', '0.99/kWh'),
                             ],
                           ),

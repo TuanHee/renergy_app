@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
@@ -18,7 +19,7 @@ class PlugInLoadingController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    order = Get.arguments as Order;
+    order = Get.arguments as Order?;
 
     countDownWaitingTime();
     update();
@@ -29,24 +30,26 @@ class PlugInLoadingController extends GetxController {
     DateTime endTime = now.add(Duration(seconds: remainSecond));
 
     remainSecondTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (status == ChargingStatus.stopped.name || status == ChargingStatus.charging.name) {
+      if (status == ChargingStatus.stopped.name ||
+          status == ChargingStatus.charging.name) {
         timer.cancel();
         return;
       }
 
       now = DateTime.now();
-      remainSecond = (endTime.millisecondsSinceEpoch - now.millisecondsSinceEpoch) ~/ 1000;
+      remainSecond =
+          (endTime.millisecondsSinceEpoch - now.millisecondsSinceEpoch) ~/ 1000;
       update();
     });
   }
 
-  String secondToMinute(int second){
+  String secondToMinute(int second) {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  void pollPlugStatus() async {
-    try {
-      apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+  void pollPlugStatus(BuildContext context) async {
+    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      try {
         if (status == ChargingStatus.charging.value) {
           remainSecondTimer?.cancel();
           timer.cancel();
@@ -68,20 +71,23 @@ class PlugInLoadingController extends GetxController {
 
           if (data['charging_stats']['status'] is String) {
             status = data['charging_stats']['status'];
+            print(data['charging_stats']['status']);
           }
         }
-
-      });
-    } catch (e, stackTrace) {
-      errorMessage = 'Error: $e, stackTrace: $stackTrace';
-      Get.log(errorMessage);
-      update();
-    }
+      } catch (e, stackTrace) {
+        errorMessage = 'Error: $e, stackTrace: $stackTrace';
+        Get.log(errorMessage);
+        update();
+      }
+    });
   }
 
- Future<void> cancelPending() async{
+  Future<void> cancelPending() async {
     try {
       final res = await Api().delete(Endpoints.order(order!.id!));
+      print(res);
+      remainSecondTimer?.cancel();
+        apiTimer?.cancel();
 
       if (res.data['status'] == 200) {
         remainSecondTimer?.cancel();
@@ -90,7 +96,6 @@ class PlugInLoadingController extends GetxController {
         update();
         Get.offAllNamed(AppRoutes.charging);
       }
-
     } catch (e, stackTrace) {
       errorMessage = 'Error: $e, stackTrace: $stackTrace';
       update();

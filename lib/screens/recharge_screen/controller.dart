@@ -12,7 +12,7 @@ class RechargeController extends GetxController {
 
   Timer? apiTimer;
   Timer? remainSecondTimer;
-  int remainSecond = 0;
+  int remainSecond = 15 * 60;
 
   String status = ParkingStatus.unavailable.value;
   Order? order;
@@ -22,6 +22,7 @@ class RechargeController extends GetxController {
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order?;
+    countDownWaitingTime();
     
     // cards = [
     //   CreditCard(
@@ -34,8 +35,12 @@ class RechargeController extends GetxController {
     // ];
   }
 
+  String secondToMinute(int second) {
+    return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
+  }
+
   void recharge() {
-    Get.offAllNamed(AppRoutes.plugInLoading);
+    Get.offAllNamed(AppRoutes.plugInLoading,  arguments: order);
   }
 
   void countDownWaitingTime() {
@@ -76,6 +81,15 @@ class RechargeController extends GetxController {
       });
   }
 
-  
+  Future<void> restart() async {
+    if(order?.id == null){
+      return;
+    }
+    final res = await Api().post(Endpoints.restart(order!.id!));
+    
+    if (res.data['status'] != 200) {
+      throw 'Stop Charging Error: ${res.data['status']}';
+    }
+  }
 }
 

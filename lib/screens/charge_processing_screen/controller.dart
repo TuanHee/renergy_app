@@ -18,38 +18,56 @@ class ChargeProcessingController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    order = Get.arguments as Order;
+    order = Get.arguments as Order?;
     pollChargingStatus();
     update();
   }
 
   void pollChargingStatus() async {
-    try {
-      while (status == ChargingStatus.charging.name) {
-        await Future.delayed(const Duration(seconds: 2));
+      if(order?.id == null){
+        return;
+      }
+      Timer.periodic(const Duration(seconds: 2), (timer) async {
+        if (status != ChargingStatus.charging.name) {
+          timer.cancel();
+          return;
+        }
 
-        final res = await Api().get(Endpoints.chargingStats(order!.id!));
+        try {
+          final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
+          if (res.data['status'] >= 200 && res.data['status'] < 300) {
+            final data = res.data['data'];
 
-          if (data['charging_stats']['status'] is String) {
-            status = data['charging_stats']['status'];
+            if (data['charging_stats']['status'] is String) {
+              status = data['charging_stats']['status'];
+            }
+
+            chargingStats = ChargingStats.fromJson(
+              res.data['data']['charging_stats'],
+            );
+            update();
           }
 
-          chargingStats = ChargingStats.fromJson(
-            res.data['data']['charging_stats'],
-          );
+          if (chargingStats?.status == ChargingStatsStatus.completed) {
+            timer.cancel();
+            Get.toNamed(
+              AppRoutes.recharge,
+              arguments: Get.find<ChargeProcessingController>().order,
+            );
+          }
+        } catch (e) {
+          timer.cancel();
+          errorMessage = 'Error: $e';
           update();
         }
-      }
-    } catch (e, stackTrace) {
-      errorMessage = 'Error: $e, stackTrace: $stackTrace';
-      update();
-    }
+      });
   }
 
   Future<void> stopCharging() async {
+    if(order?.id == null){
+      return;
+    }
     final res = await Api().post(Endpoints.stopCharging(order!.id!));
     
     if (res.data['status'] != 200) {

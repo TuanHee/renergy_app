@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import '../../components/main_bottom_nav_bar.dart';
 import '../../components/snackbar.dart';
 import 'controller.dart';
@@ -29,7 +30,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchPlugStatus();
     });
   }
@@ -42,13 +43,13 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
 
   void _fetchPlugStatus() {
     try {
-      Get.find<PlugInLoadingController>().pollPlugStatus();
+      Get.find<PlugInLoadingController>().pollPlugStatus(context);
     } catch (e) {
       Snackbar.showError('Charging session stopped Error: $e', context);
     }
   }
 
-  void _stopCharging() {
+  void _stopPending() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -67,6 +68,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
               try {
                 Get.find<PlugInLoadingController>().cancelPending();
                 Snackbar.showSuccess('Charging session stopped', context);
+                Get.offAllNamed(AppRoutes.charging);
               } catch (e) {
                 Snackbar.showError(
                   'Charging session stopped Error: $e',
@@ -89,17 +91,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       body: SafeArea(
         child: Center(
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+            decoration: BoxDecoration(color: Colors.white),
             padding: const EdgeInsets.all(32),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -213,13 +205,15 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                           Expanded(
                             child: _buildInfoItem(
                               'Charger ID',
-                              controller.order!.chargerId!.toString(),
+                              controller.order?.chargerId != null
+                                  ? controller.order!.chargerId.toString()
+                                  : '-',
                             ),
                           ),
                           Expanded(
                             child: _buildInfoItem(
                               'Station',
-                              '${controller.order!.station!.name ?? 'N/A'}',
+                              '${controller.order?.station?.name ?? 'N/A'}',
                             ),
                           ),
                         ],
@@ -230,13 +224,13 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                           Expanded(
                             child: _buildInfoItem(
                               'Power Output',
-                              '${controller.order!.bay!.port!.outputPower} kW',
+                              '${controller.order?.bay?.port?.outputPower ?? 0} kW',
                             ),
                           ),
                           Expanded(
                             child: _buildInfoItem(
                               'Type',
-                              '${controller.order!.bay!.port!.portType}',
+                              '${controller.order?.bay?.port?.portType ?? 0}',
                             ),
                           ),
                         ],
@@ -258,7 +252,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: () => _stopCharging(),
+                    onPressed: () => _stopPending(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 48,

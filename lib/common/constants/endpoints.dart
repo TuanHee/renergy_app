@@ -6,4 +6,5 @@ class Endpoints {
   static String order(int id) => '$orders/$id';
   static String chargingStats(int id) => '$orders/$id/charging-stats';
   static String stopCharging(int id) => '$orders/$id/stop-charging';
+  static String restart(int id) => '$orders/$id/restart';
 }

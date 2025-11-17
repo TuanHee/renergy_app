@@ -11,7 +11,8 @@ class RechargeScreenView extends StatelessWidget {
   const RechargeScreenView({super.key});
 
   void _leaveParking() {
-    Get.offAllNamed(AppRoutes.explorer);
+    print('leave');
+    Get.find<RechargeController>().pollParkingStatus();
   }
 
   void _startRecharge(BuildContext context) {
@@ -19,7 +20,9 @@ class RechargeScreenView extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('ReCharge?'),
-        content: const Text('Are you sure you want to restart the charging session?'),
+        content: const Text(
+          'Are you sure you want to restart the charging session?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -27,8 +30,18 @@ class RechargeScreenView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Get.offAllNamed(AppRoutes.plugInLoading, arguments: Get.find<RechargeController>().order);
+              try {
+                Get.find<RechargeController>().restart();
+                Navigator.pop(context);
+                Get.offAllNamed(
+                  AppRoutes.plugInLoading,
+                  arguments: Get.find<RechargeController>().order,
+                );
+                Snackbar.showSuccess('Charging session stopped', context);
+
+              } catch (e) {
+                Snackbar.showError(e.toString(), context);
+              }
             },
             child: const Text('recharge', style: TextStyle(color: Colors.red)),
           ),
@@ -40,6 +53,7 @@ class RechargeScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<RechargeController>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -52,17 +66,7 @@ class RechargeScreenView extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 500),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
+            decoration: BoxDecoration(color: Colors.white),
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -95,21 +99,31 @@ class RechargeScreenView extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Action buttons
-                SizedBox.expand(
-                      child: ElevatedButton(
-                        onPressed: () => _startRecharge(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD32F2F),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text('Recharge'),
+                // Waiting Time
+                GetBuilder<RechargeController>(
+                  builder: (controller) => Text(
+                    '${controller.remainSecond <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond.abs())}${controller.remainSecond <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _startRecharge(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD32F2F),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+                    child: const Text('Recharge'),
+                  ),
+                ),
+
                 const SizedBox(height: 12),
                 Text(
                   'Need assistance? Contact support.',
