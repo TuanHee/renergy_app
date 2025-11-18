@@ -355,8 +355,13 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Start Time',
-                                controller.chargingStats?.startAt ?? '-',
+                                controller.chargingStats?.startAt != null
+                                    ? DateTime.parse(
+                                        controller.chargingStats!.startAt!,
+                                      ).toLocal().toString()
+                                    : '-',
                               ),
+
                               const SizedBox(height: 12),
                               _buildDetailRow('Rate (RM)', '0.99/kWh'),
                             ],

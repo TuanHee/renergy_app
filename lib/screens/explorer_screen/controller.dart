@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
+import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
@@ -39,7 +40,6 @@ class ExplorerController extends GetxController {
       }
     } catch (e) {
       errorMessage = e.toString();
-      print('ExplorerController.fetchStations error: $e');
     } finally {
       isLoading = false;
       update();
@@ -52,18 +52,5 @@ class ExplorerController extends GetxController {
             .length ??
         0;
   }
-
-  // Future<void> fetchCharging() async {
-  //   final res = await Api().post(Endpoints.stopCharging(order!.id!));
-
-  //   if (res.data['status'] == 200) {
-  //     Snackbar.showSuccess(res.data['data']['status'], Get.context!);
-  //     update();
-  //     Get.offAllNamed(AppRoutes.recharge);
-  //   } else {
-  //     errorMessage = res.data['message'] ?? 'Failed to stop charging';
-  //     update();
-  //   }
-  // }
 }
 

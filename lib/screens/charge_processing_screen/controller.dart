@@ -6,7 +6,6 @@ import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
-import 'package:renergy_app/components/components.dart';
 
 class ChargeProcessingController extends GetxController {
   bool isLoading = true;
@@ -43,7 +42,6 @@ class ChargeProcessingController extends GetxController {
             );
             update();
           }
-          print('Status: ${chargingStats?.status} ');
 
           if (chargingStats?.status == ChargingStatsStatus.completed) {
             timer.cancel();

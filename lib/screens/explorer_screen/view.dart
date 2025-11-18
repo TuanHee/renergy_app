@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/components/float_bar.dart';
+import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatelessWidget {
@@ -69,11 +71,9 @@ class ExplorerScreenView extends StatelessWidget {
             ],
           ),
           // Bottom navigation bar
-          bottomNavigationBar: MainBottomNavBar(
-            currentIndex: 0,
-          ),
+          bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
         );
-      }
+      },
     );
   }
 }
@@ -99,6 +99,9 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     super.initState();
     _sheetController = DraggableScrollableController();
     _sheetController.addListener(_handleSheetSizeChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchIsCharging();
+    });
   }
 
   @override
@@ -117,8 +120,18 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     }
   }
 
+  void _fetchIsCharging() async {
+    try {
+      await Get.find<MainController>().fetchChargingOrder();
+    } catch (e) {
+      Snackbar.showError(e.toString(), context);
+    }
+  }
+
   Future<void> _toggleSheet() async {
-    final targetSize = _currentSize < (_collapsedSize + _expandedSize) / 2 ? _expandedSize : _collapsedSize;
+    final targetSize = _currentSize < (_collapsedSize + _expandedSize) / 2
+        ? _expandedSize
+        : _collapsedSize;
     await _sheetController.animateTo(
       targetSize,
       duration: const Duration(milliseconds: 300),
@@ -130,164 +143,194 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return DraggableScrollableSheet(
-      controller: _sheetController,
-      initialChildSize: _collapsedSize,
-      minChildSize: _collapsedSize,
-      maxChildSize: _expandedSize,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 12,
-                offset: Offset(0, -2),
-              )
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Drag handle
-                InkWell(
-                  focusColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  onTap: () {
-                    _toggleSheet();
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 8, bottom: 16),
-                    child: Center(
-                      child: Icon(
-                        _currentSize <= (_collapsedSize + _expandedSize) / 2
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        color: Colors.red.shade700,
-                        size: 24
-                      ),
-                    ),
+    return Stack(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: DraggableScrollableSheet(
+            controller: _sheetController,
+            initialChildSize: _collapsedSize,
+            minChildSize: _collapsedSize,
+            maxChildSize: _expandedSize,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
-                ),
-                RichText(
-                  text: TextSpan(
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 12,
+                      offset: Offset(0, -2),
                     ),
-                    children: const [
-                      TextSpan(text: 'Welcome to '),
-                      TextSpan(
-                        text: 'Renergy',
-                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Charge anytime, anywhere',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
-                ),
-                const SizedBox(height: 16),
-
-                // Search bar with filter icon
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey.shade300),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Drag handle
+                      InkWell(
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        onTap: () {
+                          _toggleSheet();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 8, bottom: 16),
+                          child: Center(
+                            child: Icon(
+                              _currentSize <=
+                                      (_collapsedSize + _expandedSize) / 2
+                                  ? Icons.keyboard_arrow_up_rounded
+                                  : Icons.keyboard_arrow_down_rounded,
+                              color: Colors.red.shade700,
+                              size: 24,
+                            ),
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.search, color: Colors.grey.shade600),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Search',
-                                style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          children: const [
+                            TextSpan(text: 'Welcome to '),
+                            TextSpan(
+                              text: 'Renergy',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey.shade300),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Charge anytime, anywhere',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.black54,
+                        ),
                       ),
-                      child: const Icon(Icons.tune, color: Colors.black87),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Station list
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: widget.controller.fetchStations,
-                    child: widget.controller.isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        :
-                    widget.controller.stations.isEmpty
-                        ? ListView(
-                            padding: EdgeInsets.zero,
-                            controller: scrollController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            children: const [
-                              SizedBox(height: 60),
-                              Center(
-                                child: Text(
-                                  'No charging stations found',
-                                  style: TextStyle(color: Colors.black54),
-                                ),
+                      const SizedBox(height: 16),
+
+                      // Search bar with filter icon
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 44,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
                               ),
-                            ],
-                          )
-                        : ListView.separated(
-                            padding: EdgeInsets.zero,
-                            controller: scrollController,
-                            itemCount: widget.controller.stations.length,
-                            separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade200),
-                            itemBuilder: (context, index) {
-                              return _StationItem(
-                                station: widget.controller.stations[index],
-                              );
-                            },
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.search,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Search',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: const Icon(
+                              Icons.tune,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Station list
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: widget.controller.fetchStations,
+                          child: widget.controller.isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : widget.controller.stations.isEmpty
+                              ? ListView(
+                                  padding: EdgeInsets.zero,
+                                  controller: scrollController,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  children: const [
+                                    SizedBox(height: 60),
+                                    Center(
+                                      child: Text(
+                                        'No charging stations found',
+                                        style: TextStyle(color: Colors.black54),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : ListView.separated(
+                                  padding: EdgeInsets.zero,
+                                  controller: scrollController,
+                                  itemCount: widget.controller.stations.length,
+                                  separatorBuilder: (context, index) => Divider(
+                                    height: 1,
+                                    color: Colors.grey.shade200,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    return _StationItem(
+                                      station:
+                                          widget.controller.stations[index],
+                                    );
+                                  },
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
-        );
-      },
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: FloatBar(title: Get.find<MainController>().chargingOrder?.status, onClick: () => {Get.toNamed(AppRoutes.charging)}),
+        ),
+      ],
     );
   }
 }
 
 class _StationItem extends StatelessWidget {
   final Station station;
-  
   const _StationItem({required this.station});
 
   @override
@@ -324,14 +367,24 @@ class _StationItem extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      MyBadge(label: '${station.type![0].toUpperCase()}${station.type!.substring(1)}', color: const Color(0xFF0BB07B)),
+                      MyBadge(
+                        label:
+                            '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
+                        color: const Color(0xFF0BB07B),
+                      ),
                       const SizedBox(width: 8),
-                      MyBadge(label: 'Showroom', color: Colors.black87, dark: true),
+                      MyBadge(
+                        label: 'Showroom',
+                        color: Colors.black87,
+                        dark: true,
+                      ),
                       const Spacer(),
                       InkWell(
-                        onTap: () {
-                        },
-                        child: const Icon(Icons.star_border, color: Colors.grey),
+                        onTap: () {},
+                        child: const Icon(
+                          Icons.star_border,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -354,9 +407,18 @@ class _StationItem extends StatelessWidget {
                       const SizedBox(width: 12),
                       Icon(Icons.ev_station, size: 16, color: muted),
                       const SizedBox(width: 4),
-                      Text(station.bays!.length.toString(), style: TextStyle(color: muted)),
+                      Text(
+                        station.bays!.length.toString(),
+                        style: TextStyle(color: muted),
+                      ),
                       const SizedBox(width: 12),
-                      Text(station.isActive ? 'Available' : 'Unavailable', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+                      Text(
+                        station.isActive ? 'Available' : 'Unavailable',
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(width: 4),
                       const Icon(Icons.bolt, size: 16, color: Colors.green),
                     ],
@@ -366,7 +428,13 @@ class _StationItem extends StatelessWidget {
                     children: [
                       const Icon(Icons.circle, size: 10, color: Colors.green),
                       const SizedBox(width: 6),
-                      Text('Open', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+                      Text(
+                        'Open',
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       Text('12:00am - 11:59pm', style: TextStyle(color: muted)),
                     ],
