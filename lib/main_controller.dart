@@ -7,11 +7,11 @@ class MainController extends GetxController {
   Order? chargingOrder;
 
   Future<void> fetchChargingOrder() async {
-    final res = await Api().post(Endpoints.isChanging);
+    // final res = await Api().post(Endpoints.isChanging);
 
-    if (res.data['status'] != 200) {
-      throw ('Is Changing Error: ${res.data['message'] ?? 'Unknown error'}');
-    }
+    // if (res.data['status'] != 200) {
+    //   throw ('Is Changing Error: ${res.data['message'] ?? 'Unknown error'}');
+    // }
 
     // chargingOrder = res.data['data'] as Order;
   }

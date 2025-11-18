@@ -99,9 +99,17 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     super.initState();
     _sheetController = DraggableScrollableController();
     _sheetController.addListener(_handleSheetSizeChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchBookmark();
-      // _fetchIsCharging();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await Future.wait([
+          Get.find<MainController>().fetchChargingOrder(),
+          Get.find<ExplorerController>().fetchBookmark(),
+        ]);
+      } catch (e) {
+        if (mounted) {
+          Snackbar.showError(e.toString(), context);
+        }
+      }
     });
   }
 
@@ -118,26 +126,6 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
       setState(() {
         _currentSize = sheetSize;
       });
-    }
-  }
-
-  void _fetchIsCharging() async {
-    try {
-      await Get.find<MainController>().fetchChargingOrder();
-    } catch (e) {
-      if (mounted) {
-        Snackbar.showError(e.toString(), context);
-      }
-    }
-  }
-
-  void _fetchBookmark() async {
-    try {
-      await Get.find<ExplorerController>().fetchBookmark();
-    } catch (e) {
-      if (mounted) {
-        Snackbar.showError(e.toString(), context);
-      }
     }
   }
 
@@ -289,7 +277,9 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                       // Station list
                       Expanded(
                         child: RefreshIndicator(
-                          onRefresh: widget.controller.fetchStations,
+                          onRefresh: () => widget.controller.fetchStations(onErrorCallback: (msg){
+                            Snackbar.showError(msg, context);
+                          },),
                           child: widget.controller.isLoading
                               ? const Center(child: CircularProgressIndicator())
                               : widget.controller.stations.isEmpty
@@ -379,9 +369,7 @@ class _StationItem extends StatelessWidget {
             // Details
             GetBuilder<ExplorerController>(
               builder: (controller) {
-                final isBookmarkStored = controller.bookmarks.any(
-                  (bookmark) => bookmark.stationId == station.id,
-                );
+                final bookmarkIndex = controller.bookmarks.indexWhere((bookmark) => bookmark.stationId == station.id);
                 return Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,16 +389,21 @@ class _StationItem extends StatelessWidget {
                           ),
                           const Spacer(),
                           InkWell(
-                            onTap: () {
-                              if (isBookmarkStored) {
-                                controller.removeBookmark(station.id!);
-                              } else {
-                                controller.storeBookmark(station);
+                            onTap: () async {
+                              try {
+                                if (bookmarkIndex >=0) {
+                                  final bookmarkId = controller.bookmarks[bookmarkIndex].id;
+                                  await controller.removeBookmark(bookmarkId);
+                                } else {
+                                  await controller.storeBookmark(station);
+                                }
+                              } catch (e) {
+                                Snackbar.showError(e.toString(), context);
                               }
                             },
-                            child: Icon(isBookmarkStored? Icons.star:
-                              Icons.star_border,
-                              color: isBookmarkStored
+                            child: Icon(
+                              bookmarkIndex >=0 ? Icons.star : Icons.star_border,
+                              color: bookmarkIndex >=0
                                   ? Colors.orange
                                   : Colors.grey,
                             ),

@@ -12,7 +12,6 @@ import 'package:renergy_app/components/snackbar.dart';
 
 class ExplorerController extends GetxController {
   bool isLoading = true;
-  String? errorMessage;
   List<Station> stations = [];
   List<Bookmark> bookmarks = [];
 
@@ -24,7 +23,7 @@ class ExplorerController extends GetxController {
     update();
   }
 
-  Future<void> fetchStations() async {
+  Future<void> fetchStations({Function(String msg)? onErrorCallback}) async {
     try {
       final res = await Api().get(Endpoints.stations);
 
@@ -35,10 +34,10 @@ class ExplorerController extends GetxController {
           stations = Station.listFromJson(res.data['data']['stations']);
         }
       } else {
-        errorMessage = res.data['message'] ?? 'Failed to fetch stations';
+        throw res.data['message'] ?? 'Failed to fetch stations';
       }
     } catch (e) {
-      errorMessage = e.toString();
+      onErrorCallback?.call(e.toString());
     } finally {
       isLoading = false;
       update();
@@ -71,10 +70,9 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> storeBookmark(Station station) async {
-    Bookmark newBookmark = Bookmark(stationId: station.id, station: station);
+    final newBookmark = Bookmark(stationId: station.id, station: station);
     bookmarks.add(newBookmark);
     update();
-
     try {
       final res = await Api().post(
         Endpoints.storeBookmark,
@@ -82,35 +80,39 @@ class ExplorerController extends GetxController {
       );
 
       if (res.data['status'] != 200) {
-        errorMessage = res.data['message'] ?? 'Failed to add bookmark';
+        throw res.data['message'] ?? 'Failed to add bookmark';
       }
 
+      bookmarks.last = Bookmark.fromJson(res.data['data']['bookmark']);
     } catch (e) {
       bookmarks.removeLast();
-      errorMessage = e.toString();
-    } finally {
-      isLoading = false;
       update();
+      rethrow;
     }
   }
 
-  Future<void> removeBookmark(int stationId) async {
-    final removed = bookmarks.firstWhere((e) => e.stationId == stationId);
-    bookmarks.removeWhere((e) => e.stationId == stationId);
+  Future<void> removeBookmark(int? bookmarkId) async {
+    if (bookmarkId == null) {
+      throw 'Failed to remove bookmark: Try it Later';
+    }
+    final removed = bookmarks.firstWhereOrNull((e) => e.id == bookmarkId);
+
+    if (removed == null) {
+      throw 'Failed to remove bookmark: do not have this bookmark';
+    }
+    bookmarks.remove(removed);
     update();
 
     try {
-      final res = await Api().get(Endpoints.deleteBookmark(stationId));
+      final res = await Api().delete(Endpoints.deleteBookmark(bookmarkId));
 
       if (res.data['status'] != 200) {
-        errorMessage = res.data['message'] ?? 'Failed to add bookmark';
+        throw res.data['message'] ?? 'Failed to remove bookmark';
       }
     } catch (e) {
-      bookmarks.add(removed);
-      errorMessage = e.toString();
-    } finally {
-      isLoading = false;
+      // bookmarks.add(removed);
       update();
+      rethrow;
     }
   }
 }

@@ -50,6 +50,7 @@ class AppRoutes {
         name: bookmark,
         page: () => const BookmarkScreenView(),
         transition: Transition.fadeIn,
+        binding: BookmarkBinding(),
       ),
       GetPage(
         name: account,
