@@ -27,6 +27,8 @@ class Snackbar {
   }
 
   static void showError(String message, BuildContext context) {
+    print('message: $message');
+    print('StackTrace: ${StackTrace.current}');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,

@@ -11,7 +11,6 @@ class RechargeScreenView extends StatelessWidget {
   const RechargeScreenView({super.key});
 
   void _leaveParking() {
-    print('leave');
     Get.find<RechargeController>().pollParkingStatus();
   }
 

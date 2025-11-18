@@ -85,7 +85,6 @@ class PlugInLoadingController extends GetxController {
   Future<void> cancelPending() async {
     try {
       final res = await Api().delete(Endpoints.order(order!.id!));
-      print(res);
       remainSecondTimer?.cancel();
         apiTimer?.cancel();
 

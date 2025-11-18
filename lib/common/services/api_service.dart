@@ -122,11 +122,13 @@ class Api {
 
   Future<Response> get(
     endpoint, {
+    Map<String, dynamic>? data,
     String? fullUrl,
   }) async {
     return await requestApi(
       endpoint,
       fullUrl: fullUrl,
+      data: data,
       method: 'get',
     );
   }

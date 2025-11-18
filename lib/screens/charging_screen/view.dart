@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
-import 'package:renergy_app/main.dart';
+import 'package:renergy_app/main_controller.dart';
 import 'package:renergy_app/screens/screens.dart';
 
 class ChargingScreenView extends StatefulWidget {
@@ -14,13 +14,14 @@ class ChargingScreenView extends StatefulWidget {
 }
 
 class _ChargingScreenViewState extends State<ChargingScreenView> {
-
   void _fetchIsCharging() async {
     final mainController = Get.find<MainController>();
     try {
       await mainController.fetchChargingOrder();
       if (mainController.chargingOrder?.status != null) {
-        switch (ChargingStatsStatus.fromString(mainController.chargingOrder!.status)) {
+        switch (ChargingStatsStatus.fromString(
+          mainController.chargingOrder!.status,
+        )) {
           case ChargingStatsStatus.open:
             Get.toNamed(AppRoutes.plugInLoading);
             break;
@@ -41,7 +42,9 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         }
       }
     } catch (e) {
-      Snackbar.showError(e.toString(), context);
+      if (mounted) {
+        Snackbar.showError(e.toString(), context);
+      }
     }
   }
 
@@ -57,15 +60,9 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Charging Session',
-        ),
-        centerTitle: true,
-      ),
-      body: GetBuilder<ChargingController>  (
+      appBar: AppBar(title: const Text('Charging Session'), centerTitle: true),
+      body: GetBuilder<ChargingController>(
         builder: (controller) {
-
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -164,11 +161,9 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
               ),
             ),
           );
-        }
+        },
       ),
-      bottomNavigationBar: const MainBottomNavBar(
-        currentIndex: 1,
-      ),
+      bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
     );
   }
 }

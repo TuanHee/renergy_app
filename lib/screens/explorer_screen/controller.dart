@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
+import 'package:renergy_app/common/models/bookmark.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -13,6 +14,7 @@ class ExplorerController extends GetxController {
   bool isLoading = true;
   String? errorMessage;
   List<Station> stations = [];
+  List<Bookmark> bookmarks = [];
 
   @override
   void onInit() async {
@@ -23,9 +25,6 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> fetchStations() async {
-    isLoading = true;
-    errorMessage = null;
-
     try {
       final res = await Api().get(Endpoints.stations);
 
@@ -52,5 +51,66 @@ class ExplorerController extends GetxController {
             .length ??
         0;
   }
-}
 
+  Future<void> fetchBookmark() async {
+    final res = await Api().get(Endpoints.bookmarkIndex);
+
+    if (res.data['status'] != 200) {
+      throw ('Failed to fetch Bookmark: ${res.data['message'] ?? 'Unknown error'}');
+    }
+
+    if (res.data['data']['bookmarks'] is! List) {
+      throw ('Failed to fetch Bookmark: bookmarks is not a list');
+    }
+
+    bookmarks = (res.data['data']['bookmarks'] as List)
+        .map((element) => Bookmark.fromJson(element))
+        .toList();
+
+    print(bookmarks.length);
+  }
+
+  Future<void> storeBookmark(Station station) async {
+    Bookmark newBookmark = Bookmark(stationId: station.id, station: station);
+    bookmarks.add(newBookmark);
+    update();
+
+    try {
+      final res = await Api().post(
+        Endpoints.storeBookmark,
+        data: {'station_id': station.id},
+      );
+
+      if (res.data['status'] != 200) {
+        errorMessage = res.data['message'] ?? 'Failed to add bookmark';
+      }
+
+    } catch (e) {
+      bookmarks.removeLast();
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> removeBookmark(int stationId) async {
+    final removed = bookmarks.firstWhere((e) => e.stationId == stationId);
+    bookmarks.removeWhere((e) => e.stationId == stationId);
+    update();
+
+    try {
+      final res = await Api().get(Endpoints.deleteBookmark(stationId));
+
+      if (res.data['status'] != 200) {
+        errorMessage = res.data['message'] ?? 'Failed to add bookmark';
+      }
+    } catch (e) {
+      bookmarks.add(removed);
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+}

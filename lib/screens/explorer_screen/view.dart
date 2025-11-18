@@ -4,7 +4,7 @@ import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/float_bar.dart';
-import 'package:renergy_app/main.dart';
+import 'package:renergy_app/main_controller.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatelessWidget {
@@ -100,7 +100,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     _sheetController = DraggableScrollableController();
     _sheetController.addListener(_handleSheetSizeChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchIsCharging();
+      _fetchBookmark();
+      // _fetchIsCharging();
     });
   }
 
@@ -124,7 +125,19 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     try {
       await Get.find<MainController>().fetchChargingOrder();
     } catch (e) {
-      Snackbar.showError(e.toString(), context);
+      if (mounted) {
+        Snackbar.showError(e.toString(), context);
+      }
+    }
+  }
+
+  void _fetchBookmark() async {
+    try {
+      await Get.find<ExplorerController>().fetchBookmark();
+    } catch (e) {
+      if (mounted) {
+        Snackbar.showError(e.toString(), context);
+      }
     }
   }
 
@@ -322,7 +335,10 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
         Positioned(
           right: 0,
           top: 0,
-          child: FloatBar(title: Get.find<MainController>().chargingOrder?.status, onClick: () => {Get.toNamed(AppRoutes.charging)}),
+          child: FloatBar(
+            title: Get.find<MainController>().chargingOrder?.status,
+            onClick: () => {Get.toNamed(AppRoutes.charging)},
+          ),
         ),
       ],
     );
@@ -361,86 +377,111 @@ class _StationItem extends StatelessWidget {
             const SizedBox(width: 12),
 
             // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            GetBuilder<ExplorerController>(
+              builder: (controller) {
+                final isBookmarkStored = controller.bookmarks.any(
+                  (bookmark) => bookmark.stationId == station.id,
+                );
+                return Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyBadge(
-                        label:
-                            '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
-                        color: const Color(0xFF0BB07B),
+                      Row(
+                        children: [
+                          MyBadge(
+                            label:
+                                '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
+                            color: const Color(0xFF0BB07B),
+                          ),
+                          const SizedBox(width: 8),
+                          MyBadge(
+                            label: 'Showroom',
+                            color: Colors.black87,
+                            dark: true,
+                          ),
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {
+                              if (isBookmarkStored) {
+                                controller.removeBookmark(station.id!);
+                              } else {
+                                controller.storeBookmark(station);
+                              }
+                            },
+                            child: Icon(isBookmarkStored? Icons.star:
+                              Icons.star_border,
+                              color: isBookmarkStored
+                                  ? Colors.orange
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      MyBadge(
-                        label: 'Showroom',
-                        color: Colors.black87,
-                        dark: true,
-                      ),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () {},
-                        child: const Icon(
-                          Icons.star_border,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    station.name!,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    station.shortDescription!,
-                    style: TextStyle(color: muted, fontSize: 13),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.route, size: 16, color: muted),
-                      const SizedBox(width: 4),
-                      Text('3.9 km', style: TextStyle(color: muted)),
-                      const SizedBox(width: 12),
-                      Icon(Icons.ev_station, size: 16, color: muted),
-                      const SizedBox(width: 4),
+                      const SizedBox(height: 8),
                       Text(
-                        station.bays!.length.toString(),
-                        style: TextStyle(color: muted),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        station.isActive ? 'Available' : 'Unavailable',
+                        station.name!,
                         style: TextStyle(
-                          color: Colors.green.shade700,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.bolt, size: 16, color: Colors.green),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.circle, size: 10, color: Colors.green),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 4),
                       Text(
-                        'Open',
-                        style: TextStyle(
-                          color: Colors.green.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        station.shortDescription!,
+                        style: TextStyle(color: muted, fontSize: 13),
                       ),
-                      const SizedBox(width: 8),
-                      Text('12:00am - 11:59pm', style: TextStyle(color: muted)),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.route, size: 16, color: muted),
+                          const SizedBox(width: 4),
+                          Text('3.9 km', style: TextStyle(color: muted)),
+                          const SizedBox(width: 12),
+                          Icon(Icons.ev_station, size: 16, color: muted),
+                          const SizedBox(width: 4),
+                          Text(
+                            station.bays!.length.toString(),
+                            style: TextStyle(color: muted),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            station.isActive ? 'Available' : 'Unavailable',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.bolt, size: 16, color: Colors.green),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            size: 10,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Open',
+                            style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '12:00am - 11:59pm',
+                            style: TextStyle(color: muted),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ],
         ),
