@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:renergy_app/common/models/creadit_card.dart';
+import 'package:fiuu_mobile_xdk_flutter/fiuu_mobile_xdk_flutter.dart';
 
 
 class CardController extends GetxController {
@@ -24,8 +25,12 @@ class CardController extends GetxController {
     // ];
   }
 
-  void addCard() {
+  Future<void> addCard() async {
     // call api
+
+    Map<String, dynamic> params = {}; // call payment method store api to get the params
+
+    String? result = await MobileXDK.start(params);
 
     
     // cards.add(card);
