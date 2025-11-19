@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/models/creadit_card.dart';
+import 'package:renergy_app/components/components.dart';
 
 import 'controller.dart';
 import 'widget/card_widget.dart';
@@ -15,12 +16,10 @@ class CardScreenView extends StatefulWidget {
 }
 
 class _CardScreenViewState extends State<CardScreenView> {
-
   @override
   void initState() {
     super.initState();
     // Sample data
-    
   }
 
   void _deleteCard(int index) {
@@ -35,9 +34,16 @@ class _CardScreenViewState extends State<CardScreenView> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              Get.find<CardController>().deleteCard(index);
-              Navigator.pop(context);
+            onPressed: () async {
+              try {
+                await Get.find<CardController>().deleteCard(index);
+              } catch (e) {
+                Snackbar.showError(e.toString(), context);
+              } finally {
+                if (mounted) {
+                  Navigator.pop(context);
+                }
+              }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
@@ -48,85 +54,89 @@ class _CardScreenViewState extends State<CardScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    final cardController = Get.find<CardController>();
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'My Cards',
-        ),
-        centerTitle: true,
-      ),
-      body: cardController.cards.isEmpty
-          ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Illustration with charging station icon
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Light gray circle background
-                      Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          shape: BoxShape.circle,
+    return GetBuilder<CardController>(
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(title: const Text('My Cards'), centerTitle: true),
+          body: controller.cards.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Illustration with charging station icon
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Light gray circle background
+                            Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            // Charging station icon
+                            const Icon(
+                              Icons.credit_card,
+                              size: 120,
+                              color: Colors.grey,
+                            ),
+                            // Map pin with X overlay on bottom right
+                          ],
                         ),
-                      ),
-                      // Charging station icon
-                      const Icon(
-                        Icons.credit_card,
-                        size: 120,
-                        color: Colors.grey,
-                      ),
-                      // Map pin with X overlay on bottom right
-                    ],
-                  ),
-                  const SizedBox(height: 48),
+                        const SizedBox(height: 48),
 
-                  const Text(
-                    'No cards added yet',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                        const Text(
+                          'No cards added yet',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        // Explanatory text
+                        Text(
+                          'Tap + to add your first card',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade700,
+                            height: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
-                  // Explanatory text
-                  Text(
-                    'Tap + to add your first card',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade700,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: cardController.cards.length,
-              itemBuilder: (context, index) {
-                return CardWidget(
-                  card: cardController.cards[index],
-                  onDelete: () => _deleteCard(index),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: cardController.addCard,
-        backgroundColor: Color(0xFFD32F2F),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: controller.cards.length,
+                  itemBuilder: (context, index) {
+                    return CardWidget(
+                      card: controller.cards[index],
+                      onDelete: () => _deleteCard(index),
+                    );
+                  },
+                ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              try {
+                controller.addCard();
+              } catch (e) {
+                Snackbar.showError(e.toString(), context);
+              }
+            },
+            backgroundColor: Color(0xFFD32F2F),
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        );
+      },
     );
   }
 }

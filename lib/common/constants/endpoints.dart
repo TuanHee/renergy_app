@@ -11,4 +11,5 @@ class Endpoints {
   static String storeBookmark = 'bookmarks';
   static String bookmarkIndex = 'bookmarks';
   static String deleteBookmark(int id) => '$bookmarkIndex/$id';
+  static String paymentMethods = 'payment-methods';
 }
