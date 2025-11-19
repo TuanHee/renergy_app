@@ -8,8 +8,9 @@ class Endpoints {
   static String stopCharging(int id) => '$orders/$id/stop-charging';
   static String restart(int id) => '$orders/$id/restart';
   static String isChanging = 'user/isChanging';
-  static String storeBookmark = 'bookmarks';
-  static String bookmarkIndex = 'bookmarks';
-  static String deleteBookmark(int id) => '$bookmarkIndex/$id';
+  static String bookmarks = 'bookmarks';
+  static String bookmark(int id) => '$bookmarks/$id';
   static String paymentMethods = 'payment-methods';
+  static const String vehicles = 'vehicles';
+  static String vehicle(int id) => '$vehicles/$id';
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:renergy_app/common/models/creadit_card.dart';
 import 'package:renergy_app/components/components.dart';
 
 import 'controller.dart';
@@ -19,7 +18,13 @@ class _CardScreenViewState extends State<CardScreenView> {
   @override
   void initState() {
     super.initState();
-    // Sample data
+    WidgetsBinding.instance.addPostFrameCallback((_)async{
+      try {
+        // await Get.find<CardController>().fetchCardIndex();
+      } catch (e) {
+        Snackbar.showError(e.toString(), context);
+      }
+    });
   }
 
   void _deleteCard(int index) {

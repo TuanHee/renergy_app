@@ -52,7 +52,7 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> fetchBookmark() async {
-    final res = await Api().get(Endpoints.bookmarkIndex);
+    final res = await Api().get(Endpoints.bookmarks);
 
     if (res.data['status'] != 200) {
       throw ('Failed to fetch Bookmark: ${res.data['message'] ?? 'Unknown error'}');
@@ -75,7 +75,7 @@ class ExplorerController extends GetxController {
     update();
     try {
       final res = await Api().post(
-        Endpoints.storeBookmark,
+        Endpoints.bookmarks,
         data: {'station_id': station.id},
       );
 
@@ -104,7 +104,7 @@ class ExplorerController extends GetxController {
     update();
 
     try {
-      final res = await Api().delete(Endpoints.deleteBookmark(bookmarkId));
+      final res = await Api().delete(Endpoints.bookmark(bookmarkId));
 
       if (res.data['status'] != 200) {
         throw res.data['message'] ?? 'Failed to remove bookmark';

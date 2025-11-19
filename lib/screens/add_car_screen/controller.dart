@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/constants/endpoints.dart';
+import 'package:renergy_app/common/services/api_service.dart';
 
 class AddCarController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -13,6 +15,58 @@ class AddCarController extends GetxController {
   void toggleDefault(bool value) {
     isDefaultCar = value;
     update();
+  }
+
+  Future<void> addCar() async {
+    isSaving = true;
+    update();
+    try {
+      final data ={
+          'model': modelController.text,
+          'plate_number': plateController.text.toUpperCase(),
+          'is_default': isDefaultCar ? 1 : 0,
+        };
+      final res = await Api().post(
+        Endpoints.vehicles,
+        data: data,
+      );
+      if (res.data['status'] != 200) {
+        throw res.data['message'] ?? 'Failed to add car';
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      isSaving = false;
+      update();
+    }
+  }
+
+  Future<void> updateCar({
+    required String id,
+    String? model,
+    String? plate,
+    bool? isDefault,
+  }) async {
+    isSaving = true;
+    update();
+    try {
+      final res = await Api().put(
+        Endpoints.vehicle(int.parse(id)),
+        data: {
+          if (model != null) 'model': model,
+          if (plate != null) 'plate': plate.toUpperCase(),
+          if (isDefault != null) 'is_default': isDefault,
+        },
+      );
+      if (res.data['status'] != 200) {
+        throw res.data['message'] ?? 'Failed to update car';
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      isSaving = false;
+      update();
+    }
   }
 
   String? validateModel(String? value) {
@@ -32,45 +86,6 @@ class AddCarController extends GetxController {
       return 'Use format e.g. ABC123 or ABC 123';
     }
     return null;
-  }
-
-  Future<void> save() async {
-    final currentState = formKey.currentState;
-    if (currentState == null) return;
-    if (!currentState.validate()) return;
-
-    isSaving = true;
-    errorMessage = null;
-    update();
-
-    try {
-      // TODO: Integrate with actual save service/API
-      await Future.delayed(const Duration(milliseconds: 600));
-      print('Saving car: ${modelController.text}, ${plateController.text}');
-
-      Get.snackbar(
-        'Saved',
-        'Your car has been added',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.shade600,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-      );
-      Get.back();
-    } catch (e) {
-      errorMessage = 'Failed to save. Please try again.';
-      Get.snackbar(
-        'Error',
-        errorMessage!,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade600,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-      );
-    } finally {
-      isSaving = false;
-      update();
-    }
   }
 
   @override

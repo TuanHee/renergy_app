@@ -1,5 +1,5 @@
 class Car {
-  final String id;
+  final int id;
   final String model;
   final String plate;
   final bool isDefault;
@@ -21,7 +21,7 @@ class Car {
   factory Car.fromJson(Map<String, dynamic> json) => Car(
         id: json['id'],
         model: json['model'],
-        plate: json['plate'],
+        plate: json['plate_number'],
         isDefault: json['is_default'] ?? false,
       );
 }

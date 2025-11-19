@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/components/snackbar.dart';
 import 'controller.dart';
 
 class AddCarScreenView extends StatelessWidget {
@@ -39,7 +40,10 @@ class AddCarScreenView extends StatelessWidget {
                     children: [
                       const Text(
                         'Car Model',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -64,10 +68,16 @@ class AddCarScreenView extends StatelessWidget {
                         children: const [
                           Text(
                             'Car Plate Number',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           SizedBox(width: 4),
-                          Text('*', style: TextStyle(color: Colors.red, fontSize: 14)),
+                          Text(
+                            '*',
+                            style: TextStyle(color: Colors.red, fontSize: 14),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -106,7 +116,10 @@ class AddCarScreenView extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.error_outline, color: Colors.red.shade700),
+                              Icon(
+                                Icons.error_outline,
+                                color: Colors.red.shade700,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -130,7 +143,16 @@ class AddCarScreenView extends StatelessWidget {
             child: SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: controller.isSaving ? null : controller.save,
+                onPressed: controller.isSaving
+                    ? null
+                    : ()async {
+                        try {
+                          await controller.addCar();
+                          Get.back(result: true);
+                        } catch (e) {
+                          Snackbar.showError(e.toString(), context);
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
@@ -142,7 +164,10 @@ class AddCarScreenView extends StatelessWidget {
                     ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Text('Save'),
               ),
