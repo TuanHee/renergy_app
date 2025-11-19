@@ -27,6 +27,9 @@ class BookmarkController extends GetxController {
     catch(e){
       rethrow;
     }
+    finally{
+      update();
+    }
     
   }
 
@@ -35,7 +38,6 @@ class BookmarkController extends GetxController {
       throw 'Failed to remove bookmark: Try it Later';
     }
     final removed = bookmarks.firstWhereOrNull((e) => e.id == bookmarkId);
-
     if (removed == null) {
       throw 'Failed to remove bookmark: do not have this bookmark';
     }

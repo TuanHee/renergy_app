@@ -14,7 +14,7 @@ class BookmarkItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final muted = Colors.grey.shade600;
     return InkWell(
-      onTap:()=> onTap,
+      onTap: () => onTap?.call(),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -39,7 +39,7 @@ class BookmarkItem extends StatelessWidget {
                       ),
                       const Spacer(),
                       InkWell(
-                        onTap: () =>onRemove,
+                        onTap: () =>onRemove?.call(),
                         child: Icon(Icons.star, color: Colors.orange),
                       ),
                     ],

@@ -21,7 +21,9 @@ class _BookmarkScreenViewState extends State<BookmarkScreenView> {
       try {
         await Get.find<BookmarkController>().fetchBookmark();
       } catch (e) {
-        Snackbar.showError(e.toString(), context);
+        if (mounted) {
+          Snackbar.showError(e.toString(), context);
+        }
       }
     });
   }
@@ -36,28 +38,37 @@ class _BookmarkScreenViewState extends State<BookmarkScreenView> {
         child: GetBuilder<BookmarkController>(
           builder: (controller) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               child: controller.bookmarks.isNotEmpty
                   ? ListView.builder(
                       itemCount: controller.bookmarks.length,
                       itemBuilder: (context, index) {
-                        return BookmarkItem(
-                          bookmark: controller.bookmarks[index],
-                          onTap: () {
-                            Get.offAllNamed(AppRoutes.explorer);
-                            Get.toNamed(
-                              AppRoutes.chargingStation,
-                              arguments: controller.bookmarks[index].stationId,
-                            );
-                          },
-                          onRemove: () async {
-                            try {
-                              final bookmarkId = controller.bookmarks[index].id;
-                              await controller.removeBookmark(bookmarkId);
-                            } catch (e) {
-                              Snackbar.showError(e.toString(), context);
-                            }
-                          },
+                        return Column(
+                          children: [
+                            BookmarkItem(
+                              bookmark: controller.bookmarks[index],
+                              onTap: () {
+                                Get.toNamed(
+                                  AppRoutes.chargingStation,
+                                  arguments: controller.bookmarks[index].stationId,
+                                );
+                              },
+                              onRemove: () async {
+                                try {
+                                  final bookmarkId = controller.bookmarks[index].id;
+                                  await controller.removeBookmark(bookmarkId);
+                                } catch (e) {
+                                  Snackbar.showError(e.toString(), context);
+                                }
+                              },
+                            ),
+                            if(index != controller.bookmarks.length)
+                            Container(
+                              color: Colors.grey[200],
+                              height: 2,
+                              width: double.infinity,
+                            )
+                          ],
                         );
                       },
                     )
