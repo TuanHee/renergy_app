@@ -110,7 +110,7 @@ class ExplorerController extends GetxController {
         throw res.data['message'] ?? 'Failed to remove bookmark';
       }
     } catch (e) {
-      // bookmarks.add(removed);
+      bookmarks.add(removed);
       update();
       rethrow;
     }
