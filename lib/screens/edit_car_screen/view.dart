@@ -12,9 +12,41 @@ class EditCarScreenView extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Delete Car'),
+                      content: const Text('Are you sure you want to delete this car?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
+                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true) {
+                    try {
+                      await controller.deleteCar();
+                      Get.back(result: true);
+                    } catch (e) {
+                      Snackbar.showError(e.toString(), context);
+                    }
+                  }
+                },
+                icon: const Icon(Icons.delete, color: Colors.white),
+              ),
+            ],
             centerTitle: true,
             title: const Text(
-              'Add My Car',
+              'Edit My Car',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -145,9 +177,11 @@ class EditCarScreenView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: controller.isSaving
                     ? null
-                    : ()async {
+                    : () async {
                         try {
-                          await controller.addCar();
+                          await controller.updateCar(
+                            id: controller.car?.id.toString() ?? '',
+                          );
                           Get.back(result: true);
                         } catch (e) {
                           Snackbar.showError(e.toString(), context);

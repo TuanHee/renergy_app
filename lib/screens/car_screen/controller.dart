@@ -47,27 +47,10 @@ class CarController extends GetxController {
 
   Future<void> toEditCarPage(Car car) async {
     final result = await Get.toNamed(AppRoutes.editCar, arguments: car);
+
     if (result == true) {
       await fetchCarIndex();
-    }
-  }
 
-  Future<void> deleteCar(int id) async {
-    final removed = cars.firstWhereOrNull((c) => c.id == id);
-    if (removed == null) {
-      throw 'Car not found';
-    }
-    cars.remove(removed);
-    update();
-    try {
-      final res = await Api().delete(Endpoints.vehicle(id));
-      if (res.data['status'] != 200) {
-        throw res.data['message'] ?? 'Failed to delete car';
-      }
-    } catch (e) {
-      cars.add(removed);
-      update();
-      rethrow;
     }
   }
 }

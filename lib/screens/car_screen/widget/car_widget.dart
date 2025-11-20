@@ -19,8 +19,8 @@ class CarWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          // Get.toNamed(AppRoutes.editCar, arguments: car);
+        onTap: () async {
+          await controller.toEditCarPage(car);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
