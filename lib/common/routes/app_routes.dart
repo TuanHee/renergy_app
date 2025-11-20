@@ -16,6 +16,7 @@ class AppRoutes {
   static const String recharge = '/recharge';
   static const String car = '/car';
   static const String addCar = '/add-car';
+    static const String editCar = '/edit-car';
 
   // Initial route
   static const String initial = splash;
@@ -99,6 +100,12 @@ class AppRoutes {
         page: () => const AddCarScreenView(),
         transition: Transition.fadeIn,
         binding: AddCarBinding(),
+      ),
+      GetPage(
+        name: editCar,
+        page: () => const EditCarScreenView(),
+        transition: Transition.fadeIn,
+        binding: EditCarBinding(),
       ),
     ];
   }

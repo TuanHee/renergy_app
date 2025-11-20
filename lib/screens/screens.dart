@@ -11,3 +11,4 @@ export 'card_screen/card_screen.dart';
 export 'recharge_screen/recharge_screen.dart';
 export 'add_car_screen/add_car_screen.dart';
 export 'car_screen/car_screen.dart';
+export 'edit_car_screen/edit_car_screen.dart';
