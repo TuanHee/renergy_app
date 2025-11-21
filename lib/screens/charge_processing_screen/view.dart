@@ -62,9 +62,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: ()async {
               try {
-                Get.find<ChargeProcessingController>().stopCharging();
+                await Get.find<ChargeProcessingController>().stopCharging();
                 Snackbar.showSuccess('Charging session stopped', context);
               } catch (e) {
                 Snackbar.showError(e.toString(), context);
@@ -210,7 +210,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        '${(controller.chargingStats?.meter?.soc ?? 0).toStringAsFixed(0)}%',
+                                        controller.chargingStats?.meter?.soc == null
+                                            ? '-'
+                                            : '${controller.chargingStats!.meter!.soc!.toStringAsFixed(0)}%',
                                         style: const TextStyle(
                                           fontSize: 42,
                                           fontWeight: FontWeight.bold,
@@ -358,7 +360,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 controller.chargingStats?.startAt != null
                                     ? DateTime.parse(
                                         controller.chargingStats!.startAt!,
-                                      ).toLocal().toString()
+                                      ).toLocal().toString().substring(0, 16)
                                     : '-',
                               ),
 

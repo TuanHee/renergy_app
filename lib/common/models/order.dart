@@ -17,9 +17,9 @@ class Order {
   String? updatedAt;
   List<OrderLine>? lines;
   Bay? bay;
-  int? totalUsage;
+  double? totalUsage;
   double? totalChargeableIdleTimeMinutes;
-  int? totalChargingTimeMinutes;
+  double? totalChargingTimeMinutes;
   String? invoiceNo;
   double? discountPercentage;
   double? taxPercentage;
@@ -73,13 +73,13 @@ class Order {
       updatedAt: json['updated_at'],
       lines: json['lines'] == null ? null : OrderLine.listFromJson(json['lines']),
       bay: json['bay'] == null ? null : Bay.fromJson(json['bay']),
-      totalUsage: json['total_usage'] == null ? null : int.parse(json['total_usage'].toString()),
+      totalUsage: json['total_usage'] == null ? null : double.parse(json['total_usage'].toString()),
       totalChargeableIdleTimeMinutes: json['total_chargeable_idle_time_minutes'] == null
           ? null
           : double.parse(json['total_chargeable_idle_time_minutes'].toString()),
       totalChargingTimeMinutes: json['total_charging_time_minutes'] == null
           ? null
-          : int.parse(json['total_charging_time_minutes'].toString()),
+          : double.parse(json['total_charging_time_minutes'].toString()),
       invoiceNo: json['invoice_no'],
       discountPercentage: json['discount_percentage'] == null ? null : double.parse(json['discount_percentage'].toString()),
       taxPercentage: json['tax_percentage'] == null ? null : double.parse(json['tax_percentage'].toString()),

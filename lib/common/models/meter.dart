@@ -16,6 +16,13 @@ class Meter {
       timestamp: json['timestamp'],
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'usage': usage,
+      'soc': soc,
+      'timestamp': timestamp,
+    };
+  }
 
   static List<Meter> listFromJson(dynamic json) {
     return json == null ? [] : List<Meter>.from(json.map((x) => Meter.fromJson(x)));

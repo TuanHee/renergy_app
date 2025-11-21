@@ -53,14 +53,14 @@ class FloatBar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        ChargingStatsStatus.title(title),
+                        title ?? '',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        ChargingStatsStatus.subtitle(title),
+                        subtitle ?? '',
                         style: Theme.of(
                           context,
                         ).textTheme.bodySmall?.copyWith(color: Colors.black54),

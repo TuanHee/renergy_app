@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -272,7 +273,7 @@ class PaymentResultController extends GetxController {
     _add('Port Type', _s(order?.bay?.port?.portType));
     _add('Total Usage', _s(order!.totalUsage));
     _add('Charging Time (min)', _s(order!.totalChargingTimeMinutes));
-    _add('Chargeable Idle (min)', order!.totalChargeableIdleTimeMinutes == null ? null : order!.totalChargeableIdleTimeMinutes!.toStringAsFixed(2));
+    _add('Chargeable Idle (min)', order!.totalChargeableIdleTimeMinutes?.toStringAsFixed(2));
     _add('Subtotal', order!.subtotalAmount == null ? null : _currency(order!.subtotalAmount));
     if (order!.discountPercentage != null) {
       _add('Discount (%)', order!.discountPercentage!.toString());
@@ -293,5 +294,15 @@ class PaymentResultController extends GetxController {
 
   void goToCharging() {
     Get.offAllNamed(AppRoutes.charging);
+  }
+
+  void downloadInvoice() {
+    Get.snackbar(
+      'Download',
+      'Downloading invoice...',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF4CAF50),
+      colorText: Colors.white,
+    );
   }
 }

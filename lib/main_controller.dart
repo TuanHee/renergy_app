@@ -11,36 +11,47 @@ import 'package:renergy_app/common/services/api_service.dart';
 class MainController extends GetxController {
   Order? chargingOrder;
   String? status;
+  Timer? chargingOrderTimer;
 
-  Future<void> fetchChargingOrder() async {
-    // Timer.periodic(const Duration(seconds: 2), (timer) async {
-    //   try {
+  Future<void> pollChargingOrder() async {
+    chargingOrderTimer = Timer.periodic(const Duration(seconds: 2), (
+      timer,
+    ) async {
+      try {
+        // if (status == ChargingStatus.charging.value) {
+        //   timer.cancel();
+        //   Get.offAllNamed(AppRoutes.chargeProcessing, arguments: chargingOrder);
+        //   return;
+        // }
 
-    //     // if (status == ChargingStatus.charging.value) {
-    //     //   timer.cancel();
-    //     //   Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
-    //     //   return;
-    //     // }
+        // if (status == ChargingStatus.stopped.value) {
+        //   Get.offAllNamed(AppRoutes.charging, arguments: chargingOrder);
+        //   timer.cancel();
+        //   return;
+        // }
 
-    //     // if (status == ChargingStatus.stopped.value) {
-    //     //   Get.offAllNamed(AppRoutes.charging, arguments: order);
-    //     //   timer.cancel();
-    //     //   return;
-    //     // }
+        final res = await Api().get(Endpoints.activeOrder);
 
-    //     final res = await Api().get(Endpoints.chargingStats(order!.id!));
+        if (res.data['status'] >= 200 && res.data['status'] < 300) {
+          final data = res.data['data'];
 
-    //     if (res.data['status'] >= 200 && res.data['status'] < 300) {
-    //       final data = res.data['data'];
+          status = data['status'];
+          chargingOrder = data['order'] != null
+              ? Order.fromJson(data['order'])
+              : null;
+        }
+      } catch (e, stackTrace) {
+        print('Error polling charging order: $e, $stackTrace');
+      }
+      finally{
+        update();
+      }
+    });
+  }
 
-    //       if (data['charging_stats']['status'] is String) {
-    //         status = data['charging_stats']['status'];
-    //         print(data['charging_stats']['status']);
-    //       }
-    //     }
-    //   } catch (e, stackTrace) {
-    //     update();
-    //   }
-    // });
+  @override
+  void onClose() {
+    chargingOrderTimer?.cancel();
+    super.onClose();
   }
 }

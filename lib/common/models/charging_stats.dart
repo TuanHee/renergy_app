@@ -23,6 +23,15 @@ class ChargingStats {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status?.value,
+      'started_at': startAt,
+      'stopped_at': stopAt,
+      'meter': meter?.toJson(),
+    };
+  }
+
   static List<ChargingStats> listFromJson(dynamic json) {
     return json == null ? [] : List<ChargingStats>.from(json.map((x) => ChargingStats.fromJson(x)));
   }

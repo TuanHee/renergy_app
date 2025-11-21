@@ -17,6 +17,20 @@ class PaymentResultScreenView extends StatelessWidget {
         final otherItems = controller.items.where((e) => !moneyKeys.contains(e['k'])).toList();
         return Scaffold(
           backgroundColor: const Color(0xFFF3F6FA),
+          appBar: AppBar(
+            centerTitle: true,
+            title: const Text('Payment Result'),
+            leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () => controller.downloadInvoice(),
+                icon: const Icon(Icons.download, color: Colors.white),
+              ),
+            ],
+          ),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -73,19 +87,6 @@ class PaymentResultScreenView extends StatelessWidget {
                         const SizedBox(height: 8),
                         ...otherItems.map((e) => _kv(e['k'] ?? '', e['v'] ?? '')).toList(),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: red,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: () => controller.goToCharging(),
-                      child: const Text('Back to Charging'),
                     ),
                   ),
                 ],

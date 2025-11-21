@@ -41,9 +41,12 @@ enum BayStatus {
 
 enum ChargingStatsStatus {
   open('Open'),
+  pending('Pending'),
   charging('Charging'),
-  accepted('Accepted'),
-  rejected('Rejected'),
+  finishing('Finishing'),
+  restarting('Restarting'),
+  paymentPending('Payment Pending'),
+  unPaid('Unpaid'),
   completed('Completed');
 
   const ChargingStatsStatus(this.value);
@@ -62,10 +65,13 @@ enum ChargingStatsStatus {
   static String subtitle(String? value){
     switch(ChargingStatsStatus.fromString(value)){
       case ChargingStatsStatus.open: return 'plug in the charger to start the process';
-      case ChargingStatsStatus.accepted: return 'the charge process was started soon';
+      case ChargingStatsStatus.pending: return 'your request is pending';
       case ChargingStatsStatus.charging: return 'charging in progress';
+      case ChargingStatsStatus.finishing: return 'customer is leaving the parking';
+      case ChargingStatsStatus.restarting: return 'waiting for rechange';
+      case ChargingStatsStatus.paymentPending: return 'payment pending';
+      case ChargingStatsStatus.unPaid: return 'unpaid';
       case ChargingStatsStatus.completed: return 'leave the parking to completed the whole process';
-      case ChargingStatsStatus.rejected: return 'your request was rejected, please try it later';
       
       default: return '';
     }
@@ -74,10 +80,13 @@ enum ChargingStatsStatus {
   static String title(String? value){
     switch(ChargingStatsStatus.fromString(value)){
       case ChargingStatsStatus.open: return 'Ready To Charge';
-      case ChargingStatsStatus.accepted: return 'Accepted';
+       case ChargingStatsStatus.pending: return 'Pending';
       case ChargingStatsStatus.charging: return 'Charging';
+      case ChargingStatsStatus.finishing: return 'Finishing';
+      case ChargingStatsStatus.restarting: return 'Recharging';
+      case ChargingStatsStatus.paymentPending: return 'Payment Pending';
+      case ChargingStatsStatus.unPaid: return 'Unpaid';
       case ChargingStatsStatus.completed: return 'Leave Parking';
-      case ChargingStatsStatus.rejected: return 'Rejected';
       
       default: return '';
     }

@@ -46,7 +46,7 @@ class PlugInLoadingController extends GetxController {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  void pollPlugStatus(BuildContext context) async {
+  Future<void> pollPlugStatus(BuildContext context) async {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         if (status == ChargingStatus.charging.value) {

@@ -22,7 +22,6 @@ class BookmarkController extends GetxController {
         .map((element) => Bookmark.fromJson(element))
         .toList();
 
-    print(bookmarks.length);
     }
     catch(e){
       rethrow;

@@ -13,4 +13,5 @@ class Endpoints {
   static String paymentMethods = 'payment-methods';
   static const String vehicles = 'vehicles';
   static String vehicle(int id) => '$vehicles/$id';
+  static String activeOrder = 'home/active-order-stats';
 }

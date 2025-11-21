@@ -41,9 +41,9 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
     super.dispose();
   }
 
-  void _fetchPlugStatus() {
+  void _fetchPlugStatus()async {
     try {
-      Get.find<PlugInLoadingController>().pollPlugStatus(context);
+      await Get.find<PlugInLoadingController>().pollPlugStatus(context);
     } catch (e) {
       Snackbar.showError('Charging session stopped Error: $e', context);
     }

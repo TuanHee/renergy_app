@@ -28,9 +28,9 @@ class RechargeScreenView extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               try {
-                Get.find<RechargeController>().restart();
+                await Get.find<RechargeController>().restart();
                 Navigator.pop(context);
                 Get.offAllNamed(
                   AppRoutes.plugInLoading,

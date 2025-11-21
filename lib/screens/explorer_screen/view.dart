@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -102,7 +103,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await Future.wait([
-          Get.find<MainController>().fetchChargingOrder(),
+          Get.find<MainController>().pollChargingOrder(),
           Get.find<ExplorerController>().fetchBookmark(),
         ]);
       } catch (e) {
@@ -322,13 +323,19 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
             },
           ),
         ),
-        Positioned(
-          right: 0,
-          top: 0,
-          child: FloatBar(
-            title: Get.find<MainController>().chargingOrder?.status,
-            onClick: () => {Get.toNamed(AppRoutes.charging)},
-          ),
+        GetBuilder<MainController>(
+          builder: (controller) {
+            return controller.status == null ? SizedBox.shrink():
+            Positioned(
+              right: 0,
+              top: 0,
+              child: FloatBar(
+                title: ChargingStatsStatus.title(controller.status),
+                subtitle: ChargingStatsStatus.subtitle(controller.status),
+                onClick: () => {Get.toNamed(AppRoutes.charging)},
+              ),
+            );
+          }
         ),
       ],
     );
