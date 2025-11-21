@@ -11,7 +11,6 @@ class PlugInLoadingController extends GetxController {
   Order? order;
   String status = 'ready';
   int remainSecond = 15 * 60;
-  String errorMessage = '';
 
   Timer? remainSecondTimer;
   Timer? apiTimer;
@@ -57,10 +56,10 @@ class PlugInLoadingController extends GetxController {
           return;
         }
 
-        if (status == ChargingStatus.stopped.value) {
-          Get.offAllNamed(AppRoutes.charging, arguments: order);
+        if (status == ChargingStatus.cancelled.value) {
           remainSecondTimer?.cancel();
           timer.cancel();
+          Get.offAllNamed(AppRoutes.charging, arguments: order);
           return;
         }
 
@@ -75,9 +74,7 @@ class PlugInLoadingController extends GetxController {
           }
         }
       } catch (e, stackTrace) {
-        errorMessage = 'Error: $e, stackTrace: $stackTrace';
-        Get.log(errorMessage);
-        update();
+        rethrow;
       }
     });
   }
@@ -88,16 +85,11 @@ class PlugInLoadingController extends GetxController {
       remainSecondTimer?.cancel();
         apiTimer?.cancel();
 
-      if (res.data['status'] == 200) {
-        remainSecondTimer?.cancel();
-        apiTimer?.cancel();
-        status = ChargingStatus.stopped.name;
-        update();
-        Get.offAllNamed(AppRoutes.charging);
+      if (res.data['status'] != 200) {
+        throw'Failed to cancel order: Try again later';
       }
     } catch (e, stackTrace) {
-      errorMessage = 'Error: $e, stackTrace: $stackTrace';
-      update();
+      rethrow;
     }
   }
 }

@@ -1,19 +1,46 @@
+import 'dart:async';
+
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
+import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/order.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 
 class MainController extends GetxController {
   Order? chargingOrder;
+  String? status;
 
   Future<void> fetchChargingOrder() async {
-    // final res = await Api().post(Endpoints.isChanging);
+    // Timer.periodic(const Duration(seconds: 2), (timer) async {
+    //   try {
 
-    // if (res.data['status'] != 200) {
-    //   throw ('Is Changing Error: ${res.data['message'] ?? 'Unknown error'}');
-    // }
+    //     // if (status == ChargingStatus.charging.value) {
+    //     //   timer.cancel();
+    //     //   Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
+    //     //   return;
+    //     // }
 
-    // chargingOrder = res.data['data'] as Order;
+    //     // if (status == ChargingStatus.stopped.value) {
+    //     //   Get.offAllNamed(AppRoutes.charging, arguments: order);
+    //     //   timer.cancel();
+    //     //   return;
+    //     // }
+
+    //     final res = await Api().get(Endpoints.chargingStats(order!.id!));
+
+    //     if (res.data['status'] >= 200 && res.data['status'] < 300) {
+    //       final data = res.data['data'];
+
+    //       if (data['charging_stats']['status'] is String) {
+    //         status = data['charging_stats']['status'];
+    //         print(data['charging_stats']['status']);
+    //       }
+    //     }
+    //   } catch (e, stackTrace) {
+    //     update();
+    //   }
+    // });
   }
 }
-

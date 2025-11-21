@@ -98,7 +98,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                             const Icon(
                               Icons.location_on,
                               size: 32,
-                              color: Colors.black,
+                              color: Color.fromRGBO(0, 0, 0, 1),
                             ),
                             const Icon(
                               Icons.close,
@@ -136,7 +136,8 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                   // Explore Now button
                   OutlinedButton(
                     onPressed: () {
-                      Get.offAllNamed(AppRoutes.explorer);
+                      // Get.offAllNamed(AppRoutes.explorer);
+                      Get.offAllNamed(AppRoutes.paymentResult);
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(

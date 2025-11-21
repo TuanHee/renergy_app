@@ -5,7 +5,7 @@ class OrderLine {
   int? orderId;
   String? orderableType;
   int? orderableId;
-  int? quantity;
+  double? quantity;
   String? uom;
   double? unitPrice;
   double? subtotalAmount;
@@ -43,7 +43,7 @@ class OrderLine {
       orderId: json['order_id'] == null ? null : int.parse(json['order_id'].toString()),
       orderableType: json['orderable_type'],
       orderableId: json['orderable_id'] == null ? null : int.parse(json['orderable_id'].toString()),
-      quantity: json['quantity'] == null ? null : int.parse(json['quantity'].toString()),
+      quantity: json['quantity'] == null ? null : double.parse(json['quantity'].toString()),
       uom: json['uom'],
       unitPrice: json['unit_price'] == null ? null : double.parse(json['unit_price'].toString()),
       subtotalAmount: json['subtotal_amount'] == null ? null : double.parse(json['subtotal_amount'].toString()),

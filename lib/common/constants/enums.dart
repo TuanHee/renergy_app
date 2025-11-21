@@ -3,7 +3,8 @@ enum ChargingStatus {
   pending('Pending'),
   charging('Charging'),
   stopped('Stopped'),
-  completed('Completed');
+  completed('Completed'),
+  cancelled('Cancelled');
 
   const ChargingStatus(this.value);
   final String value;

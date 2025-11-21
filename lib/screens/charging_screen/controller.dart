@@ -13,7 +13,7 @@ import 'package:renergy_app/screens/explorer_screen/controller.dart';
 class ChargingController extends GetxController {
   ChargingStatus status = ChargingStatus.none;
   ChargingStats? chargingStats;
-  Order? order;
+  List<Order> orders = [];
 
   @override
   void onInit() async{

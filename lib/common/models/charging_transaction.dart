@@ -6,7 +6,7 @@ class ChargingTransaction {
   String? startedAt;
   String? stoppedAt;
   String? stopReason;
-  int? durationMinutes;
+  double? durationMinutes;
   double? meterStartValue;
   double? meterStopValue;
   double? usage;
@@ -38,7 +38,7 @@ class ChargingTransaction {
       startedAt: json['started_at'],
       stoppedAt: json['stopped_at'],
       stopReason: json['stop_reason'],
-      durationMinutes: json['duration_minutes'] == null ? null : int.parse(json['duration_minutes'].toString()),
+      durationMinutes: json['duration_minutes'] == null ? null : double.parse(json['duration_minutes'].toString()),
       meterStartValue: json['meter_start_value'] == null ? null : double.parse(json['meter_start_value'].toString()),
       meterStopValue: json['meter_stop_value'] == null ? null : double.parse(json['meter_stop_value'].toString()),
       usage: json['usage'] == null ? null : double.parse(json['usage'].toString()),
