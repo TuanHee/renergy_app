@@ -12,3 +12,4 @@ export 'recharge_screen/recharge_screen.dart';
 export 'add_car_screen/add_car_screen.dart';
 export 'car_screen/car_screen.dart';
 export 'edit_car_screen/edit_car_screen.dart';
+export 'payment_result_screen/payment_result_screen.dart';
