@@ -103,7 +103,6 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await Future.wait([
-          Get.find<MainController>().pollChargingOrder(),
           Get.find<ExplorerController>().fetchBookmark(),
         ]);
       } catch (e) {

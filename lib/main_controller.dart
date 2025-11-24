@@ -13,6 +13,12 @@ class MainController extends GetxController {
   String? status;
   Timer? chargingOrderTimer;
 
+  @override
+  onInit() {
+    super.onInit();
+    pollChargingOrder();
+  }  
+
   Future<void> pollChargingOrder() async {
     chargingOrderTimer = Timer.periodic(const Duration(seconds: 2), (
       timer,

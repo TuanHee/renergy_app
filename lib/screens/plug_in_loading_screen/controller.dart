@@ -73,8 +73,9 @@ class PlugInLoadingController extends GetxController {
             print(data['charging_stats']['status']);
           }
         }
+        update();
       } catch (e, stackTrace) {
-        rethrow;
+        print('pollPlugStatus error: $e, $stackTrace');
       }
     });
   }

@@ -23,8 +23,17 @@ class ChargingController extends GetxController {
     fetchChargingHistory();
   }
 
-  void fetchChargingHistory(){
-
+  Future<void> fetchChargingHistory() async {
+    try {
+      final res = await Api().get(Endpoints.orders);
+      dynamic list = res.data['data']?['orders'] ?? res.data['orders'] ?? res.data['data'] ?? res.data;
+      orders = Order.listFromJson(list);
+    } catch (e) {
+      print('Error fetching charging history: $e');
+      // rethrow;
+    } finally {
+      update();
+    }
   }
 }
 
