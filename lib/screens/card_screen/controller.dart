@@ -32,7 +32,7 @@ class CardController extends GetxController {
       if (res.data['status'] != 200) {
         throw res.data['message'] ?? 'Failed to init payment method';
       }
-      final data = res.data['data'];
+      final data = res.data['data']['params'];
       final Map<String, dynamic> params = data is Map<String, dynamic> ? data : {};
       print('param: $params');
       final String? result = await MobileXDK.start(params);

@@ -39,7 +39,7 @@ dependencies:
   sign_in_with_apple: ^7.0.1
   dio: ^5.9.0
   shared_preferences: ^2.5.3
-  fiuu_mobile_xdk_flutter: 3.34.21
+  fiuu_mobile_xdk_flutter: 3.34.30
 
 dev_dependencies:
   flutter_test:
