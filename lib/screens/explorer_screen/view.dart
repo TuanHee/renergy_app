@@ -5,7 +5,6 @@ import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/float_bar.dart';
-import 'package:renergy_app/main_controller.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatelessWidget {
@@ -101,15 +100,24 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     _sheetController = DraggableScrollableController();
     _sheetController.addListener(_handleSheetSizeChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        await Future.wait([
-          Get.find<ExplorerController>().fetchBookmark(),
+      final controller = widget.controller;
+      await Future.wait([
+          controller.fetchBookmark(
+            onErrorCallback: (msg) {
+              if (mounted) Snackbar.showError(msg, context);
+            },
+          ),
+          controller.pollChargingOrder(
+            onErrorCallback: (msg) {
+              if (mounted) Snackbar.showError(msg, context);
+            },
+          ),
+          controller.fetchStations(
+            onErrorCallback: (msg) {
+              if (mounted) Snackbar.showError(msg, context);
+            },
+          ),
         ]);
-      } catch (e) {
-        if (mounted) {
-          Snackbar.showError(e.toString(), context);
-        }
-      }
     });
   }
 
@@ -117,6 +125,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
   void dispose() {
     _sheetController.removeListener(_handleSheetSizeChanged);
     _sheetController.dispose();
+    widget.controller.stopPollingChargingOrder();
     super.dispose();
   }
 
@@ -322,7 +331,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
             },
           ),
         ),
-        GetBuilder<MainController>(
+        GetBuilder<ExplorerController>(
           builder: (controller) {
             return controller.status == null ? SizedBox.shrink():
             Positioned(

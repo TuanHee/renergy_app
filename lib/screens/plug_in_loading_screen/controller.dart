@@ -29,8 +29,8 @@ class PlugInLoadingController extends GetxController {
     DateTime endTime = now.add(Duration(seconds: remainSecond));
 
     remainSecondTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (status == ChargingStatus.stopped.name ||
-          status == ChargingStatus.charging.name) {
+      if (status == ChargingStatsStatus.finishing.name ||
+          status == ChargingStatsStatus.charging.name) {
         timer.cancel();
         return;
       }
@@ -49,14 +49,14 @@ class PlugInLoadingController extends GetxController {
   Future<void> pollPlugStatus(BuildContext context) async {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
-        if (status == ChargingStatus.charging.value) {
+        if (status == ChargingStatsStatus.charging.value) {
           remainSecondTimer?.cancel();
           timer.cancel();
           Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
           return;
         }
 
-        if (status == ChargingStatus.cancelled.value) {
+        if (status == ChargingStatsStatus.cancelled.name) {
           remainSecondTimer?.cancel();
           timer.cancel();
           Get.offAllNamed(AppRoutes.charging, arguments: order);

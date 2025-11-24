@@ -1,25 +1,3 @@
-enum ChargingStatus {
-  none('None'),
-  pending('Pending'),
-  charging('Charging'),
-  stopped('Stopped'),
-  completed('Completed'),
-  cancelled('Cancelled');
-
-  const ChargingStatus(this.value);
-  final String value;
-
-  static ChargingStatus? fromString(String? value) {
-    if (value == null) return null;
-    for (ChargingStatus status in ChargingStatus.values) {
-      if (status.value == value) {
-        return status;
-      }
-    }
-    return null;
-  }
-}
-
 enum BayStatus {
   available('Available'),
   reserved('Reserved'),
@@ -47,7 +25,8 @@ enum ChargingStatsStatus {
   restarting('Restarting'),
   paymentPending('Payment Pending'),
   unPaid('Unpaid'),
-  completed('Completed');
+  completed('Completed'),
+  cancelled('Cancelled');
 
   const ChargingStatsStatus(this.value);
   final String value;
@@ -72,6 +51,7 @@ enum ChargingStatsStatus {
       case ChargingStatsStatus.paymentPending: return 'payment pending';
       case ChargingStatsStatus.unPaid: return 'unpaid';
       case ChargingStatsStatus.completed: return 'leave the parking to completed the whole process';
+      case ChargingStatsStatus.cancelled: return 'cancelled';
       
       default: return '';
     }
@@ -87,6 +67,7 @@ enum ChargingStatsStatus {
       case ChargingStatsStatus.paymentPending: return 'Payment Pending';
       case ChargingStatsStatus.unPaid: return 'Unpaid';
       case ChargingStatsStatus.completed: return 'Leave Parking';
+      case ChargingStatsStatus.cancelled: return 'Cancelled';
       
       default: return '';
     }

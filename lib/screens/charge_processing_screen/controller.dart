@@ -10,9 +10,10 @@ import 'package:renergy_app/common/services/api_service.dart';
 class ChargeProcessingController extends GetxController {
   bool isLoading = true;
   String? errorMessage;
-  String status = ChargingStatus.charging.name;
+  String status = ChargingStatsStatus.charging.name;
   Order? order;
   ChargingStats? chargingStats;
+  Timer? pollingTimer;
 
   @override
   void onInit() async {
@@ -26,7 +27,7 @@ class ChargeProcessingController extends GetxController {
     if (order?.id == null) {
       return;
     }
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
+    pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       try {
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
@@ -58,6 +59,10 @@ class ChargeProcessingController extends GetxController {
     });
   }
 
+  Future<void> stopPollingTimer() async {
+    pollingTimer?.cancel();
+  }
+
   Future<void> stopCharging() async {
     if (order?.id == null) {
       return;
@@ -67,5 +72,11 @@ class ChargeProcessingController extends GetxController {
     if (res.data['status'] != 200) {
       throw 'Stop Charging Error: ${res.data['status']}';
     }
+  }
+
+  @override
+  void onClose() {
+    stopPollingTimer();
+    super.onClose();
   }
 }

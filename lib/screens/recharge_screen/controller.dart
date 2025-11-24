@@ -48,11 +48,6 @@ class RechargeController extends GetxController {
     DateTime endTime = now.add(Duration(seconds: remainSecond));
 
     remainSecondTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (status == ChargingStatus.stopped.name || status == ChargingStatus.charging.name) {
-        timer.cancel();
-        return;
-      }
-
       now = DateTime.now();
       remainSecond = (endTime.millisecondsSinceEpoch - now.millisecondsSinceEpoch) ~/ 1000;
       update();

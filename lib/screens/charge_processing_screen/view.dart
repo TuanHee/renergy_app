@@ -62,7 +62,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: ()async {
+            onPressed: () async {
               try {
                 await Get.find<ChargeProcessingController>().stopCharging();
                 Snackbar.showSuccess('Charging session stopped', context);
@@ -98,27 +98,16 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             builder: (controller) => Column(
               children: [
                 // Header
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {},
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      'Charging',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
-                      const Text(
-                        'Charging',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () {},
-                      ),
-                    ],
+                    ),
                   ),
                 ),
 
@@ -210,7 +199,8 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        controller.chargingStats?.meter?.soc == null
+                                        controller.chargingStats?.meter?.soc ==
+                                                null
                                             ? '-'
                                             : '${controller.chargingStats!.meter!.soc!.toStringAsFixed(0)}%',
                                         style: const TextStyle(

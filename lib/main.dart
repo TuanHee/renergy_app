@@ -3,10 +3,7 @@ import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/app_theme.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 
-import 'main_controller.dart';
-
 void main() {
-  Get.put(MainController(), permanent: true);
   runApp(const MyApp());
 }
 

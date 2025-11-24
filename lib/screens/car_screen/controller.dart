@@ -50,7 +50,6 @@ class CarController extends GetxController {
 
     if (result == true) {
       await fetchCarIndex();
-
     }
   }
 }

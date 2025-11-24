@@ -17,6 +17,7 @@ class BookmarkItem extends StatelessWidget {
       onTap: () => onTap?.call(),
       borderRadius: BorderRadius.circular(12),
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

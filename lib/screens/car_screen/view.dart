@@ -23,12 +23,6 @@ class _CarScreenViewState extends State<CarScreenView> {
     _fetchCar();
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _fetchCar(); // Refresh when returning
-    }
-  }
-
   void _fetchCar(){
     WidgetsBinding.instance.addPostFrameCallback((_)async{
       try {
