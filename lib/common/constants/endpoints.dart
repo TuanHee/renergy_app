@@ -1,4 +1,5 @@
 class Endpoints {
+  static const String fcmToken = 'fcm-token';
   static const String login = 'login';
   static const String stations = 'stations';
   static String station(int id) => '$stations/$id';
