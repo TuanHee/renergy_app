@@ -7,12 +7,15 @@ import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 
+const int waitingTime = 15 * 60;
+
 class PlugInLoadingController extends GetxController {
   Order? order;
   String status = 'ready';
-  int remainSecond = 15 * 60;
+  DateTime startTime = DateTime.now();
 
-  Timer? remainSecondTimer;
+  int remainSecond = waitingTime;
+  Timer? countdownTimer;
   Timer? apiTimer;
 
   @override
@@ -25,19 +28,16 @@ class PlugInLoadingController extends GetxController {
   }
 
   void countDownWaitingTime() {
-    DateTime now = DateTime.now();
-    DateTime endTime = now.add(Duration(seconds: remainSecond));
+    DateTime endTime = startTime.add(Duration(seconds: waitingTime));
 
-    remainSecondTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (status == ChargingStatsStatus.finishing.name ||
           status == ChargingStatsStatus.charging.name) {
         timer.cancel();
         return;
       }
 
-      now = DateTime.now();
-      remainSecond =
-          (endTime.millisecondsSinceEpoch - now.millisecondsSinceEpoch) ~/ 1000;
+      int remainSecond = endTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch ~/ 1000;
       update();
     });
   }
@@ -50,14 +50,14 @@ class PlugInLoadingController extends GetxController {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         if (status == ChargingStatsStatus.charging.value) {
-          remainSecondTimer?.cancel();
+          countdownTimer?.cancel();
           timer.cancel();
           Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
           return;
         }
 
         if (status == ChargingStatsStatus.cancelled.name) {
-          remainSecondTimer?.cancel();
+          countdownTimer?.cancel();
           timer.cancel();
           Get.offAllNamed(AppRoutes.charging, arguments: order);
           return;
@@ -70,7 +70,7 @@ class PlugInLoadingController extends GetxController {
 
           if (data['charging_stats']['status'] is String) {
             status = data['charging_stats']['status'];
-            print(data['charging_stats']['status']);
+            startTime = DateTime.parse(data['charging_stats']['started_at']);
           }
         }
         update();
@@ -83,7 +83,7 @@ class PlugInLoadingController extends GetxController {
   Future<void> cancelPending() async {
     try {
       final res = await Api().delete(Endpoints.order(order!.id!));
-      remainSecondTimer?.cancel();
+      countdownTimer?.cancel();
         apiTimer?.cancel();
 
       if (res.data['status'] != 200) {
