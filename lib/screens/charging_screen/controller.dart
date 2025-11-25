@@ -21,7 +21,9 @@ class ChargingController extends GetxController {
     super.onInit();
   }
 
-  Future<void> fetchChargingHistory() async {
+  Future<void> fetchChargingHistory({
+    Function(String msg)? onErrorCallback,
+  }) async {
     try {
       final res = await Api().get(Endpoints.orders);
       dynamic list =
@@ -31,7 +33,7 @@ class ChargingController extends GetxController {
           res.data;
       orderHistories = Order.listFromJson(list);
     } catch (e) {
-      print('Error fetching charging history: $e');
+      onErrorCallback?.call('Error fetching charging history: $e');
       // rethrow;
     } finally {
       update();

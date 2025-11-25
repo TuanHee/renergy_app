@@ -22,6 +22,12 @@ class ExplorerController extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    chargingOrderTimer?.cancel();
+    super.onClose();
+  }
+
   Future<void> fetchStations({Function(String msg)? onErrorCallback}) async {
     try {
       final res = await Api().get(Endpoints.stations);
@@ -140,7 +146,6 @@ class ExplorerController extends GetxController {
           }
         }
       } catch (e, stackTrace) {
-        timer.cancel();
         onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
       }
     });

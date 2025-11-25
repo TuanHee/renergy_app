@@ -41,10 +41,6 @@ class RechargeController extends GetxController {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  void recharge() {
-    Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
-  }
-
   void countDownWaitingTime() {
     DateTime endTime = startTime.add(Duration(seconds: waitingTime));
 
@@ -74,7 +70,7 @@ class RechargeController extends GetxController {
         if (status == ChargingStatsStatus.open.value) {
           countdownTimer?.cancel();
           timer.cancel();
-          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
+          Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
           return;
         }
         // if (status == ChargingStatsStatus.charging.value) {
@@ -98,12 +94,14 @@ class RechargeController extends GetxController {
 
           if (data['charging_stats']['status'] is String) {
             status = data['charging_stats']['status'];
-            startTime = DateTime.parse(data['charging_stats']['started_at']);
+            if (data['charging_stats']['stopped_at'] != null) {
+              startTime =
+                  DateTime.tryParse(data['charging_stats']['stopped_at'] ?? '') ?? DateTime.now();
+            }
           }
         }
         update();
       } catch (e, stackTrace) {
-        timer.cancel();
         print('pollChargingStatus error: $e, $stackTrace');
       }
     });
@@ -118,5 +116,12 @@ class RechargeController extends GetxController {
     if (res.data['status'] != 200) {
       throw 'Stop Charging Error: ${res.data['status']}';
     }
+  }
+
+  @override
+  void onClose() {
+    countdownTimer?.cancel();
+      apiTimer?.cancel();
+    super.onClose();
   }
 }

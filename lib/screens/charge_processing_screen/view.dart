@@ -39,6 +39,11 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.find<ChargeProcessingController>().pollChargingStatus();
+    });
+
   }
 
   @override
@@ -304,7 +309,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.battery_charging_full,
                                 label: 'Energy Added',
                                 value:
-                                    '${(controller.chargingStats?.meter?.usage ?? 0).toStringAsFixed(1)} kWh',
+                                    '${((controller.chargingStats?.meter?.usage ?? 0) / 1000).toStringAsFixed(1)} kWh',
                               ),
                             ),
                             const SizedBox(width: 12),

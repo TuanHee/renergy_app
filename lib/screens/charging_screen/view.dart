@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/enums.dart';
+import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/screens/screens.dart';
@@ -17,54 +18,48 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final controller = Get.find<ChargingController>();
       final isStayPage = Get.arguments?['isStayPage'] ?? false;
       await Future.wait([
-        Get.find<ChargingController>().fetchChargingHistory(),
-        Get.find<ChargingController>().fetchChargingOrder(),
+        controller.fetchChargingHistory(),
+        controller.fetchChargingOrder(),
       ]);
-      if (!isStayPage) {
-        navToSpecificPage();
+      if (!isStayPage && controller.currentOrder != null) {
+        navToSpecificPage(
+          status: controller.status,
+          order: controller.currentOrder!,
+        );
       }
     });
   }
 
-  void navToSpecificPage() {
+  void navToSpecificPage({
+    required ChargingStatsStatus status,
+    required Order order,
+  }) {
     if (!Get.isRegistered<ChargingController>()) {
       return;
     }
-    final controller = Get.find<ChargingController>();
-    print('Charging status: ${controller.status}');
     try {
-      switch (controller.status) {
+      switch (status) {
         case ChargingStatsStatus.open:
-          Get.toNamed(
-            AppRoutes.plugInLoading,
-            arguments: controller.currentOrder,
-          );
+          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
           break;
 
         case ChargingStatsStatus.pending:
-          Get.toNamed(
-            AppRoutes.plugInLoading,
-            arguments: controller.currentOrder,
-          );
+          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
           break;
 
         case ChargingStatsStatus.charging:
-          Get.toNamed(
-            AppRoutes.chargeProcessing,
-            arguments: controller.currentOrder,
-          );
+          Get.toNamed(AppRoutes.chargeProcessing, arguments: order);
           break;
 
         case ChargingStatsStatus.finishing:
-          Get.toNamed(AppRoutes.recharge, arguments: controller.currentOrder);
+          Get.toNamed(AppRoutes.recharge, arguments: order);
+          break;
 
         case ChargingStatsStatus.restarting:
-          Get.toNamed(
-            AppRoutes.plugInLoading,
-            arguments: controller.currentOrder,
-          );
+          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
           break;
 
         // case ChargingStatsStatus.paymentPending:
@@ -76,7 +71,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         //   break;
 
         case ChargingStatsStatus.completed:
-          Get.toNamed(AppRoutes.paymentResult);
+          Get.toNamed(AppRoutes.paymentResult, arguments: order);
           break;
         default:
           break;
@@ -205,15 +200,8 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         : 'RM${order.netAmount!.toStringAsFixed(2)}';
                     final totalUsage = order.totalUsage == null
                         ? '-'
-                        : '${order.totalUsage} kWh';
-                    final location =
-                        [
-                              order.station?.address1,
-                              order.station?.address2,
-                              order.station?.state,
-                            ]
-                            .where((e) => e != null && e.toString().isNotEmpty)
-                            .join(', ');
+                        : '${((order.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh';
+
                     final status = order.status ?? '';
                     // Compute total charging duration in minutes
                     final duration = order.totalChargingTimeMinutes != null
@@ -252,7 +240,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         : status == 'Pending' || status == 'Open'
                         ? Colors.orange.shade600
                         : Colors.grey.shade600;
-                    final title = order.station?.name ?? 'Station';
+                    final title = order.invoiceNo ?? '';
                     final carPlate =
                         order.customer?.customerVehiclePlate ?? '-';
                     return Card(
@@ -264,10 +252,16 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        onTap: () => Get.toNamed(
-                          AppRoutes.paymentResult,
-                          arguments: order,
-                        ),
+                        onTap: () {
+                          navToSpecificPage(
+                            status:
+                                ChargingStatsStatus.fromString(
+                                  order.status ?? '',
+                                ) ??
+                                ChargingStatsStatus.none,
+                            order: order,
+                          );
+                        },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -284,6 +278,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -358,7 +353,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                               ),
 
                               const SizedBox(height: 6),
-                              _kv('Port', order.bay?.port?.portType ?? '-'),
+                              _kv('Station', order.stationName ?? order.station?.name ?? '-'),
                               const SizedBox(height: 6),
                               _kv('Car Plate', carPlate),
                               const SizedBox(height: 6),

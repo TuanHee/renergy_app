@@ -41,7 +41,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
     super.dispose();
   }
 
-  void _fetchPlugStatus()async {
+  void _fetchPlugStatus() async {
     await Get.find<PlugInLoadingController>().pollChargingStatus(context);
   }
 
@@ -51,28 +51,31 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       builder: (context) => AlertDialog(
         title: const Text('Stop Charging?'),
         content: const Text(
-          'Are you sure you want to stop the charging session?',
+          'Are you sure you want to cancel the pending session?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('No'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
               try {
-                Get.find<PlugInLoadingController>().cancelPending();
-                Snackbar.showSuccess('Charging session stopped', context);
-                Get.offAllNamed(AppRoutes.charging);
+                await Get.find<PlugInLoadingController>().cancelPending();
+                Snackbar.showSuccess(
+                  'Pending session cancelled successfully',
+                  context,
+                );
+                Get.offNamed(AppRoutes.charging);
               } catch (e) {
                 Snackbar.showError(
-                  'Charging session stopped Error: $e',
+                  'Pending session cancelled Error: $e',
                   context,
                 );
               }
+              Navigator.pop(context);
             },
-            child: const Text('Stop', style: TextStyle(color: Colors.red)),
+            child: const Text('Yes', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -95,7 +98,10 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true}),
+                    onPressed: () => Get.offAllNamed(
+                      AppRoutes.charging,
+                      arguments: {'isStayPage': true},
+                    ),
                   ),
                   const Expanded(
                     child: Center(
@@ -122,16 +128,14 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   children: [
                     const SizedBox(width: 16),
                     Icon(Icons.power, size: 48, color: Colors.green[300]),
-        
+
                     AnimatedBuilder(
                       animation: _pulseAnimation,
                       builder: (context, child) {
                         return Opacity(
                           opacity: _pulseAnimation.value,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                            ),
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
                             width: 80,
                             height: 2,
                             decoration: BoxDecoration(
@@ -148,7 +152,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                         );
                       },
                     ),
-        
+
                     Icon(
                       Icons.directions_car,
                       size: 48,
@@ -157,7 +161,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                   ],
                 ),
               ),
-        
+
               // Title
               const Text(
                 'Ready to Charge',
@@ -168,7 +172,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 ),
               ),
               const SizedBox(height: 12),
-        
+
               // Subtitle
               Text(
                 'Please connect the port to your vehicle within 15 minutes.\nIdle fees might apply after grace period.',
@@ -176,7 +180,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 style: TextStyle(fontSize: 15, color: Colors.grey[600]),
               ),
               const SizedBox(height: 32),
-        
+
               // Status Indicator
               AnimatedBuilder(
                 animation: _pulseAnimation,
@@ -198,17 +202,14 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                       const SizedBox(width: 8),
                       Text(
                         'Waiting for connection',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   );
                 },
               ),
               const SizedBox(height: 32),
-        
+
               // Charger Info Card
               Container(
                 decoration: BoxDecoration(
@@ -257,7 +258,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 ),
               ),
               const SizedBox(height: 24),
-        
+
               // Waiting Time
               GetBuilder<PlugInLoadingController>(
                 builder: (controller) => Text(
@@ -266,7 +267,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 ),
               ),
               const SizedBox(height: 4),
-        
+
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -292,7 +293,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                 ),
               ),
               const SizedBox(height: 6),
-        
+
               // Help Text
               Text(
                 'Having trouble? Contact support',

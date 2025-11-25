@@ -65,9 +65,9 @@ class PlugInLoadingController extends GetxController {
           Get.offAllNamed(AppRoutes.charging, arguments: order);
           return;
         }
-        if(order?.id == null){
+        if (order?.id == null) {
           timer.cancel();
-          throw('Order id is null');
+          throw ('Order id is null');
         }
 
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
@@ -79,13 +79,15 @@ class PlugInLoadingController extends GetxController {
             status = data['charging_stats']['status'];
             if (data['charging_stats']['started_at'] != null) {
               startTime =
-                  DateTime.tryParse(data['charging_stats']['started_at'] ?? '') ?? DateTime.now();
+                  DateTime.tryParse(
+                    data['charging_stats']['started_at'] ?? '',
+                  ) ??
+                  DateTime.now();
             }
           }
         }
         update();
       } catch (e, stackTrace) {
-        timer.cancel();
         print('pollChargingStatus error: $e, $stackTrace');
       }
     });
@@ -94,8 +96,6 @@ class PlugInLoadingController extends GetxController {
   Future<void> cancelPending() async {
     try {
       final res = await Api().delete(Endpoints.order(order!.id!));
-      countdownTimer?.cancel();
-      apiTimer?.cancel();
 
       if (res.data['status'] != 200) {
         throw 'Failed to cancel order: Try again later';
@@ -103,5 +103,12 @@ class PlugInLoadingController extends GetxController {
     } catch (e, stackTrace) {
       rethrow;
     }
+  }
+
+  @override
+  void onClose() {
+    countdownTimer?.cancel();
+    apiTimer?.cancel();
+    super.onClose();
   }
 }

@@ -427,7 +427,7 @@ class _StationItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        station.name!,
+                        station.name ?? '',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -435,7 +435,7 @@ class _StationItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        station.shortDescription!,
+                        station.shortDescription ?? '',
                         style: TextStyle(color: muted, fontSize: 13),
                       ),
                       const SizedBox(height: 8),

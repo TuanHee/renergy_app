@@ -457,7 +457,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        '${bay.port!.outputPower}kW ${bay.port!.currentType}',
+                        '${bay.port?.outputPower ?? '-'}kW ${bay.port?.currentType ?? '-'}',
                       ),
                     ],
                   ),                  

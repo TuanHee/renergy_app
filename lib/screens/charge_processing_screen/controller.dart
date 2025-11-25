@@ -9,7 +9,6 @@ import 'package:renergy_app/common/services/api_service.dart';
 
 class ChargeProcessingController extends GetxController {
   bool isLoading = true;
-  String? errorMessage;
   String status = ChargingStatsStatus.charging.name;
   Order? order;
   ChargingStats? chargingStats;
@@ -19,7 +18,6 @@ class ChargeProcessingController extends GetxController {
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order?;
-    pollChargingStatus();
     update();
   }
 
@@ -30,6 +28,10 @@ class ChargeProcessingController extends GetxController {
     pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       try {
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
+        if (status == ChargingStatsStatus.finishing.name) {
+          timer.cancel();
+          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
+        }
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
@@ -43,7 +45,7 @@ class ChargeProcessingController extends GetxController {
           );
           update();
         }
-        
+
         if (chargingStats?.status == ChargingStatsStatus.completed) {
           timer.cancel();
           Get.toNamed(
@@ -52,15 +54,9 @@ class ChargeProcessingController extends GetxController {
           );
         }
       } catch (e) {
-        timer.cancel();
-        errorMessage = 'Error: $e';
-        update();
+        print('Polling Error: $e');
       }
     });
-  }
-
-  Future<void> stopPollingTimer() async {
-    pollingTimer?.cancel();
   }
 
   Future<void> stopCharging() async {
@@ -76,7 +72,8 @@ class ChargeProcessingController extends GetxController {
 
   @override
   void onClose() {
-    stopPollingTimer();
+    pollingTimer?.cancel();
+
     super.onClose();
   }
 }

@@ -7,6 +7,7 @@ class Order {
   int? id;
   int? stationId;
   Station? station;
+  String? stationName;
   int? bayId;
   int? chargerId;
   int? chargerPortId;
@@ -34,6 +35,7 @@ class Order {
     this.id,
     this.stationId,
     this.station,
+    this.stationName,
     this.bayId,
     this.chargerId,
     this.chargerPortId,
@@ -62,6 +64,7 @@ class Order {
     return Order(
       id: json['id'] == null ? null : int.parse(json['id'].toString()),
       stationId: json['station_id'] == null ? null : int.parse(json['station_id'].toString()),
+      stationName: json['station_name'],
       station: json['station'] == null ? null : Station.fromJson(json['station']),
       bayId: json['bay_id'] == null ? null : int.parse(json['bay_id'].toString()),
       chargerId: json['charger_id'] == null ? null : int.parse(json['charger_id'].toString()),
@@ -106,6 +109,7 @@ class Order {
       'id': id,
       'station_id': stationId,
       'station': station?.toJson(),
+      'station_name': stationName,
       'bay_id': bayId,
       'charger_id': chargerId,
       'charger_port_id': chargerPortId,
