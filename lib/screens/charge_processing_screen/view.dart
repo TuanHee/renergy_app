@@ -88,7 +88,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFEF2F2), // red-50
+              Color.fromARGB(255, 233, 231, 231), // red-50
               Color(0xFFFFF7ED), // orange-50
             ],
           ),
@@ -98,16 +98,30 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
             builder: (controller) => Column(
               children: [
                 // Header
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Text(
-                      'Charging',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true}),
                       ),
-                    ),
+                      const Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Text(
+                              'Charging',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 48), // balance the row
+                    ],
                   ),
                 ),
 

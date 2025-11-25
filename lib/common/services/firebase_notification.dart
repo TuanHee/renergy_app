@@ -57,7 +57,7 @@ class NotificationService {
     try {
       final token = await _firebaseMessaging.getToken();
       print('FCM token: $token');
-      // await Api().post(Endpoints.fcmToken, data: {'fcm_token': token});
+      await Api().post(Endpoints.fcmToken, data: {'token': token});
     } catch (e) {
       print('Error initializing FCM token: $e');
     }

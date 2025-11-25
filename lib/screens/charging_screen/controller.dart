@@ -11,21 +11,24 @@ import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/screens/explorer_screen/controller.dart';
 
 class ChargingController extends GetxController {
-  ChargingStatsStatus status = ChargingStatsStatus.open;
+  ChargingStatsStatus status = ChargingStatsStatus.none;
   ChargingStats? chargingStats;
   Order? currentOrder;
   List<Order> orderHistories = [];
 
   @override
-  void onInit() async{
+  void onInit() async {
     super.onInit();
-    fetchChargingHistory();
   }
 
   Future<void> fetchChargingHistory() async {
     try {
       final res = await Api().get(Endpoints.orders);
-      dynamic list = res.data['data']?['orders'] ?? res.data['orders'] ?? res.data['data'] ?? res.data;
+      dynamic list =
+          res.data['data']?['orders'] ??
+          res.data['orders'] ??
+          res.data['data'] ??
+          res.data;
       orderHistories = Order.listFromJson(list);
     } catch (e) {
       print('Error fetching charging history: $e');
@@ -35,27 +38,30 @@ class ChargingController extends GetxController {
     }
   }
 
-   Future<void> fetchChargingOrder({Function(String msg)? onErrorCallback}) async {
+  Future<void> fetchChargingOrder({
+    Function(String msg)? onErrorCallback,
+  }) async {
     try {
-        final res = await Api().get(Endpoints.activeOrder);
+      final res = await Api().get(Endpoints.activeOrder);
 
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
-          final newStatus = ChargingStatsStatus.fromString(data['status']);
-          final newOrder = data['order'] != null ? Order.fromJson(data['order']) : null;
-          final changedStatus = newStatus != null && status != newStatus;
-          final changedOrder = (currentOrder?.id ?? -1) != (newOrder?.id ?? -1);
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
+        final newStatus = ChargingStatsStatus.fromString(data['status']);
+        final newOrder = data['order'] != null
+            ? Order.fromJson(data['order'])
+            : null;
+        final changedStatus = newStatus != null && status != newStatus;
+        final changedOrder = (currentOrder?.id ?? -1) != (newOrder?.id ?? -1);
 
-          if (changedStatus || changedOrder) {
-            status = newStatus ?? status;
-            currentOrder = newOrder;
-            
-            update();
-          }
+        if (changedStatus || changedOrder) {
+          status = newStatus ?? status;
+          currentOrder = newOrder;
+
+          update();
         }
-      } catch (e, stackTrace) {
-        onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
       }
+    } catch (e, stackTrace) {
+      onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
+    }
   }
 }
-

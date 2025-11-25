@@ -29,16 +29,16 @@ class MainBottomNavBar extends StatelessWidget {
             // Navigate to corresponding route
             switch (index) {
               case 0:
-                Get.offNamed(AppRoutes.explorer);
+                Get.offAllNamed(AppRoutes.explorer);
                 break;
               case 1:
-                Get.offNamed(AppRoutes.charging);
+                Get.offAllNamed(AppRoutes.charging);
                 break;
               case 2:
-                Get.offNamed(AppRoutes.bookmark);
+                Get.offAllNamed(AppRoutes.bookmark);
                 break;
               case 3:
-                Get.offNamed(AppRoutes.account);
+                Get.offAllNamed(AppRoutes.account);
                 break;
             }
           },

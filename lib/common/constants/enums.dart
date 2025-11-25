@@ -18,6 +18,7 @@ enum BayStatus {
 }
 
 enum ChargingStatsStatus {
+  none('None'),
   open('Open'),
   pending('Pending'),
   charging('Charging'),

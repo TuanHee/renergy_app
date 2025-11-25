@@ -42,7 +42,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
   }
 
   void _fetchPlugStatus()async {
-    await Get.find<PlugInLoadingController>().pollPlugStatus(context);
+    await Get.find<PlugInLoadingController>().pollChargingStatus(context);
   }
 
   void _stopPending() {
@@ -85,199 +85,220 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
     return Scaffold(
       bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: SafeArea(
-        child: Center(
-          child: Container(
-            decoration: BoxDecoration(color: Colors.white),
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Animated Icon
-                SizedBox(
-                  height: 160,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(width: 16),
-                      Icon(Icons.power, size: 48, color: Colors.green[300]),
-
-                      AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _pulseAnimation.value,
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              width: 80,
-                              height: 2,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.green[300]!,
-                                    Colors.green[500]!,
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      Icon(
-                        Icons.directions_car,
-                        size: 48,
-                        color: Colors.grey[400],
-                      ),
-                    ],
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true}),
                   ),
-                ),
-
-                // Title
-                const Text(
-                  'Ready to Charge',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1F2937),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Subtitle
-                Text(
-                  'Please connect the port to your vehicle within 15 minutes.\nIdle fees might apply after grace period.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 32),
-
-                // Status Indicator
-                AnimatedBuilder(
-                  animation: _pulseAnimation,
-                  builder: (context, child) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Opacity(
-                          opacity: _pulseAnimation.value,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFEF5350), // red-500
-                              shape: BoxShape.circle,
-                            ),
+                  const Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text(
+                          'Pending',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Waiting for connection',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 48), // balance the row
+                ],
+              ),
+              // Animated Icon
+              SizedBox(
+                height: 160,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 16),
+                    Icon(Icons.power, size: 48, color: Colors.green[300]),
+        
+                    AnimatedBuilder(
+                      animation: _pulseAnimation,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _pulseAnimation.value,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                            ),
+                            width: 80,
+                            height: 2,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.green[300]!,
+                                  Colors.green[500]!,
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+        
+                    Icon(
+                      Icons.directions_car,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                  ],
+                ),
+              ),
+        
+              // Title
+              const Text(
+                'Ready to Charge',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+              const SizedBox(height: 12),
+        
+              // Subtitle
+              Text(
+                'Please connect the port to your vehicle within 15 minutes.\nIdle fees might apply after grace period.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 32),
+        
+              // Status Indicator
+              AnimatedBuilder(
+                animation: _pulseAnimation,
+                builder: (context, child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Opacity(
+                        opacity: _pulseAnimation.value,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF5350), // red-500
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Waiting for connection',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+        
+              // Charger Info Card
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FAFB), // gray-50
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoItem(
+                            'Charger ID',
+                            controller.order?.chargerId != null
+                                ? controller.order!.chargerId.toString()
+                                : '-',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildInfoItem(
+                            'Station',
+                            '${controller.order?.station?.name ?? 'N/A'}',
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 32),
-
-                // Charger Info Card
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB), // gray-50
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInfoItem(
-                              'Charger ID',
-                              controller.order?.chargerId != null
-                                  ? controller.order!.chargerId.toString()
-                                  : '-',
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildInfoItem(
-                              'Station',
-                              '${controller.order?.station?.name ?? 'N/A'}',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildInfoItem(
-                              'Power Output',
-                              '${controller.order?.bay?.port?.outputPower ?? 0} kW',
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildInfoItem(
-                              'Type',
-                              '${controller.order?.bay?.port?.portType ?? 0}',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Waiting Time
-                GetBuilder<PlugInLoadingController>(
-                  builder: (controller) => Text(
-                    '${controller.remainSecond <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond.abs())}${controller.remainSecond <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => _stopPending(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 48,
-                        vertical: 16,
-                      ),
-                      side: BorderSide(color: Colors.grey.shade600),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
                     ),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoItem(
+                            'Power Output',
+                            '${controller.order?.bay?.port?.outputPower ?? 0} kW',
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildInfoItem(
+                            'Type',
+                            '${controller.order?.bay?.port?.portType ?? 0}',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+        
+              // Waiting Time
+              GetBuilder<PlugInLoadingController>(
+                builder: (controller) => Text(
+                  '${controller.remainSecond <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond.abs())}${controller.remainSecond <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(height: 4),
+        
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => _stopPending(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 16,
+                    ),
+                    side: BorderSide(color: Colors.grey.shade600),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
-
-                // Help Text
-                Text(
-                  'Having trouble? Contact support',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[400]),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 6),
+        
+              // Help Text
+              Text(
+                'Having trouble? Contact support',
+                style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+              ),
+            ],
           ),
         ),
       ),

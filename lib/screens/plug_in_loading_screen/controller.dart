@@ -37,7 +37,10 @@ class PlugInLoadingController extends GetxController {
         return;
       }
 
-      int remainSecond = endTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      remainSecond =
+          (endTime.millisecondsSinceEpoch -
+              DateTime.now().millisecondsSinceEpoch) ~/
+          1000;
       update();
     });
   }
@@ -46,7 +49,7 @@ class PlugInLoadingController extends GetxController {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  Future<void> pollPlugStatus(BuildContext context) async {
+  Future<void> pollChargingStatus(BuildContext context) async {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         if (status == ChargingStatsStatus.charging.value) {
@@ -62,6 +65,10 @@ class PlugInLoadingController extends GetxController {
           Get.offAllNamed(AppRoutes.charging, arguments: order);
           return;
         }
+        if(order?.id == null){
+          timer.cancel();
+          throw('Order id is null');
+        }
 
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
@@ -70,12 +77,16 @@ class PlugInLoadingController extends GetxController {
 
           if (data['charging_stats']['status'] is String) {
             status = data['charging_stats']['status'];
-            startTime = DateTime.parse(data['charging_stats']['started_at']);
+            if (data['charging_stats']['started_at'] != null) {
+              startTime =
+                  DateTime.tryParse(data['charging_stats']['started_at'] ?? '') ?? DateTime.now();
+            }
           }
         }
         update();
       } catch (e, stackTrace) {
-        print('pollPlugStatus error: $e, $stackTrace');
+        timer.cancel();
+        print('pollChargingStatus error: $e, $stackTrace');
       }
     });
   }
@@ -84,10 +95,10 @@ class PlugInLoadingController extends GetxController {
     try {
       final res = await Api().delete(Endpoints.order(order!.id!));
       countdownTimer?.cancel();
-        apiTimer?.cancel();
+      apiTimer?.cancel();
 
       if (res.data['status'] != 200) {
-        throw'Failed to cancel order: Try again later';
+        throw 'Failed to cancel order: Try again later';
       }
     } catch (e, stackTrace) {
       rethrow;

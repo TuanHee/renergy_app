@@ -7,13 +7,14 @@ import '../../components/main_bottom_nav_bar.dart';
 import 'controller.dart';
 
 // Recharge Page asking user to leave or start a new session
-class RechargeScreenView extends StatelessWidget {
+class RechargeScreenView extends StatefulWidget {
   const RechargeScreenView({super.key});
 
-  void _leaveParking() {
-    Get.find<RechargeController>().pollParkingStatus();
-  }
+  @override
+  State<RechargeScreenView> createState() => _RechargeScreenViewState();
+}
 
+class _RechargeScreenViewState extends State<RechargeScreenView> {
   void _startRecharge(BuildContext context) {
     showDialog(
       context: context,
@@ -32,12 +33,6 @@ class RechargeScreenView extends StatelessWidget {
               try {
                 await Get.find<RechargeController>().restart();
                 Navigator.pop(context);
-                Get.offAllNamed(
-                  AppRoutes.plugInLoading,
-                  arguments: Get.find<RechargeController>().order,
-                );
-                Snackbar.showSuccess('Charging session stopped', context);
-
               } catch (e) {
                 Snackbar.showError(e.toString(), context);
               }
@@ -50,6 +45,14 @@ class RechargeScreenView extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.find<RechargeController>().pollChargingStatus(context);
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = Get.find<RechargeController>();
 
@@ -58,6 +61,10 @@ class RechargeScreenView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Charging Completed'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true}),
+        ),
       ),
       bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: Center(

@@ -13,8 +13,27 @@ class ChargingScreenView extends StatefulWidget {
 }
 
 class _ChargingScreenViewState extends State<ChargingScreenView> {
-  void _fetchIsCharging() async {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final isStayPage = Get.arguments?['isStayPage'] ?? false;
+      await Future.wait([
+        Get.find<ChargingController>().fetchChargingHistory(),
+        Get.find<ChargingController>().fetchChargingOrder(),
+      ]);
+      if (!isStayPage) {
+        navToSpecificPage();
+      }
+    });
+  }
+
+  void navToSpecificPage() {
+    if (!Get.isRegistered<ChargingController>()) {
+      return;
+    }
     final controller = Get.find<ChargingController>();
+    print('Charging status: ${controller.status}');
     try {
       switch (controller.status) {
         case ChargingStatsStatus.open:
@@ -67,15 +86,6 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         Snackbar.showError(e.toString(), context);
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_)async {
-      await Get.find<ChargingController>().fetchChargingOrder();
-      _fetchIsCharging();
-    });
   }
 
   @override
