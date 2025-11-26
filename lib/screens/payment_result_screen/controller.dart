@@ -102,7 +102,6 @@ class PaymentResultController extends GetxController {
       final uri = Uri.parse('$httpBaseUrl/${Endpoints.pdf(order!.id!)}');
       // final canLaunch = await canLaunchUrl(uri);
       final canLaunch = true;
-      print("INVOICE URL = $uri");
       if (!canLaunch) throw 'Cannot open invoice link';
       await launchUrl(uri, mode: LaunchMode.inAppBrowserView,);
 

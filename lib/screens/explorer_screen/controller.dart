@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
@@ -16,6 +17,8 @@ class ExplorerController extends GetxController {
   Order? chargingOrder;
   String? status;
   Timer? chargingOrderTimer;
+  List<Station>? filteredList;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void onInit() async {
@@ -153,5 +156,16 @@ class ExplorerController extends GetxController {
 
   void stopPollingChargingOrder() {
     chargingOrderTimer?.cancel();
+  }
+
+  List<Station> get filteredStations {
+    List<Station> returnStations = [];
+    returnStations = filteredList == null ? stations : filteredList!;
+    
+    if(searchController.text.isNotEmpty){
+      final query = searchController.text.toLowerCase();
+      returnStations = returnStations.where((s) => (s.name ?? '').toLowerCase().contains(query)).toList();
+    }
+    return returnStations;
   }
 }

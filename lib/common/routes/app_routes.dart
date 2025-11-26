@@ -18,6 +18,7 @@ class AppRoutes {
   static const String addCar = '/add-car';
   static const String editCar = '/edit-car';
   static const String paymentResult = '/payment-result';
+  static const String filter = '/filter';
 
   // Initial route
   static const String initial = splash;
@@ -113,6 +114,12 @@ class AppRoutes {
         page: () => const PaymentResultScreenView(),
         transition: Transition.fadeIn,
         binding: PaymentResultBinding(),
+      ),
+      GetPage(
+        name: filter,
+        page: () => const FilterScreenView(),
+        transition: Transition.fadeIn,
+        binding: FilterBinding(),
       ),
     ];
   }

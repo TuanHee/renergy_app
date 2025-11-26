@@ -239,9 +239,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           Expanded(
                             child: Container(
                               height: 44,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(10),
@@ -249,16 +247,24 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.search,
-                                    color: Colors.grey.shade600,
-                                  ),
+                                  Icon(Icons.search, color: Colors.grey.shade600),
                                   const SizedBox(width: 8),
                                   Expanded(
-                                    child: Text(
-                                      'Search',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
+                                    child: TextField(
+                                      controller: widget.controller.searchController,
+                                      onChanged: (value) {
+                                        widget.controller.update();
+                                      },
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: Colors.black87,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: 'Search',
+                                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        border: InputBorder.none,
+                                        isDense: true,
                                       ),
                                     ),
                                   ),
@@ -267,17 +273,27 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: const Icon(
-                              Icons.tune,
-                              color: Colors.black87,
+                          GestureDetector(
+                            onTap: () async {
+                              final filteredStations = await Get.toNamed(AppRoutes.filter);
+                              if(filteredStations != null){
+                                widget.controller.filteredList = filteredStations as List<Station>;
+                                widget.controller.searchController.text = '';
+                                widget.controller.update();
+                              }
+                            },
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: const Icon(
+                                Icons.tune,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
                         ],
@@ -310,15 +326,14 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                               : ListView.separated(
                                   padding: EdgeInsets.zero,
                                   controller: scrollController,
-                                  itemCount: widget.controller.stations.length,
+                                  itemCount: widget.controller.filteredStations.length,
                                   separatorBuilder: (context, index) => Divider(
                                     height: 1,
                                     color: Colors.grey.shade200,
                                   ),
                                   itemBuilder: (context, index) {
                                     return _StationItem(
-                                      station:
-                                          widget.controller.stations[index],
+                                      station: widget.controller.filteredStations[index],
                                     );
                                   },
                                 ),
