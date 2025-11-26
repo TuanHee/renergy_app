@@ -12,21 +12,47 @@ class PaymentResultScreenView extends StatelessWidget {
       builder: (controller) {
         final red = const Color(0xFFD32F2F);
         final muted = Colors.grey.shade600;
-        final moneyKeys = {'Subtotal', 'Discount (%)', 'Discount Amount', 'Tax (%)', 'Tax Amount', 'Net Amount', 'Amount'};
-        final moneyItems = controller.items.where((e) => moneyKeys.contains(e['label'])).toList();
-        final otherItems = controller.items.where((e) => !moneyKeys.contains(e['label'])).toList();
+        final moneyKeys = {
+          'Subtotal',
+          'Discount (%)',
+          'Discount Amount',
+          'Tax (%)',
+          'Tax Amount',
+          'Net Amount',
+          'Amount',
+        };
+        final moneyItems = controller.items
+            .where((e) => moneyKeys.contains(e['label']))
+            .toList();
+        final otherItems = controller.items
+            .where((e) => !moneyKeys.contains(e['label']))
+            .toList();
         final completedRaw = controller.order?.completedAt;
         String completedText = '';
         if (completedRaw != null && completedRaw.isNotEmpty) {
           final dt = DateTime.tryParse(completedRaw);
           if (dt != null) {
             final local = dt.toLocal();
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const months = [
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec',
+            ];
             final h = local.hour;
             final ampm = h >= 12 ? 'PM' : 'AM';
             final hh = ((h % 12 == 0 ? 12 : h % 12)).toString().padLeft(2, '0');
             final mm = local.minute.toString().padLeft(2, '0');
-            completedText = '${local.day.toString().padLeft(2,'0')} ${months[local.month-1]} ${local.year}, $hh:$mm $ampm';
+            completedText =
+                '${local.day.toString().padLeft(2, '0')} ${months[local.month - 1]} ${local.year}, $hh:$mm $ampm';
           } else {
             completedText = completedRaw;
           }
@@ -43,7 +69,15 @@ class PaymentResultScreenView extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () => controller.downloadInvoice(),
-                icon: const Icon(Icons.download, color: Colors.white),
+                icon: controller.isDownloading
+                    ? SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.download, color: Colors.white),
               ),
             ],
           ),
@@ -64,15 +98,23 @@ class PaymentResultScreenView extends StatelessWidget {
                   //   ],
                   // ),
                   const SizedBox(height: 12),
-                  Text(controller.order!.invoiceNo ?? '', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                  Text(
+                    controller.order!.invoiceNo ?? '',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                  ),
                   Text(
                     completedText,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: muted),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: muted,
+                    ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   Divider(color: Colors.grey.shade300),
                   const SizedBox(height: 12),
                   Container(
@@ -80,19 +122,36 @@ class PaymentResultScreenView extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text('Payment Summary', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                        const Text(
+                          'Payment Summary',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         ...moneyItems.map((e) {
                           final label = e['label'] ?? '';
                           final value = e['value'] ?? '';
-                          final isTotal = label == 'Net Amount' || label == 'Amount';
-                          return _buildKeyValueRow(label, value, highlightValue: isTotal);
+                          final isTotal =
+                              label == 'Net Amount' || label == 'Amount';
+                          return _buildKeyValueRow(
+                            label,
+                            value,
+                            highlightValue: isTotal,
+                          );
                         }).toList(),
                       ],
                     ),
@@ -103,13 +162,25 @@ class PaymentResultScreenView extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text('Details', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                        const Text(
+                          'Details',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         ...otherItems.map((e) {
                           final label = e['label'] ?? '';
@@ -129,15 +200,24 @@ class PaymentResultScreenView extends StatelessWidget {
   }
 }
 
-Widget _buildKeyValueRow(String label, String value, {bool highlightValue = false}) {
+Widget _buildKeyValueRow(
+  String label,
+  String value, {
+  bool highlightValue = false,
+}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
       children: [
-        Expanded(child: Text(label, style: const TextStyle(color: Colors.black54))),
+        Expanded(
+          child: Text(label, style: const TextStyle(color: Colors.black54)),
+        ),
         Text(
           value,
-          style: TextStyle(color: highlightValue ? const Color(0xFFD32F2F) : Colors.black87, fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w400),
+          style: TextStyle(
+            color: highlightValue ? const Color(0xFFD32F2F) : Colors.black87,
+            fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w400,
+          ),
         ),
       ],
     ),

@@ -146,6 +146,30 @@ class Api {
     );
   }
 
+  Future<Response> getBytes(
+    String endpoint, {
+    String? fullUrl,
+  }) async {
+    final url = fullUrl ?? '$httpBaseUrl/$endpoint';
+    try {
+      final baseOptions = getOptions();
+      final options = Options(
+        headers: baseOptions?.headers,
+        responseType: ResponseType.bytes,
+      );
+      final response = await dio.get(url, options: options);
+      if ((response.statusCode ?? 0) >= 300) {
+        throw response.statusMessage ?? 'Download error';
+      }
+      return response;
+    } on DioException catch (e) {
+      final err = changeExceptionMessage(e);
+      throw err.message ?? 'Unknown error';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   Future<Response> put(
     endpoint, {
     String? fullUrl,

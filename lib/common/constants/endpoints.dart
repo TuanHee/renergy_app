@@ -15,4 +15,5 @@ class Endpoints {
   static const String vehicles = 'vehicles';
   static String vehicle(int id) => '$vehicles/$id';
   static String activeOrder = 'home/active-order-stats';
+  static String pdf(int id) => '$orders/$id/pdf';
 }
