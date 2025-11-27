@@ -307,7 +307,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           },),
                           child: widget.controller.isLoading
                               ? const Center(child: CircularProgressIndicator())
-                              : widget.controller.stations.isEmpty
+                              : widget.controller.filteredStations.isEmpty
                               ? ListView(
                                   padding: EdgeInsets.zero,
                                   controller: scrollController,

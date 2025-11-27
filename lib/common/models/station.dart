@@ -1,4 +1,5 @@
 import 'package:renergy_app/common/models/bay.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Station {
   int? id;
@@ -93,5 +94,12 @@ class Station {
 
   static List<Station> listFromJson(dynamic json) {
     return json == null ? [] : List<Station>.from(json.map((x) => Station.fromJson(x)));
+  }
+
+  double distanceTo(Position position) {
+    final lat = double.tryParse(latitude ?? '');
+    final lon = double.tryParse(longitude ?? '');
+    if (lat == null || lon == null) return double.maxFinite;
+    return Geolocator.distanceBetween(position.latitude, position.longitude, lat, lon);
   }
 }

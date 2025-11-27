@@ -9,6 +9,7 @@ import 'package:renergy_app/common/models/bookmark.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/main.dart';
 
 class ExplorerController extends GetxController {
   bool isLoading = true;
@@ -166,6 +167,12 @@ class ExplorerController extends GetxController {
       final query = searchController.text.toLowerCase();
       returnStations = returnStations.where((s) => (s.name ?? '').toLowerCase().contains(query)).toList();
     }
+
+    final position = Get.find<MainController>().position;
+    if(position != null){
+      returnStations.sort((a, b) => a.distanceTo(position).compareTo(b.distanceTo(position)));
+    }
+
     return returnStations;
   }
 }

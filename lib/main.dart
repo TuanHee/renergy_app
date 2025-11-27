@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/app_theme.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -22,8 +23,8 @@ void main() async {
     print('Firebase initializeApp error: $e\n$st');
   }
 
-  final position = await LocationHandler.getCurrentLocation();
-  print(position);
+  final mainController = Get.put(MainController());
+  mainController.position = await LocationHandler.getCurrentLocation();
 
   runApp(const MyApp());
 }
@@ -79,4 +80,8 @@ class DebugWrapper extends StatelessWidget {
       ),
     );
   }
+}
+
+class MainController extends GetxController {
+  Position? position;
 }
