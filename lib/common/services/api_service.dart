@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' as a;
+import 'package:renergy_app/global.dart';
 
 import '../constants/constants.dart';
-// import 'storage_service.dart';
+import 'storage_service.dart';
 
 class Api {
   static final Api _instance = Api._internal();
@@ -104,12 +106,12 @@ class Api {
     Options requestOptions = Options();
     requestOptions.headers = requestOptions.headers ?? {};
 
-    // String? token = StorageService.to.getString(storageAccessToken);
-    // token ??= '';
+    String? token = StorageService.to.getString(storageAccessToken);
+    token ??= '';
 
-    // if (token.isNotEmpty) {
-    //   requestOptions.headers!.addAll({'Authorization': 'Bearer $token'});
-    // }
+    if (token.isNotEmpty) {
+      requestOptions.headers!.addAll({'Authorization': 'Bearer $token'});
+    }
 
     // String lang = TranslationService.locale.languageCode;
     // requestOptions.headers!.addAll({'Accept-Language': lang});
@@ -286,7 +288,8 @@ class Api {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        // StorageService.to.remove(storageAccessToken);
+        StorageService.to.remove(storageAccessToken);
+        Global.isLoginValid = false;
       }
 
       if(e.message is String){

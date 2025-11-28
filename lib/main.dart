@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/app_theme.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/global.dart';
 
 import 'common/constants/server.dart';
 import 'common/services/firebase_notification.dart';
@@ -12,6 +13,8 @@ import 'common/services/location_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Global.init();
+
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp();
