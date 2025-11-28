@@ -15,7 +15,7 @@ class Global {
     String? accessToken = StorageService.to.getString(storageAccessToken);
     if (accessToken != null && accessToken != '') {
       try {
-        final res = await Api().post(Endpoints);
+        final res = await Api().post(Endpoints.user);
 
         isLoginValid = res.data['status'] == 200;
       } catch (e) {
