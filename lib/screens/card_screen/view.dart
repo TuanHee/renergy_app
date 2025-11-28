@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 
 import 'controller.dart';
@@ -122,9 +123,22 @@ class _CardScreenViewState extends State<CardScreenView> {
                   padding: const EdgeInsets.all(16),
                   itemCount: controller.cards.length,
                   itemBuilder: (context, index) {
-                    return CardWidget(
-                      card: controller.cards[index],
-                      onDelete: () => _deleteCard(index),
+                    final card = controller.cards[index];
+                    return GestureDetector(
+                      onTap: () async {
+                        final result = await Get.toNamed(AppRoutes.editCard, arguments: card);
+                        if (result == true) {
+                          try {
+                            await Get.find<CardController>().fetchCarIndex();
+                          } catch (e) {
+                            Snackbar.showError(e.toString(), context);
+                          }
+                        }
+                      },
+                      child: CardWidget(
+                        card: card,
+                        onDelete: () => _deleteCard(index),
+                      ),
                     );
                   },
                 ),
