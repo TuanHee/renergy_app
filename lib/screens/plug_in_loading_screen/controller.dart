@@ -7,6 +7,7 @@ import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/global.dart';
 
 const int waitingTime = 15 * 60;
 
@@ -49,6 +50,9 @@ class PlugInLoadingController extends GetxController {
   }
 
   Future<void> pollChargingStatus(BuildContext context) async {
+    if(!Global.isLoginValid){
+      return;
+    }
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         if (order?.id == null) {

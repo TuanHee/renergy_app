@@ -9,6 +9,7 @@ import 'package:renergy_app/common/models/bookmark.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
 
 class ExplorerController extends GetxController {
@@ -129,6 +130,9 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> pollChargingOrder({Function(String msg)? onErrorCallback}) async {
+    if(!Global.isLoginValid){
+      return;
+    }
     chargingOrderTimer = Timer.periodic(const Duration(seconds: 2), (
       timer,
     ) async {

@@ -33,7 +33,7 @@ class _StationScreenViewState extends State<StationScreenView> {
   void _onScroll() {
     final scrollOffset = _scrollController.offset;
     final imageHeight = 250.0;
-    
+
     // Gradually increase opacity as user scrolls past the image
     final newOpacity = (scrollOffset / imageHeight).clamp(0.0, 1.0);
     if (_opacity != newOpacity) {
@@ -49,9 +49,9 @@ class _StationScreenViewState extends State<StationScreenView> {
       builder: (controller) {
         if (controller.isLoading) {
           return Scaffold(
-            body: const Center(child: CircularProgressIndicator(
-              color: Colors.red,
-            )),
+            body: const Center(
+              child: CircularProgressIndicator(color: Colors.red),
+            ),
           );
         }
 
@@ -78,7 +78,12 @@ class _StationScreenViewState extends State<StationScreenView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Charging station image
-                Image.network(controller.stationImageUrl!, fit: BoxFit.fill, height: 250, width: double.infinity,),
+                Image.network(
+                  controller.stationImageUrl!,
+                  fit: BoxFit.fill,
+                  height: 250,
+                  width: double.infinity,
+                ),
                 // Status bar overlay at bottom of image
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -92,7 +97,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                     ],
                   ),
                 ),
-        
+
                 // Station information
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -102,13 +107,17 @@ class _StationScreenViewState extends State<StationScreenView> {
                       // Tags
                       Row(
                         children: [
-                          MyBadge(label: '${controller.station.type![0].toUpperCase()}${controller.station.type!.substring(1)}', color: const Color(0xFF0BB07B)),
+                          MyBadge(
+                            label:
+                                '${controller.station.type![0].toUpperCase()}${controller.station.type!.substring(1)}',
+                            color: const Color(0xFF0BB07B),
+                          ),
                           const SizedBox(width: 8),
                           MyBadge(label: 'Showroom', color: Colors.black87),
                         ],
                       ),
                       const SizedBox(height: 12),
-        
+
                       // Title
                       Text(
                         controller.station.name!,
@@ -118,7 +127,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         ),
                       ),
                       const SizedBox(height: 8),
-        
+
                       // Address
                       Text(
                         '${controller.station.address1!} ${controller.station.address2!}',
@@ -129,7 +138,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-        
+
                       // Select Charging Bay Section
                       const Text(
                         'Select Charging Bay',
@@ -140,13 +149,12 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(height: 12),
 
-
-                      for (Bay bay in controller.station.bays!)...[
+                      for (Bay bay in controller.station.bays!) ...[
                         _chargingBayCard(controller, bay),
                         const SizedBox(height: 8),
                       ],
                       const SizedBox(height: 16),
-        
+
                       // Promo Code Section
                       const Text(
                         'Do You Have Any Promo Code?',
@@ -176,14 +184,17 @@ class _StationScreenViewState extends State<StationScreenView> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
                             ),
                             child: const Text('Apply'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
-        
+
                       // Select My Car Section
                       const Text(
                         'Select My Car',
@@ -203,20 +214,46 @@ class _StationScreenViewState extends State<StationScreenView> {
                           filled: true,
                           fillColor: Colors.grey.shade50,
                         ),
-                        items: const [
-                          DropdownMenuItem<int>(
-                            value: 1,
-                            child: Text('ABC 123'),
-                          ),
-                        ],
+                        items: controller.vehicles.map((car) {
+                          return DropdownMenuItem<int>(
+                            value: car.id,
+                            child: Text(car.plate),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           if (value != null) {
                             controller.selectCar(value);
                           }
                         },
                       ),
+
+                      if (controller.vehicles.isEmpty)
+                        Row(
+                          children: [
+                            Text(
+                              'No car available',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            TextButton(
+                              onPressed: ()async {
+                                await Get.toNamed(AppRoutes.car);
+                                controller.initCar();
+                                controller.update();
+                              },
+                              child: const Text(
+                                'Add car here',
+                                style: TextStyle(
+                                  color: Colors.red,  
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
                       const SizedBox(height: 24),
-        
+
                       // Pricing Section
                       const Text(
                         'Pricing',
@@ -243,7 +280,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         child: const Text('View Price List'),
                       ),
                       const SizedBox(height: 24),
-        
+
                       // Schedule Idle Section
                       const Text(
                         'Schedule Idle',
@@ -260,7 +297,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       const SizedBox(height: 12),
                       _scheduleDays(),
                       const SizedBox(height: 24),
-        
+
                       // Operation Info Section
                       const Text(
                         'Operation Info',
@@ -275,7 +312,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       _infoItem(Icons.schedule, 'Business Hour'),
                       _scheduleDays(),
                       const SizedBox(height: 24),
-        
+
                       // Report Station
                       OutlinedButton.icon(
                         onPressed: () {},
@@ -290,7 +327,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-        
+
                       // Nearby Station Section
                       Container(
                         padding: const EdgeInsets.all(24),
@@ -308,13 +345,19 @@ class _StationScreenViewState extends State<StationScreenView> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Icon(Icons.location_off, size: 48, color: Colors.grey),
+                            const Icon(
+                              Icons.location_off,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(height: 8),
                             const Text('No nearby station'),
                             const SizedBox(height: 8),
                             TextButton(
                               onPressed: () {},
-                              child: const Text('Find more charging station on map'),
+                              child: const Text(
+                                'Find more charging station on map',
+                              ),
                             ),
                           ],
                         ),
@@ -326,79 +369,84 @@ class _StationScreenViewState extends State<StationScreenView> {
             ),
           ),
           bottomNavigationBar: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Add card to proceed with payment.',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Get.toNamed(AppRoutes.card);
+                        },
+                        child: const Text('+ Add Card'),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.navigation),
+                          label: const Text('Navigate'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: const BorderSide(color: Colors.red),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed:
+                              controller.unlockable &&
+                                  controller.selectedBay != null &&
+                                  controller.selectedCar != null
+                              ? controller.unlockBay
+                              : null,
+                          icon: const Icon(Icons.lock_open),
+                          label: const Text('Unlock Now'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.grey.shade500,
+                            disabledForegroundColor: Colors.grey.shade200,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Add card to proceed with payment.',
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Get.toNamed(AppRoutes.card);
-                          },
-                          child: const Text('+ Add Card'),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.navigation),
-                            label: const Text('Navigate'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              side: const BorderSide(color: Colors.red),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: controller.unlockable && controller.selectedBay != null && controller.selectedCar != null? controller.unlockBay : null,
-                            icon: const Icon(Icons.lock_open),
-                            label: const Text('Unlock Now'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: Colors.grey.shade500,
-                              disabledForegroundColor: Colors.grey.shade200,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ),
+          ),
         );
-      }
+      },
     );
   }
 
@@ -407,22 +455,21 @@ class _StationScreenViewState extends State<StationScreenView> {
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(color: color, fontSize: 12),
-        ),
+        Text(label, style: TextStyle(color: color, fontSize: 12)),
       ],
     );
   }
 
   Widget _chargingBayCard(StationController controller, Bay bay) {
     final isSelected = controller.selectedBay == bay.id!;
-    
+
     return InkWell(
       highlightColor: Colors.transparent,
       hoverColor: Colors.transparent,
       splashColor: Colors.transparent,
-      onTap: () => bay.status == BayStatus.available ? controller.selectBay(bay.id!) : null,
+      onTap: () => bay.status == BayStatus.available
+          ? controller.selectBay(bay.id!)
+          : null,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -446,16 +493,17 @@ class _StationScreenViewState extends State<StationScreenView> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           bay.name!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -463,17 +511,24 @@ class _StationScreenViewState extends State<StationScreenView> {
                         '${bay.port?.outputPower ?? '-'}kW ${bay.port?.currentType ?? '-'}',
                       ),
                     ],
-                  ),                  
+                  ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: bay.status == BayStatus.available ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                      color: bay.status == BayStatus.available
+                          ? Colors.green.withValues(alpha: 0.1)
+                          : Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       bay.status?.value.toUpperCase() ?? '',
                       style: TextStyle(
-                        color: bay.status == BayStatus.available ? Colors.green.shade700 : Colors.red.shade700,
+                        color: bay.status == BayStatus.available
+                            ? Colors.green.shade700
+                            : Colors.red.shade700,
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                       ),
@@ -488,7 +543,10 @@ class _StationScreenViewState extends State<StationScreenView> {
               child: ClipRect(
                 child: isSelected
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           border: Border(
                             top: BorderSide(color: Colors.grey.shade200),
@@ -509,19 +567,23 @@ class _StationScreenViewState extends State<StationScreenView> {
                                   },
                                   activeColor: Colors.red,
                                 ),
-                                SizedBox(width: 8,),
-                                Icon(Icons.ev_station, size: 16, color: Colors.grey.shade600),
+                                SizedBox(width: 8),
+                                Icon(
+                                  Icons.ev_station,
+                                  size: 16,
+                                  color: Colors.grey.shade600,
+                                ),
                                 SizedBox(width: 16),
                                 Text(bay.port!.portType ?? 'Unknown'),
                               ],
                             ),
-                            Text('RM 0.99 / Kwh')
+                            Text('RM 0.99 / Kwh'),
                           ],
                         ),
                       )
                     : const SizedBox.shrink(),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -549,7 +611,8 @@ class _StationScreenViewState extends State<StationScreenView> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: days.length,
-        separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade200),
+        separatorBuilder: (_, __) =>
+            Divider(height: 1, color: Colors.grey.shade200),
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -579,10 +642,7 @@ class _StationScreenViewState extends State<StationScreenView> {
         const SizedBox(width: 12),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
     );

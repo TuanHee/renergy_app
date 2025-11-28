@@ -55,7 +55,7 @@ class BookmarkItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    bookmark?.station?.shortDescription ?? '',
+                    bookmark?.station?.description ?? '',
                     style: TextStyle(color: muted, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

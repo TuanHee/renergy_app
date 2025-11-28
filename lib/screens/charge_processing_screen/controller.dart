@@ -6,6 +6,7 @@ import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/global.dart';
 
 class ChargeProcessingController extends GetxController {
   bool isLoading = true;
@@ -22,7 +23,7 @@ class ChargeProcessingController extends GetxController {
   }
 
   void pollChargingStatus() async {
-    if (order?.id == null) {
+    if (order?.id == null || !Global.isLoginValid) {
       return;
     }
     pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {

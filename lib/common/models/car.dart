@@ -2,7 +2,7 @@ class Car {
   final int id;
   final String model;
   final String plate;
-  final bool isDefault;
+  final bool? isDefault;
 
   Car({
     required this.id,

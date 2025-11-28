@@ -58,8 +58,7 @@ class StationController extends GetxController {
         vehicles = (res.data['data']['vehicles'] as List)
             .map((e) => Car.fromJson(e))
             .toList();
-            print('vehicles: $vehicles');
-        unlockable = res.data['data']['unlockable'];
+            print('vehicles: ${vehicles.length}');
       }
     } catch (e) {
       print(e);

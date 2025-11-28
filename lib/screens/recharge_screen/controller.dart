@@ -6,6 +6,7 @@ import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/global.dart';
 
 class RechargeController extends GetxController {
   bool isLoading = true;
@@ -69,6 +70,9 @@ class RechargeController extends GetxController {
   }
 
   Future<void> pollChargingStatus(BuildContext context) async {
+    if(!Global.isLoginValid){
+      return;
+    }
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
         final res = await Api().get(Endpoints.chargingStats(order!.id!));

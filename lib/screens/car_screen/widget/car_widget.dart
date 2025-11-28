@@ -43,7 +43,7 @@ class CarWidget extends StatelessWidget {
                             letterSpacing: 1.2,
                           ),
                         ),
-                        if (car.isDefault)
+                        if (car.isDefault == true)
                         Text(
                           '(Default)',
                           style: const TextStyle(
