@@ -126,15 +126,14 @@ enum ChargingStatsStatus {
           return;
         }
 
-        Get.back();
-        await Get.toNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
+        await Get.offNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
         break;
       case ChargingStatsStatus.charging:
         if (page == chargingProcessPage.chargingProcessing) {
           return;
         }
-        Get.back();
-        await Get.toNamed(
+
+        await Get.offNamed(
           AppRoutes.chargeProcessing,
           arguments: chargingStat!.order!,
         );
@@ -142,22 +141,19 @@ enum ChargingStatsStatus {
 
       case ChargingStatsStatus.completed:
         if (chargingStat!.order!.status == OrderStatus.completed.value) {
-          Get.back();
-          await Get.toNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
+          await Get.offNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
         }
         if (page == chargingProcessPage.recharge) {
           return;
         }
-        Get.back();
-        await Get.toNamed(AppRoutes.recharge, arguments: chargingStat.order!);
+        await Get.offNamed(AppRoutes.recharge, arguments: chargingStat.order!);
         break;
       case ChargingStatsStatus.cancelled:
         if (chargingStat!.order!.status == OrderStatus.cancelled) {
-          Get.back();
-          await Get.toNamed(AppRoutes.charging);
+          await Get.offAllNamed(AppRoutes.charging);
         } else if (chargingStat.order!.status == OrderStatus.restarting.value ||
             chargingStat.order!.status == OrderStatus.pending.value) {
-          await Get.toNamed(
+          await Get.offNamed(
             AppRoutes.recharge,
             arguments: {'order': chargingStat.order, 'canRecharge': false},
           );

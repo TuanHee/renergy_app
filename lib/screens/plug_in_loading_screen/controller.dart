@@ -64,16 +64,17 @@ class PlugInLoadingController extends GetxController {
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
-          print('charging_stats: ${data['charging_stats']}');
 
           if (data['charging_stats'] != null) {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);
-            print('chargingStats: ${chargingStats?.status}');
           }
         }
 
         if (chargingStats?.status != null) {
           await ChargingStatsStatus.page(chargingStats, chargingProcessPage.plugIn);
+          if(chargingStats?.status != ChargingStatsStatus.open){
+            timer.cancel();
+          }
         }
         
         update();
