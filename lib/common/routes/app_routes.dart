@@ -75,6 +75,7 @@ class AppRoutes {
         page: () => const StationScreenView(),
         transition: Transition.fadeIn,
         binding: StationBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: plugInLoading,

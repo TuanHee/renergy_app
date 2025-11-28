@@ -20,8 +20,6 @@ class Global {
       try {
         final res = await Api().get(Endpoints.user);
         
-        print('user: ${res.data}');
-
         isLoginValid = res.data['status'] == 200;
       } catch (e) {
         print('error: $e');

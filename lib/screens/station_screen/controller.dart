@@ -34,7 +34,9 @@ class StationController extends GetxController {
     ]);
     
     isLoading = false;
-    selectCar(vehicles.firstWhere((car) => car.isDefault == true).id);
+    if(vehicles.isNotEmpty){
+      selectCar(vehicles.firstWhere((car) => car.isDefault == true).id);
+    }
     update();
   }
 
@@ -60,6 +62,7 @@ class StationController extends GetxController {
             .map((e) => Car.fromJson(e))
             .toList();
       }
+      update();
     } catch (e) {
       print(e);
     }

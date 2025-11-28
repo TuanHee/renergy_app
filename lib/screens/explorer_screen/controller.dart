@@ -8,6 +8,7 @@ import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bookmark.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
@@ -63,6 +64,9 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> fetchBookmark({Function(String msg)? onErrorCallback}) async {
+    if(!Global.isLoginValid){
+      return;
+    }
     try {
       final res = await Api().get(Endpoints.bookmarks);
 
@@ -83,6 +87,10 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> storeBookmark(Station station) async {
+    if(!Global.isLoginValid){
+      Get.offAllNamed(AppRoutes.login);
+      return;
+    }
     final newBookmark = Bookmark(stationId: station.id, station: station);
     bookmarks.add(newBookmark);
     update();
@@ -105,6 +113,10 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> removeBookmark(int? bookmarkId) async {
+    if(!Global.isLoginValid){
+      Get.offAllNamed(AppRoutes.login);
+      return;
+    }
     if (bookmarkId == null) {
       throw 'Failed to remove bookmark: Try it Later';
     }
@@ -145,6 +157,7 @@ class ExplorerController extends GetxController {
           final newOrder = data['order'] != null ? Order.fromJson(data['order']) : null;
           final changedStatus = newStatus != null && status != newStatus;
           final changedOrder = (chargingOrder?.id ?? -1) != (newOrder?.id ?? -1);
+          print('changedStatus: $newStatus');
 
           if (changedStatus || changedOrder) {
             status = newStatus ?? status;

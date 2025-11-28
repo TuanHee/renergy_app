@@ -31,14 +31,11 @@ class PaymentResultController extends GetxController {
   }) async {
     try {
       if(order?.id == null) throw('Order id is null');
-      print('order id: ${order?.id}');
       final res = await Api().get(Endpoints.order(order!.id!));
 
       if (res.data['status'] >= 200 && res.data['status'] < 300) {
         final data = res.data['data'];
         order = Order.fromJson(data['order']);
-        print('order data: $data');
-        print('order: ${order?.toJson()}');
         update();
       }
     } catch (e, stackTrace) {

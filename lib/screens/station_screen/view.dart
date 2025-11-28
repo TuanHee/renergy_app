@@ -238,7 +238,6 @@ class _StationScreenViewState extends State<StationScreenView> {
                               onPressed: ()async {
                                 await Get.toNamed(AppRoutes.car);
                                 controller.initCar();
-                                controller.update();
                               },
                               child: const Text(
                                 'Add car here',

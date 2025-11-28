@@ -5,6 +5,7 @@ import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/float_bar.dart';
+import 'package:renergy_app/global.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatelessWidget {
@@ -26,6 +27,7 @@ class ExplorerScreenView extends StatelessWidget {
               ),
             ),
             actions: [
+              if (Global.isLoginValid)
               IconButton(
                 onPressed: () {},
                 icon: const Icon(Icons.notifications_none, color: Colors.white),
@@ -107,11 +109,11 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
               if (mounted) Snackbar.showError(msg, context);
             },
           ),
-          controller.pollChargingOrder(
-            onErrorCallback: (msg) {
-              if (mounted) Snackbar.showError(msg, context);
-            },
-          ),
+          // controller.pollChargingOrder(
+          //   onErrorCallback: (msg) {
+          //     if (mounted) Snackbar.showError(msg, context);
+          //   },
+          // ),
           controller.fetchStations(
             onErrorCallback: (msg) {
               if (mounted) Snackbar.showError(msg, context);

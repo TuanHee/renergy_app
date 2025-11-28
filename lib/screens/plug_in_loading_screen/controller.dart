@@ -64,6 +64,7 @@ class PlugInLoadingController extends GetxController {
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
+          print('charging_stats: ${data['charging_stats']}');
 
           if (data['charging_stats'] != null) {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);

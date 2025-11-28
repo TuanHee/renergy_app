@@ -79,7 +79,7 @@ class AccountScreenView extends StatelessWidget {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    // TODO: Implement logout
+                                    controller.logout();
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFE74C3C),
