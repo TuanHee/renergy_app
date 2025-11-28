@@ -26,7 +26,7 @@ class RegisterController extends GetxController {
     try {
       
     } catch (e) {
-      Snackbar.showError(e.toString(), Get.context!);
+      // Snackbar.showError(e.toString(), Get.context!);
     }
 
   }
