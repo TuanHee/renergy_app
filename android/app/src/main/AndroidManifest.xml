@@ -6,6 +6,7 @@
         android:label="renergy_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+    
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -40,6 +41,8 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="YOUR KEY HERE"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
