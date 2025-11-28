@@ -30,14 +30,11 @@ class PlugInLoadingController extends GetxController {
   void countDownWaitingTime() {
     DateTime endTime = chargingStats?.startAt == null
         ? DateTime.now().add(Duration(seconds: waitingTime))
-        : DateTime.tryParse(chargingStats!.startAt!)!.add(Duration(seconds: waitingTime));
+        : DateTime.tryParse(
+            chargingStats!.startAt!,
+          )!.add(Duration(seconds: waitingTime));
 
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (chargingStats?.status == ChargingStatsStatus.finishing.name ||
-          chargingStats?.status == ChargingStatsStatus.charging.name) {
-        timer.cancel();
-        return;
-      }
 
       remainSecond =
           (endTime.millisecondsSinceEpoch -
@@ -54,19 +51,6 @@ class PlugInLoadingController extends GetxController {
   Future<void> pollChargingStatus(BuildContext context) async {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
-        if (chargingStats?.status == ChargingStatsStatus.charging.value) {
-          countdownTimer?.cancel();
-          timer.cancel();
-          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
-          return;
-        }
-
-        if (chargingStats?.status == ChargingStatsStatus.cancelled.name) {
-          countdownTimer?.cancel();
-          timer.cancel();
-          Get.offAllNamed(AppRoutes.charging, arguments: order);
-          return;
-        }
         if (order?.id == null) {
           timer.cancel();
           throw ('Order id is null');
@@ -81,6 +65,11 @@ class PlugInLoadingController extends GetxController {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);
           }
         }
+
+        if (chargingStats?.status != null) {
+          ChargingStatsStatus.page(chargingStats, chargingProcessPage.plugIn);
+        }
+        
         update();
       } catch (e, stackTrace) {
         print('pollChargingStatus error: $e, $stackTrace');

@@ -14,6 +14,7 @@ class ChargingStats {
     this.startAt,
     this.stopAt,
     this.meter,
+    this.order,
   });
 
   factory ChargingStats.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class ChargingStats {
       startAt: json['started_at'],
       stopAt: json['stopped_at'],
       meter: json['meter'] == null ? null : Meter.fromJson(json['meter']),
+      order: json['order'] == null ? null : Order.fromJson(json['order']),
     );
   }
 
@@ -31,6 +33,7 @@ class ChargingStats {
       'started_at': startAt,
       'stopped_at': stopAt,
       'meter': meter?.toJson(),
+      'order': order?.toJson(),
     };
   }
 

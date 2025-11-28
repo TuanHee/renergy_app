@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/common/services/api_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PaymentResultController extends GetxController {
@@ -11,7 +12,7 @@ class PaymentResultController extends GetxController {
   bool isDownloading = false;
 
   @override
-  void onInit() {
+  void onInit() async{
     super.onInit();
     final args = Get.arguments;
     if (args is Order) {
@@ -20,7 +21,29 @@ class PaymentResultController extends GetxController {
       order = Order.fromJson(args['order']);
     }
 
+    await fetchOrder();
+
     buildItems();
+  }
+
+  Future<void> fetchOrder({
+    Function(String msg)? onErrorCallback,
+  }) async {
+    try {
+      if(order?.id == null) throw('Order id is null');
+      print('order id: ${order?.id}');
+      final res = await Api().get(Endpoints.order(order!.id!));
+
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
+        order = Order.fromJson(data['order']);
+        print('order data: $data');
+        print('order: ${order?.toJson()}');
+        update();
+      }
+    } catch (e, stackTrace) {
+      onErrorCallback?.call('Error fetch order: $e, $stackTrace');
+    }
   }
 
   String formatCurrency(double? v) {

@@ -367,8 +367,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
               right: 0,
               top: 0,
               child: FloatBar(
-                title: ChargingStatsStatus.title(controller.status),
-                subtitle: ChargingStatsStatus.subtitle(controller.status),
+                title: OrderStatus.title(controller.status),
+                subtitle: OrderStatus.subtitle(controller.status),
                 onClick: () => {Get.toNamed(AppRoutes.charging)},
               ),
             );

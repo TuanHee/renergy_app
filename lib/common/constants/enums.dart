@@ -1,3 +1,8 @@
+import 'package:get/get.dart';
+
+import '../models/charging_stats.dart';
+import '../routes/app_routes.dart';
+
 enum BayStatus {
   available('Available'),
   reserved('Reserved'),
@@ -17,15 +22,81 @@ enum BayStatus {
   }
 }
 
-enum ChargingStatsStatus {
-  none('None'),
-  open('Open'),
+enum OrderStatus {
   pending('Pending'),
   charging('Charging'),
   finishing('Finishing'),
   restarting('Restarting'),
+  cancelled('Cancelled'),
   paymentPending('Payment Pending'),
-  unPaid('Unpaid'),
+  completed('Completed'),
+  unpaid('Unpaid'),
+  error('Error');
+
+  const OrderStatus(this.value);
+  final String value;
+
+  static OrderStatus? fromString(String? value) {
+    if (value == null) return null;
+    for (final status in OrderStatus.values) {
+      if (status.value == value) return status;
+    }
+    return null;
+  }
+
+  static String subtitle(String? value) {
+    switch (OrderStatus.fromString(value)) {
+      case OrderStatus.pending:
+        return 'your request is pending';
+      case OrderStatus.charging:
+        return 'charging in progress';
+      case OrderStatus.finishing:
+        return 'customer is leaving the parking';
+      case OrderStatus.restarting:
+        return 'waiting for rechange';
+      case OrderStatus.paymentPending:
+        return 'payment pending';
+      case OrderStatus.unpaid:
+        return 'unpaid';
+      case OrderStatus.completed:
+        return 'leave the parking to completed the whole process';
+      case OrderStatus.cancelled:
+        return 'cancelled';
+
+      default:
+        return '';
+    }
+  }
+
+  static String title(String? value) {
+    switch (OrderStatus.fromString(value)) {
+      case OrderStatus.pending:
+        return 'Pending';
+      case OrderStatus.charging:
+        return 'Charging';
+      case OrderStatus.finishing:
+        return 'Finishing';
+      case OrderStatus.restarting:
+        return 'Recharging';
+      case OrderStatus.paymentPending:
+        return 'Payment Pending';
+      case OrderStatus.unpaid:
+        return 'Unpaid';
+      case OrderStatus.completed:
+        return 'Leave Parking';
+      case OrderStatus.cancelled:
+        return 'Cancelled';
+
+      default:
+        return '';
+    }
+  }
+}
+
+enum ChargingStatsStatus {
+  none('None'),
+  open('Open'),
+  charging('Charging'),
   completed('Completed'),
   cancelled('Cancelled');
 
@@ -42,40 +113,58 @@ enum ChargingStatsStatus {
     return null;
   }
 
-  static String subtitle(String? value){
-    switch(ChargingStatsStatus.fromString(value)){
-      case ChargingStatsStatus.open: return 'plug in the charger to start the process';
-      case ChargingStatsStatus.pending: return 'your request is pending';
-      case ChargingStatsStatus.charging: return 'charging in progress';
-      case ChargingStatsStatus.finishing: return 'customer is leaving the parking';
-      case ChargingStatsStatus.restarting: return 'waiting for rechange';
-      case ChargingStatsStatus.paymentPending: return 'payment pending';
-      case ChargingStatsStatus.unPaid: return 'unpaid';
-      case ChargingStatsStatus.completed: return 'leave the parking to completed the whole process';
-      case ChargingStatsStatus.cancelled: return 'cancelled';
-      
-      default: return '';
+  static void page(ChargingStats? chargingStat, chargingProcessPage page) {
+    if (chargingStat?.status == null) throw 'Charging stats status is null';
+    if (chargingStat?.order == null) throw 'Charging stats order is null';
+    switch (chargingStat?.status) {
+      case ChargingStatsStatus.open:
+        if (page == chargingProcessPage.plugIn) {
+          return;
+        }
+
+        Get.back();
+        Get.toNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
+        break;
+      case ChargingStatsStatus.charging:
+        if (page == chargingProcessPage.chargingProcessing) {
+          return;
+        }
+        Get.back();
+        Get.toNamed(
+          AppRoutes.chargeProcessing,
+          arguments: chargingStat!.order!,
+        );
+        break;
+
+      case ChargingStatsStatus.completed:
+        if (chargingStat!.order!.status == OrderStatus.completed.value) {
+          Get.back();
+          Get.toNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
+        }
+        if (page == chargingProcessPage.recharge) {
+          return;
+        }
+        Get.back();
+        Get.toNamed(AppRoutes.recharge, arguments: chargingStat.order!);
+        break;
+      case ChargingStatsStatus.cancelled:
+        if (chargingStat!.order!.status == OrderStatus.cancelled) {
+          Get.back();
+          Get.toNamed(AppRoutes.charging);
+        } else if (chargingStat.order!.status == OrderStatus.restarting.value ||
+            chargingStat.order!.status == OrderStatus.pending.value) {
+          Get.toNamed(
+            AppRoutes.recharge,
+            arguments: {'order': chargingStat.order, 'canRecharge': false},
+          );
+        }
+      default:
+        break;
     }
   }
-
-  static String title(String? value){
-    switch(ChargingStatsStatus.fromString(value)){
-      case ChargingStatsStatus.open: return 'Ready To Charge';
-       case ChargingStatsStatus.pending: return 'Pending';
-      case ChargingStatsStatus.charging: return 'Charging';
-      case ChargingStatsStatus.finishing: return 'Finishing';
-      case ChargingStatsStatus.restarting: return 'Recharging';
-      case ChargingStatsStatus.paymentPending: return 'Payment Pending';
-      case ChargingStatsStatus.unPaid: return 'Unpaid';
-      case ChargingStatsStatus.completed: return 'Leave Parking';
-      case ChargingStatsStatus.cancelled: return 'Cancelled';
-      
-      default: return '';
-    }
-  }
-
-
 }
+
+enum chargingProcessPage { charging,plugIn, chargingProcessing, recharge }
 
 enum ParkingStatus {
   available('Available'),

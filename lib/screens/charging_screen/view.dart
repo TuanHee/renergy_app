@@ -24,63 +24,13 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         controller.fetchChargingHistory(),
         controller.fetchChargingOrder(),
       ]);
-      if (!isStayPage && controller.currentOrder != null) {
-        navToSpecificPage(
-          status: controller.status,
-          order: controller.currentOrder!,
+      if (!isStayPage && controller.chargingStats != null) {
+        ChargingStatsStatus.page(
+          controller.chargingStats,
+          chargingProcessPage.charging,
         );
       }
     });
-  }
-
-  void navToSpecificPage({
-    required ChargingStatsStatus status,
-    required Order order,
-  }) {
-    if (!Get.isRegistered<ChargingController>()) {
-      return;
-    }
-    try {
-      switch (status) {
-        case ChargingStatsStatus.open:
-          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
-          break;
-
-        case ChargingStatsStatus.pending:
-          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
-          break;
-
-        case ChargingStatsStatus.charging:
-          Get.toNamed(AppRoutes.chargeProcessing, arguments: order);
-          break;
-
-        case ChargingStatsStatus.finishing:
-          Get.toNamed(AppRoutes.recharge, arguments: order);
-          break;
-
-        case ChargingStatsStatus.restarting:
-          Get.toNamed(AppRoutes.plugInLoading, arguments: order);
-          break;
-
-        // case ChargingStatsStatus.paymentPending:
-        //   Get.toNamed(AppRoutes.charging);
-        //   break;
-
-        // case ChargingStatsStatus.unPaid:
-        //   Get.toNamed(AppRoutes.paymentResult);
-        //   break;
-
-        case ChargingStatsStatus.completed:
-          Get.toNamed(AppRoutes.paymentResult, arguments: order);
-          break;
-        default:
-          break;
-      }
-    } catch (e) {
-      if (mounted) {
-        Snackbar.showError(e.toString(), context);
-      }
-    }
   }
 
   @override
@@ -253,14 +203,13 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          navToSpecificPage(
-                            status:
-                                ChargingStatsStatus.fromString(
-                                  order.status ?? '',
-                                ) ??
-                                ChargingStatsStatus.none,
-                            order: order,
+                          if(order.id == controller.chargingStats?.order?.id && order.id != null)
+                          ChargingStatsStatus.page(controller.chargingStats,
+                            chargingProcessPage.charging,
                           );
+                          else{
+                             Get.toNamed(AppRoutes.paymentResult, arguments: order);
+                          }
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -353,7 +302,10 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                               ),
 
                               const SizedBox(height: 6),
-                              _kv('Station', order.stationName ?? order.station?.name ?? '-'),
+                              _kv(
+                                'Station',
+                                order.stationName ?? order.station?.name ?? '-',
+                              ),
                               const SizedBox(height: 6),
                               _kv('Car Plate', carPlate),
                               const SizedBox(height: 6),

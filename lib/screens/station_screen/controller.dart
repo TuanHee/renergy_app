@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
+import 'package:renergy_app/common/models/car.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -16,6 +17,7 @@ class StationController extends GetxController {
   int? selectedCar;
   late int stationId;
   bool unlockable = false;
+  List<Car> vehicles = [];
 
   @override
   void onInit() async {
@@ -43,6 +45,21 @@ class StationController extends GetxController {
       print(e);
     }
   }
+
+  // Future<void> initCar() async {
+  //   try {
+  //     final res = await Api().get(Endpoints.vehicles);
+      
+  //     if (res.data['status'] == 200) {
+  //       vehicles = (res.data['data']['vehicles'] as List)
+  //           .map((e) => Car.fromJson(e))
+  //           .toList();
+  //       unlockable = res.data['data']['unlockable'];
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   void selectBay(int bayId) {
     selectedBay = bayId;

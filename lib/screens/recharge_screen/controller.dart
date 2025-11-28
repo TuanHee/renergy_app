@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/constants.dart';
+import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
-import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
-
-import '../plug_in_loading_screen/controller.dart';
 
 class RechargeController extends GetxController {
   bool isLoading = true;
@@ -15,15 +13,26 @@ class RechargeController extends GetxController {
   Timer? apiTimer;
   Timer? countdownTimer;
   int remainSecond = 15 * 60;
-  DateTime startTime = DateTime.now();
+  ChargingStats? chargingStats;
+  bool canRecharge = true;
 
-  String status = ParkingStatus.unavailable.value;
   Order? order;
 
   @override
   void onInit() async {
     super.onInit();
-    order = Get.arguments as Order?;
+    final args = Get.arguments;
+    if (args is Order) {
+      order = args;
+    } else if (args is Map) {
+      final rawOrder = args['order'];
+      if (rawOrder is Order) {
+        order = rawOrder;
+      } else if (rawOrder is Map<String, dynamic>) {
+        order = Order.fromJson(rawOrder);
+      }
+      canRecharge = args['canRecharge'] as bool? ?? true;
+    }
     countDownWaitingTime();
 
     // cards = [
@@ -42,18 +51,19 @@ class RechargeController extends GetxController {
   }
 
   void countDownWaitingTime() {
-    DateTime endTime = startTime.add(Duration(seconds: waitingTime));
+    DateTime endTime =
+        DateTime.tryParse(chargingStats?.stopAt ?? '') ?? DateTime.now();
 
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (status == ChargingStatsStatus.finishing.name ||
-          status == ChargingStatsStatus.charging.name) {
+      if (chargingStats?.status != ChargingStatsStatus.completed.name) {
         timer.cancel();
         return;
       }
 
       remainSecond =
           (endTime.millisecondsSinceEpoch -
-          DateTime.now().millisecondsSinceEpoch) ~/ 1000;
+              DateTime.now().millisecondsSinceEpoch) ~/
+          1000;
       update();
     });
   }
@@ -61,45 +71,16 @@ class RechargeController extends GetxController {
   Future<void> pollChargingStatus(BuildContext context) async {
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
-        if (status == ChargingStatsStatus.restarting.value) {
-          countdownTimer?.cancel();
-          timer.cancel();
-          Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
-        }
-
-        if (status == ChargingStatsStatus.open.value) {
-          countdownTimer?.cancel();
-          timer.cancel();
-          Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
-          return;
-        }
-        // if (status == ChargingStatsStatus.charging.value) {
-        //   countdownTimer?.cancel();
-        //   timer.cancel();
-        //   Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
-        //   return;
-        // }
-
-        // if (status == ChargingStatsStatus.cancelled.name) {
-        //   countdownTimer?.cancel();
-        //   timer.cancel();
-        //   Get.offAllNamed(AppRoutes.charging, arguments: order);
-        //   return;
-        // }
-
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
 
           if (data['charging_stats']['status'] is String) {
-            status = data['charging_stats']['status'];
-            if (data['charging_stats']['stopped_at'] != null) {
-              startTime =
-                  DateTime.tryParse(data['charging_stats']['stopped_at'] ?? '') ?? DateTime.now();
-            }
+            chargingStats = ChargingStats.fromJson(data['charging_stats']);
           }
         }
+        ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
         update();
       } catch (e, stackTrace) {
         print('pollChargingStatus error: $e, $stackTrace');
@@ -121,7 +102,7 @@ class RechargeController extends GetxController {
   @override
   void onClose() {
     countdownTimer?.cancel();
-      apiTimer?.cancel();
+    apiTimer?.cancel();
     super.onClose();
   }
 }

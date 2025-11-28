@@ -28,10 +28,6 @@ class ChargeProcessingController extends GetxController {
     pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       try {
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
-        if (status == ChargingStatsStatus.finishing.name) {
-          timer.cancel();
-          Get.offAllNamed(AppRoutes.chargeProcessing, arguments: order);
-        }
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
           final data = res.data['data'];
@@ -43,6 +39,8 @@ class ChargeProcessingController extends GetxController {
           chargingStats = ChargingStats.fromJson(
             res.data['data']['charging_stats'],
           );
+
+          ChargingStatsStatus.page(chargingStats!, chargingProcessPage.chargingProcessing);
           update();
         }
 
@@ -73,7 +71,6 @@ class ChargeProcessingController extends GetxController {
   @override
   void onClose() {
     pollingTimer?.cancel();
-
     super.onClose();
   }
 }

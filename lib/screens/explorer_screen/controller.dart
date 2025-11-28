@@ -141,6 +141,7 @@ class ExplorerController extends GetxController {
           final newOrder = data['order'] != null ? Order.fromJson(data['order']) : null;
           final changedStatus = newStatus != null && status != newStatus;
           final changedOrder = (chargingOrder?.id ?? -1) != (newOrder?.id ?? -1);
+          print('newStatus in explorer: $newStatus');
 
           if (changedStatus || changedOrder) {
             status = newStatus ?? status;

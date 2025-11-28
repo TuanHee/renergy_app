@@ -114,6 +114,7 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
                 ),
 
                 const SizedBox(height: 4),
+                if(controller.canRecharge)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

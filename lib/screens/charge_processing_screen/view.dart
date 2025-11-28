@@ -393,7 +393,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Rate (RM)',
-                                '${controller.chargingStats!.order!.charging_price!.toStringAsFixed(2)}/kWh',
+                                '${ controller.chargingStats?.order?.charging_price != null ? controller.chargingStats!.order!.charging_price!.toStringAsFixed(2) : '-'}',
                               ),
                             ],
                           ),
