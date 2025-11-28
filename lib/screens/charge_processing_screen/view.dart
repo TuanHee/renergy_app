@@ -39,11 +39,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.find<ChargeProcessingController>().pollChargingStatus();
     });
-
   }
 
   @override
@@ -109,7 +108,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true}),
+                        onPressed: () => Get.offAllNamed(
+                          AppRoutes.charging,
+                          arguments: {'isStayPage': true},
+                        ),
                       ),
                       const Expanded(
                         child: Center(
@@ -284,7 +286,12 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.speed,
                                 label: 'Port Type',
                                 value:
-                                    controller.order?.bay?.port?.portType ??
+                                    controller
+                                        .chargingStats
+                                        ?.order
+                                        ?.bay
+                                        ?.port
+                                        ?.portType ??
                                     '-',
                               ),
                             ),
@@ -294,7 +301,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.access_time,
                                 label: 'Output Power (kW)',
                                 value:
-                                    '${controller.order?.bay?.port?.outputPower ?? 0} kW',
+                                    '${controller.chargingStats?.order?.bay?.port?.outputPower ?? 0} kW',
                               ),
                             ),
                           ],
@@ -318,7 +325,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.attach_money,
                                 label: 'Current Cost',
                                 value:
-                                    'RM ${controller.chargingStats?.meter?.usage != null ? ((controller.chargingStats!.meter!.usage! / 1000) * 0.99).toStringAsFixed(2) : '-'}',
+                                    'RM ${controller.chargingStats?.meter?.usage != null && controller.chargingStats!.order!.charging_price != null ? ((controller.chargingStats!.meter!.usage! / 1000) * controller.chargingStats!.order!.charging_price!).toStringAsFixed(2) : '-'}',
                               ),
                             ),
                           ],
@@ -354,14 +361,24 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               const SizedBox(height: 16),
                               _buildDetailRow(
                                 'Charger ID',
-                                controller.order?.chargerId != null
-                                    ? controller.order!.chargerId!.toString()
+                                controller.chargingStats?.order?.chargerId !=
+                                        null
+                                    ? controller
+                                          .chargingStats!
+                                          .order!
+                                          .chargerId!
+                                          .toString()
                                     : '-',
                               ),
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Location',
-                                controller.order?.station?.name ?? '-',
+                                controller
+                                        .chargingStats
+                                        ?.order
+                                        ?.station
+                                        ?.name ??
+                                    '-',
                               ),
                               const SizedBox(height: 12),
                               _buildDetailRow(
@@ -374,7 +391,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               ),
 
                               const SizedBox(height: 12),
-                              _buildDetailRow('Rate (RM)', '0.99/kWh'),
+                              _buildDetailRow(
+                                'Rate (RM)',
+                                '${controller.chargingStats!.order!.charging_price!.toStringAsFixed(2)}/kWh',
+                              ),
                             ],
                           ),
                         ),

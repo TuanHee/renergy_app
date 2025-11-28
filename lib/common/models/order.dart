@@ -21,6 +21,8 @@ class Order {
   double? totalUsage;
   double? totalChargeableIdleTimeMinutes;
   double? totalChargingTimeMinutes;
+  double? charging_price;
+  double? idle_price;
   String? invoiceNo;
   double? discountPercentage;
   double? taxPercentage;
@@ -49,6 +51,8 @@ class Order {
     this.totalUsage,
     this.totalChargeableIdleTimeMinutes,
     this.totalChargingTimeMinutes,
+    this.charging_price,
+    this.idle_price,
     this.invoiceNo,
     this.discountPercentage,
     this.taxPercentage,
@@ -83,6 +87,8 @@ class Order {
       totalChargingTimeMinutes: json['total_charging_time_minutes'] == null
           ? null
           : double.parse(json['total_charging_time_minutes'].toString()),
+      charging_price: json['fees']['charging_price'] == null ? null : double.parse(json['fees']['charging_price'].toString()),
+      idle_price: json['fees']['idle_price'] == null ? null : double.parse(json['fees']['idle_price'].toString()),
       invoiceNo: json['invoice_no'],
       discountPercentage: json['discount_percentage'] == null ? null : double.parse(json['discount_percentage'].toString()),
       taxPercentage: json['tax_percentage'] == null ? null : double.parse(json['tax_percentage'].toString()),
@@ -123,6 +129,10 @@ class Order {
       'total_usage': totalUsage,
       'total_chargeable_idle_time_minutes': totalChargeableIdleTimeMinutes,
       'total_charging_time_minutes': totalChargingTimeMinutes,
+      'fees': {
+        'charging_price': charging_price,
+        'idle_price': idle_price,
+      },
       'invoice_no': invoiceNo,
       'discount_percentage': discountPercentage,
       'tax_percentage': taxPercentage,

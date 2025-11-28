@@ -8,6 +8,7 @@ export 'station_screen/station_screen.dart';
 export 'plug_in_loading_screen/plug_in_loading_screen.dart';
 export 'charge_processing_screen/charge_processing_screen.dart';
 export 'card_screen/card_screen.dart';
+export 'edit_card_screen/edit_card_screen.dart';
 export 'recharge_screen/recharge_screen.dart';
 export 'add_car_screen/add_car_screen.dart';
 export 'car_screen/car_screen.dart';

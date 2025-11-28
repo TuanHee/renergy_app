@@ -1,11 +1,13 @@
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/meter.dart';
+import 'package:renergy_app/common/models/order.dart';
 
 class ChargingStats {
   ChargingStatsStatus? status;
   String? startAt;
   String? stopAt;
   Meter? meter;
+  Order? order;
 
   ChargingStats({
     this.status,

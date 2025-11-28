@@ -224,15 +224,15 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                         Expanded(
                           child: _buildInfoItem(
                             'Charger ID',
-                            controller.order?.chargerId != null
-                                ? controller.order!.chargerId.toString()
+                            controller.chargingStats?.order?.chargerId != null
+                                ? controller.chargingStats!.order!.chargerId.toString()
                                 : '-',
                           ),
                         ),
                         Expanded(
                           child: _buildInfoItem(
                             'Station',
-                            '${controller.order?.station?.name ?? 'N/A'}',
+                            '${controller.chargingStats?.order?.station?.name ?? 'N/A'}',
                           ),
                         ),
                       ],
@@ -243,13 +243,13 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                         Expanded(
                           child: _buildInfoItem(
                             'Power Output',
-                            '${controller.order?.bay?.port?.outputPower ?? 0} kW',
+                            '${controller.chargingStats?.order?.bay?.port?.outputPower ?? 0} kW',
                           ),
                         ),
                         Expanded(
                           child: _buildInfoItem(
                             'Type',
-                            '${controller.order?.bay?.port?.portType ?? 0}',
+                            '${controller.chargingStats?.order?.bay?.port?.portType ?? 0}',
                           ),
                         ),
                       ],
