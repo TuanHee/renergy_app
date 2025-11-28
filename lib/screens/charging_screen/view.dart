@@ -25,10 +25,11 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         controller.fetchChargingOrder(),
       ]);
       if (!isStayPage && controller.chargingStats != null) {
-        ChargingStatsStatus.page(
+        await ChargingStatsStatus.page(
           controller.chargingStats,
           chargingProcessPage.charging,
         );
+        controller.fetchChargingHistory();
       }
     });
   }

@@ -113,9 +113,13 @@ enum ChargingStatsStatus {
     return null;
   }
 
-  static void page(ChargingStats? chargingStat, chargingProcessPage page) {
+  static Future<void> page(ChargingStats? chargingStat, chargingProcessPage page) async {
     if (chargingStat?.status == null) throw 'Charging stats status is null';
     if (chargingStat?.order == null) throw 'Charging stats order is null';
+
+          print('chargingStat?.status: ${chargingStat?.status}');
+          print('chargingStat?.order?.status: ${chargingStat?.order?.status}');
+
     switch (chargingStat?.status) {
       case ChargingStatsStatus.open:
         if (page == chargingProcessPage.plugIn) {
@@ -123,14 +127,14 @@ enum ChargingStatsStatus {
         }
 
         Get.back();
-        Get.toNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
+        await Get.toNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
         break;
       case ChargingStatsStatus.charging:
         if (page == chargingProcessPage.chargingProcessing) {
           return;
         }
         Get.back();
-        Get.toNamed(
+        await Get.toNamed(
           AppRoutes.chargeProcessing,
           arguments: chargingStat!.order!,
         );
@@ -139,21 +143,21 @@ enum ChargingStatsStatus {
       case ChargingStatsStatus.completed:
         if (chargingStat!.order!.status == OrderStatus.completed.value) {
           Get.back();
-          Get.toNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
+          await Get.toNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
         }
         if (page == chargingProcessPage.recharge) {
           return;
         }
         Get.back();
-        Get.toNamed(AppRoutes.recharge, arguments: chargingStat.order!);
+        await Get.toNamed(AppRoutes.recharge, arguments: chargingStat.order!);
         break;
       case ChargingStatsStatus.cancelled:
         if (chargingStat!.order!.status == OrderStatus.cancelled) {
           Get.back();
-          Get.toNamed(AppRoutes.charging);
+          await Get.toNamed(AppRoutes.charging);
         } else if (chargingStat.order!.status == OrderStatus.restarting.value ||
             chargingStat.order!.status == OrderStatus.pending.value) {
-          Get.toNamed(
+          await Get.toNamed(
             AppRoutes.recharge,
             arguments: {'order': chargingStat.order, 'canRecharge': false},
           );

@@ -325,7 +325,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.attach_money,
                                 label: 'Current Cost',
                                 value:
-                                    'RM ${controller.chargingStats?.meter?.usage != null && controller.chargingStats!.order!.charging_price != null ? ((controller.chargingStats!.meter!.usage! / 1000) * controller.chargingStats!.order!.charging_price!).toStringAsFixed(2) : '-'}',
+                                    'RM ${controller.chargingStats?.meter?.usage != null && controller.chargingStats?.order?.charging_price != null ? ((controller.chargingStats!.meter!.usage! / 1000) * controller.chargingStats!.order!.charging_price!).toStringAsFixed(2) : '-'}',
                               ),
                             ),
                           ],

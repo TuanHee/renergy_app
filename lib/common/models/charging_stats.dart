@@ -27,7 +27,7 @@ class ChargingStats {
     );
   }
 
-  Map<String, dynamic> toJson() {
+Map<String, dynamic> toJson() {
     return {
       'status': status?.value,
       'started_at': startAt,

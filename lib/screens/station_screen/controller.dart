@@ -96,15 +96,10 @@ class StationController extends GetxController {
         Order order = Order.fromJson(res.data['data']['order']);
         Get.offAllNamed(AppRoutes.plugInLoading, arguments: order);
       } else {
-        Get.snackbar(
-          'Error',
-          res.data['message'] ?? 'Failed to unlock bay',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        throw Exception(res.data['message'] ?? 'Failed to unlock bay');
       }
     } catch (e) {
+      print('Error in unlockBay: $e');
       Get.snackbar(
         'Error',
         e.toString(),

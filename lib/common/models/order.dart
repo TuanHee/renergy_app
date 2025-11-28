@@ -87,8 +87,12 @@ class Order {
       totalChargingTimeMinutes: json['total_charging_time_minutes'] == null
           ? null
           : double.parse(json['total_charging_time_minutes'].toString()),
-      charging_price: json['fees']['charging_price'] == null ? null : double.parse(json['fees']['charging_price'].toString()),
-      idle_price: json['fees']['idle_price'] == null ? null : double.parse(json['fees']['idle_price'].toString()),
+      charging_price: json['fees'] != null && json['fees']['charging_price'] != null
+          ? double.parse(json['fees']['charging_price'].toString())
+          : null,
+      idle_price: json['fees'] != null && json['fees']['idle_price'] != null
+          ? double.parse(json['fees']['idle_price'].toString())
+          : null,
       invoiceNo: json['invoice_no'],
       discountPercentage: json['discount_percentage'] == null ? null : double.parse(json['discount_percentage'].toString()),
       taxPercentage: json['tax_percentage'] == null ? null : double.parse(json['tax_percentage'].toString()),

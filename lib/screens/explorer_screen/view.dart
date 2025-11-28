@@ -109,11 +109,11 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
               if (mounted) Snackbar.showError(msg, context);
             },
           ),
-          // controller.pollChargingOrder(
-          //   onErrorCallback: (msg) {
-          //     if (mounted) Snackbar.showError(msg, context);
-          //   },
-          // ),
+          controller.pollChargingOrder(
+            onErrorCallback: (msg) {
+              if (mounted) Snackbar.showError(msg, context);
+            },
+          ),
           controller.fetchStations(
             onErrorCallback: (msg) {
               if (mounted) Snackbar.showError(msg, context);

@@ -68,11 +68,12 @@ class PlugInLoadingController extends GetxController {
 
           if (data['charging_stats'] != null) {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);
+            print('chargingStats: ${chargingStats?.status}');
           }
         }
 
         if (chargingStats?.status != null) {
-          ChargingStatsStatus.page(chargingStats, chargingProcessPage.plugIn);
+          await ChargingStatsStatus.page(chargingStats, chargingProcessPage.plugIn);
         }
         
         update();
