@@ -8,18 +8,23 @@ class Global {
   static bool isLoginValid = false;
 
   static Future init() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
     await Get.putAsync<StorageService>(() => StorageService().init());
+    await checkLoginStatus();
   }
 
   static Future<void> checkLoginStatus() async {
     String? accessToken = StorageService.to.getString(storageAccessToken);
     if (accessToken != null && accessToken != '') {
       try {
-        final res = await Api().post(Endpoints);
+        final res = await Api().get(Endpoints.user);
+        
+        print('user: ${res.data}');
 
         isLoginValid = res.data['status'] == 200;
       } catch (e) {
-        // TODO: show error
+        print('error: $e');
       }
     } else {
       isLoginValid = false;

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:renergy_app/common/constants/endpoints.dart';
+import 'package:renergy_app/common/constants/constants.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/common/services/storage_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
+import 'package:renergy_app/global.dart';
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -73,11 +76,17 @@ class RegisterController extends GetxController {
         'password_confirmation': confirmPasswordController.text,
       };
       print('register payload: $payload');
-      await Api().post(Endpoints.register, data: payload);
+      final res = await Api().post(Endpoints.register, data: payload);
+
+      if (res.data['status'] != 200) {
+        throw res.data['message'] ?? 'Failed to register';
+      }
+
+      StorageService.to.setString(storageAccessToken, res.data['data']['_token']);
+      Global.isLoginValid = true;
+      print(StorageService.to.getString(storageAccessToken));
       
-      isLoading = false;
-      update();
-      Get.back(result: true);
+      Get.offAllNamed(AppRoutes.explorer);
       if (Get.context != null) {
         Snackbar.showSuccess('Register successful',Get.context!);
       }

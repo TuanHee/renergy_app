@@ -11,6 +11,8 @@ class AuthMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     String? accessToken = StorageService.to.getString(storageAccessToken);
+
+    print('accessToken: $accessToken');
     if (accessToken != null && accessToken != '') {
       Global.checkLoginStatus();
       if (!Global.isLoginValid) {

@@ -11,7 +11,14 @@ class LoginScreenView extends StatelessWidget {
     return GetBuilder<LoginController>(
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(centerTitle: true, title: const Text('Login')),
+          appBar: AppBar(
+            centerTitle: true,
+            title: const Text('Login'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Get.offNamed(AppRoutes.explorer),
+            ),
+          ),
           body: SafeArea(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
