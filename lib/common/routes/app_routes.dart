@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
+import 'package:renergy_app/common/middlewares/middlewares.dart';
 import 'package:renergy_app/screens/screens.dart';
 
 class AppRoutes {
   // Route names
   static const String splash = '/splash';
+  static const String register = '/register';
   static const String login = '/login';
   static const String explorer = '/explorer';
   static const String charging = '/charging';
@@ -24,6 +26,8 @@ class AppRoutes {
   // Initial route
   static const String initial = splash;
 
+  static List<AuthMiddleware> authMiddleware = [AuthMiddleware()];
+
   // Get all routes
   static List<GetPage> getPages() {
     return [
@@ -37,6 +41,7 @@ class AppRoutes {
         name: login,
         page: () => const LoginScreenView(),
         transition: Transition.fadeIn,
+        binding: LoginBinding(),
       ),
       GetPage(
         name: explorer,
@@ -49,18 +54,21 @@ class AppRoutes {
         page: () => const ChargingScreenView(),
         transition: Transition.fadeIn,
         binding: ChargingBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: bookmark,
         page: () => const BookmarkScreenView(),
         transition: Transition.fadeIn,
         binding: BookmarkBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: account,
         page: () => const AccountScreenView(),
         transition: Transition.fadeIn,
         binding: AccountBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: chargingStation,
@@ -73,18 +81,21 @@ class AppRoutes {
         page: () => const PlugInLoadingScreenView(),
         transition: Transition.fadeIn,
         binding: PlugInLoadingBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: chargeProcessing,
         page: () => const ChargeProcessingScreenView(),
         transition: Transition.fadeIn,
         binding: ChargeProcessingBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: card,
         page: () => const CardScreenView(),
         transition: Transition.fadeIn,
         binding: CardBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: editCard,
@@ -97,36 +108,47 @@ class AppRoutes {
         page: () => const RechargeScreenView(),
         transition: Transition.fadeIn,
         binding: RechargeBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: car,
         page: () => const CarScreenView(),
         transition: Transition.fadeIn,
         binding: CarBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: addCar,
         page: () => const AddCarScreenView(),
         transition: Transition.fadeIn,
         binding: AddCarBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: editCar,
         page: () => const EditCarScreenView(),
         transition: Transition.fadeIn,
         binding: EditCarBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: paymentResult,
         page: () => const PaymentResultScreenView(),
         transition: Transition.fadeIn,
         binding: PaymentResultBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: filter,
         page: () => const FilterScreenView(),
         transition: Transition.fadeIn,
         binding: FilterBinding(),
+      ),
+      GetPage(
+        name: register, 
+        page: () => const RegisterScreenView(),
+        transition: Transition.fadeIn,
+        binding: RegisterBinding()
       ),
     ];
   }
