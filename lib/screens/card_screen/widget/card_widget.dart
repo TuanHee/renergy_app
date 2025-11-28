@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../common/models/creadit_card.dart';
+import '../../../common/models/credit_card.dart';
 
 class CardWidget extends StatelessWidget {
   final CreditCard card;
@@ -21,7 +21,7 @@ class CardWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: card.cardType.colors,
+            colors: card.brandColors,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -36,12 +36,12 @@ class CardWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Image.asset(
-                    card.cardType.logo,
+                    card.brandLogo,
                     width: 50,
                     height: 30,
                     errorBuilder: (context, error, stackTrace) {
                       return Icon(
-                        card.cardType.icon,
+                        card.typeIcon,
                         color: Colors.white,
                         size: 40,
                       );
@@ -66,7 +66,7 @@ class CardWidget extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                card.cardNumber,
+                '**** **** **** ${card.last4}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -88,15 +88,6 @@ class CardWidget extends StatelessWidget {
                           fontSize: 10,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        card.cardHolder,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
                     ],
                   ),
                   Column(
@@ -110,14 +101,6 @@ class CardWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        card.expiryDate,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
                     ],
                   ),
                 ],

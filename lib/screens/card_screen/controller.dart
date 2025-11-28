@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:renergy_app/common/models/creadit_card.dart';
+import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:fiuu_mobile_xdk_flutter/fiuu_mobile_xdk_flutter.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
@@ -26,6 +26,28 @@ class CardController extends GetxController {
     // ];
   }
 
+  Future<void> fetchCarIndex() async {
+    isLoading = true;
+    update();
+    try {
+      final res = await Api().get(Endpoints.vehicles);
+      if (res.data['status'] != 200) {
+        throw res.data['message'] ?? 'Failed to fetch cars';
+      }
+      final data = res.data['data'];
+      final vehicles = (data is Map && data['cards'] is List)
+          ? List<Map<String, dynamic>>.from(data['cards'])
+          : <Map<String, dynamic>>[];
+      cards = vehicles.map((json) => CreditCard.fromJson(json)).toList();
+      update();
+    } catch (e) {
+      rethrow;
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+  
   Future<void> addCard() async {
     try {
       final res = await Api().post(Endpoints.paymentMethods);
