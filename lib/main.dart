@@ -12,7 +12,6 @@ import 'common/services/firebase_notification.dart';
 import 'common/services/location_handler.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await Global.init();
 
   try {
