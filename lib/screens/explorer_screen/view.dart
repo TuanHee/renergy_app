@@ -89,7 +89,7 @@ class _BottomSheetPanel extends StatefulWidget {
 
 class _BottomSheetPanelState extends State<_BottomSheetPanel> {
   static const double _collapsedSize = 0.35;
-  static const double _expandedSize = 0.70;
+  static const double _expandedSize = 0.99;
 
   late final DraggableScrollableController _sheetController;
   double _currentSize = _collapsedSize;
@@ -182,7 +182,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Drag handle
                       InkWell(
@@ -193,7 +193,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           _toggleSheet();
                         },
                         child: Container(
-                          margin: const EdgeInsets.only(top: 8, bottom: 16),
+                          margin: const EdgeInsets.only(top: 8, bottom: 6),
                           child: Center(
                             child: Icon(
                               _currentSize <=
@@ -201,7 +201,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                   ? Icons.keyboard_arrow_up_rounded
                                   : Icons.keyboard_arrow_down_rounded,
                               color: Colors.red.shade700,
-                              size: 24,
+                              size: 22,
                             ),
                           ),
                         ),
@@ -211,6 +211,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: Colors.black,
                             fontWeight: FontWeight.w600,
+                            fontSize: 20
                           ),
                           children: const [
                             TextSpan(text: 'Welcome to '),
@@ -224,11 +225,12 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         'Charge anytime, anywhere',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.black54,
+                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -379,22 +381,18 @@ class _StationItem extends StatelessWidget {
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                width: 90,
-                height: 70,
-                color: const Color(0xFFE6F0FF),
-                alignment: Alignment.center,
-                child: const Icon(Icons.image, color: Colors.blue),
-              ),
+            Image.network(
+              'https://picsum.photos/500/300',
+              width: 72,
+              height: 54,
+              fit: BoxFit.cover,
             ),
-            const SizedBox(width: 12),
+            
+            const SizedBox(width: 8),
 
             // Details
             GetBuilder<ExplorerController>(
@@ -440,67 +438,46 @@ class _StationItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
                         station.name ?? '',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         station.shortDescription ?? '',
-                        style: TextStyle(color: muted, fontSize: 13),
+                        style: TextStyle(color: muted, fontSize: 12),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(Icons.route, size: 16, color: muted),
+                          Icon(Icons.route, size: 14, color: muted),
                           const SizedBox(width: 4),
-                          Text('3.9 km', style: TextStyle(color: muted)),
-                          const SizedBox(width: 12),
-                          Icon(Icons.ev_station, size: 16, color: muted),
+                          Text('3.9 km', style: TextStyle(color: muted, fontSize: 12)),
+                          const SizedBox(width: 8),
+                          Icon(Icons.ev_station, size: 14, color: muted),
                           const SizedBox(width: 4),
                           Text(
                             station.bays!.length.toString(),
-                            style: TextStyle(color: muted),
+                            style: TextStyle(color: muted, fontSize: 12),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Text(
                             station.isActive ? 'Available' : 'Unavailable',
                             style: TextStyle(
                               color: Colors.green.shade700,
                               fontWeight: FontWeight.w600,
+                              fontSize: 12,
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.bolt, size: 16, color: Colors.green),
+                          const Icon(Icons.bolt, size: 14, color: Colors.green),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.circle,
-                            size: 10,
-                            color: Colors.green,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Open',
-                            style: TextStyle(
-                              color: Colors.green.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '12:00am - 11:59pm',
-                            style: TextStyle(color: muted),
-                          ),
-                        ],
-                      ),
+                      const SizedBox(height: 4),
                     ],
                   ),
                 );
