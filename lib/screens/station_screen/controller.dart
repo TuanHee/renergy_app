@@ -15,6 +15,7 @@ class StationController extends GetxController {
   int? selectedBay;
   int? selectedCar;
   late int stationId;
+  bool unlockable = false;
 
   @override
   void onInit() async {
@@ -36,6 +37,7 @@ class StationController extends GetxController {
       
       if (res.data['status'] == 200) {
         station = Station.fromJson(res.data['data']['station']);
+        unlockable = res.data['data']['unlockable'];
       }
     } catch (e) {
       print(e);
@@ -54,6 +56,10 @@ class StationController extends GetxController {
 
   Future<void> unlockBay() async {
     try {
+      if(unlockable){
+        false;
+      }
+      
       final res = await Api().post(
         Endpoints.orders, 
         data:{

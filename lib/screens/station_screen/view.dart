@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bay.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/screens/station_screen/station_screen.dart';
 
@@ -349,7 +350,9 @@ class _StationScreenViewState extends State<StationScreenView> {
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.toNamed(AppRoutes.card);
+                          },
                           child: const Text('+ Add Card'),
                         ),
                       ],
@@ -373,7 +376,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: controller.selectedBay != null && controller.selectedCar != null ? controller.unlockBay : null,
+                            onPressed: controller.unlockable && controller.selectedBay != null && controller.selectedCar != null? controller.unlockBay : null,
                             icon: const Icon(Icons.lock_open),
                             label: const Text('Unlock Now'),
                             style: ElevatedButton.styleFrom(

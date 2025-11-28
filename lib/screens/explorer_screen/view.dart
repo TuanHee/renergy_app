@@ -89,7 +89,7 @@ class _BottomSheetPanel extends StatefulWidget {
 
 class _BottomSheetPanelState extends State<_BottomSheetPanel> {
   static const double _collapsedSize = 0.35;
-  static const double _expandedSize = 0.99;
+  static const double _expandedSize = 0.80;
 
   late final DraggableScrollableController _sheetController;
   double _currentSize = _collapsedSize;
@@ -163,6 +163,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
             initialChildSize: _collapsedSize,
             minChildSize: _collapsedSize,
             maxChildSize: _expandedSize,
+            snap: true,
+            snapSizes: const [_collapsedSize, _expandedSize],
             builder: (context, scrollController) {
               return Container(
                 decoration: const BoxDecoration(
@@ -181,167 +183,177 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Drag handle
-                      InkWell(
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        splashColor: Colors.transparent,
-                        onTap: () {
-                          _toggleSheet();
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 8, bottom: 6),
-                          child: Center(
-                            child: Icon(
-                              _currentSize <=
-                                      (_collapsedSize + _expandedSize) / 2
-                                  ? Icons.keyboard_arrow_up_rounded
-                                  : Icons.keyboard_arrow_down_rounded,
-                              color: Colors.red.shade700,
-                              size: 22,
-                            ),
-                          ),
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20
-                          ),
-                          children: const [
-                            TextSpan(text: 'Welcome to '),
-                            TextSpan(
-                              text: 'Renergy',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Charge anytime, anywhere',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.black54,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Search bar with filter icon
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 44,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search, color: Colors.grey.shade600),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: widget.controller.searchController,
-                                      onChanged: (value) {
-                                        widget.controller.update();
+                  child: RefreshIndicator(
+                    onRefresh: () => widget.controller.fetchStations(onErrorCallback: (msg){
+                      Snackbar.showError(msg, context);
+                    },),
+                    child: CustomScrollView(
+                      controller: scrollController,
+                      slivers: [
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _FixedHeaderDelegate(
+                            minHeight: 150,
+                            maxHeight: 150,
+                            builder: (context) {
+                              return Container(
+                                color: Colors.white,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    InkWell(
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      splashColor: Colors.transparent,
+                                      onTap: () {
+                                        _toggleSheet();
                                       },
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: Colors.black87,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Search',
-                                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                                          color: Colors.grey.shade600,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(top: 8, bottom: 6),
+                                        child: Center(
+                                          child: Icon(
+                                            _currentSize <= (_collapsedSize + _expandedSize) / 2
+                                                ? Icons.keyboard_arrow_up_rounded
+                                                : Icons.keyboard_arrow_down_rounded,
+                                            color: Colors.red.shade700,
+                                            size: 22,
+                                          ),
                                         ),
-                                        border: InputBorder.none,
-                                        isDense: true,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          GestureDetector(
-                            onTap: () async {
-                              final filteredStations = await Get.toNamed(AppRoutes.filter);
-                              if(filteredStations != null){
-                                widget.controller.filteredList = filteredStations as List<Station>;
-                                widget.controller.searchController.text = '';
-                                widget.controller.update();
-                              }
-                            },
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: const Icon(
-                                Icons.tune,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      // Station list
-                      Expanded(
-                        child: RefreshIndicator(
-                          onRefresh: () => widget.controller.fetchStations(onErrorCallback: (msg){
-                            Snackbar.showError(msg, context);
-                          },),
-                          child: widget.controller.isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : widget.controller.filteredStations.isEmpty
-                              ? ListView(
-                                  padding: EdgeInsets.zero,
-                                  controller: scrollController,
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  children: const [
-                                    SizedBox(height: 60),
-                                    Center(
-                                      child: Text(
-                                        'No charging stations found',
-                                        style: TextStyle(color: Colors.black54),
+                                    RichText(
+                                      text: TextSpan(
+                                        style: theme.textTheme.titleLarge?.copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20,
+                                        ),
+                                        children: const [
+                                          TextSpan(text: 'Welcome to '),
+                                          TextSpan(
+                                            text: 'Renergy',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Charge anytime, anywhere',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: Colors.black54,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            height: 44,
+                                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade100,
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(color: Colors.grey.shade300),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.search, color: Colors.grey.shade600),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: widget.controller.searchController,
+                                                    onChanged: (value) {
+                                                      widget.controller.update();
+                                                    },
+                                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                                      color: Colors.black87,
+                                                    ),
+                                                    decoration: InputDecoration(
+                                                      hintText: 'Search',
+                                                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                                                        color: Colors.grey.shade600,
+                                                      ),
+                                                      border: InputBorder.none,
+                                                      isDense: true,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            final filteredStations = await Get.toNamed(AppRoutes.filter);
+                                            if (filteredStations != null) {
+                                              widget.controller.filteredList = filteredStations as List<Station>;
+                                              widget.controller.searchController.text = '';
+                                              widget.controller.update();
+                                            }
+                                          },
+                                          child: Container(
+                                            width: 44,
+                                            height: 44,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade100,
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(color: Colors.grey.shade300),
+                                            ),
+                                            child: const Icon(
+                                              Icons.tune,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                )
-                              : ListView.separated(
-                                  padding: EdgeInsets.zero,
-                                  controller: scrollController,
-                                  itemCount: widget.controller.filteredStations.length,
-                                  separatorBuilder: (context, index) => Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade200,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    return _StationItem(
-                                      station: widget.controller.filteredStations[index],
-                                    );
-                                  },
                                 ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                        if (widget.controller.isLoading)
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        else if (widget.controller.filteredStations.isEmpty)
+                          SliverToBoxAdapter(
+                            child: Column(
+                              children: const [
+                                SizedBox(height: 60),
+                                Center(
+                                  child: Text(
+                                    'No charging stations found',
+                                    style: TextStyle(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          SliverList.builder(
+                            itemCount: widget.controller.filteredStations.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  _StationItem(
+                                    station: widget.controller.filteredStations[index],
+                                  ),
+                                  Divider(height: 1, color: Colors.grey.shade200),
+                                ],
+                              );
+                            },
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -446,11 +458,13 @@ class _StationItem extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        station.shortDescription ?? '',
-                        style: TextStyle(color: muted, fontSize: 12),
-                      ),
+                      if (station.description != null && station.description!.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          station.description!,
+                          style: TextStyle(color: muted, fontSize: 12),
+                        ),
+                      ],
                       const SizedBox(height: 6),
                       Row(
                         children: [
@@ -506,4 +520,28 @@ Widget _circleIconButton(IconData icon) {
       icon: Icon(icon, color: Colors.black87),
     ),
   );
+}
+
+class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double minHeight;
+  final double maxHeight;
+  final Widget Function(BuildContext) builder;
+
+  _FixedHeaderDelegate({required this.minHeight, required this.maxHeight, required this.builder});
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return builder(context);
+  }
+
+  @override
+  bool shouldRebuild(covariant _FixedHeaderDelegate oldDelegate) {
+    return minHeight != oldDelegate.minHeight || maxHeight != oldDelegate.maxHeight || builder != oldDelegate.builder;
+  }
 }
