@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ class StationController extends GetxController {
     ]);
     
     isLoading = false;
-    selectCar(1);
+    selectCar(vehicles.firstWhere((car) => car.isDefault == true).id);
     update();
   }
 
@@ -42,8 +43,8 @@ class StationController extends GetxController {
       final res = await Api().get(Endpoints.station(stationId));
       
       if (res.data['status'] == 200) {
-        station = Station.fromJson(res.data['data']['station']);
         unlockable = res.data['data']['unlockable'];
+        station = Station.fromJson(res.data['data']['station']);
       }
     } catch (e) {
       print(e);
@@ -58,7 +59,6 @@ class StationController extends GetxController {
         vehicles = (res.data['data']['vehicles'] as List)
             .map((e) => Car.fromJson(e))
             .toList();
-            print('vehicles: ${vehicles.length}');
       }
     } catch (e) {
       print(e);
