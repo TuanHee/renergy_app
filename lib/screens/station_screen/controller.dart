@@ -27,7 +27,11 @@ class StationController extends GetxController {
   
     stationImageUrl = 'https://picsum.photos/500/300';
     isLoading = true;
-    await initStation();
+    await Future.wait([
+      initStation(),
+      initCar(),
+    ]);
+    
     isLoading = false;
     selectCar(1);
     update();
@@ -46,20 +50,21 @@ class StationController extends GetxController {
     }
   }
 
-  // Future<void> initCar() async {
-  //   try {
-  //     final res = await Api().get(Endpoints.vehicles);
+  Future<void> initCar() async {
+    try {
+      final res = await Api().get(Endpoints.vehicles);
       
-  //     if (res.data['status'] == 200) {
-  //       vehicles = (res.data['data']['vehicles'] as List)
-  //           .map((e) => Car.fromJson(e))
-  //           .toList();
-  //       unlockable = res.data['data']['unlockable'];
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+      if (res.data['status'] == 200) {
+        vehicles = (res.data['data']['vehicles'] as List)
+            .map((e) => Car.fromJson(e))
+            .toList();
+            print('vehicles: $vehicles');
+        unlockable = res.data['data']['unlockable'];
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   void selectBay(int bayId) {
     selectedBay = bayId;
