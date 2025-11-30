@@ -14,6 +14,7 @@ class ChargeProcessingController extends GetxController {
   Order? order;
   ChargingStats? chargingStats;
   Timer? pollingTimer;
+  bool isfetching = false;
 
   @override
   void onInit() async {
@@ -28,6 +29,10 @@ class ChargeProcessingController extends GetxController {
     }
     pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       try {
+        if (isfetching) {
+          return;
+        }
+        isfetching = true;
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
@@ -54,6 +59,8 @@ class ChargeProcessingController extends GetxController {
         }
       } catch (e) {
         print('Polling Error: $e');
+      } finally {
+        isfetching = false;
       }
     });
   }

@@ -20,6 +20,7 @@ class ExplorerController extends GetxController {
   Order? chargingOrder;
   String? status;
   Timer? chargingOrderTimer;
+  bool isfetching = false;
   List<Station>? filteredList;
   TextEditingController searchController = TextEditingController();
 
@@ -149,6 +150,10 @@ class ExplorerController extends GetxController {
       timer,
     ) async {
       try {
+        if (isfetching) {
+          return;
+        }
+        isfetching = true;
         final res = await Api().get(Endpoints.activeOrder);
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
@@ -167,6 +172,8 @@ class ExplorerController extends GetxController {
         }
       } catch (e, stackTrace) {
         onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
+      } finally {
+        isfetching = false;
       }
     });
   }

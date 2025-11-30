@@ -18,6 +18,7 @@ class PlugInLoadingController extends GetxController {
   int remainSecond = waitingTime;
   Timer? countdownTimer;
   Timer? apiTimer;
+  bool isfetching = false;
 
   @override
   void onInit() async {
@@ -55,6 +56,10 @@ class PlugInLoadingController extends GetxController {
     }
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
+        if (isfetching) {
+          return;
+        }
+        isfetching = true;
         if (order?.id == null) {
           timer.cancel();
           throw ('Order id is null');
@@ -80,6 +85,8 @@ class PlugInLoadingController extends GetxController {
         update();
       } catch (e, stackTrace) {
         print('pollChargingStatus error: $e, $stackTrace');
+      } finally {
+        isfetching = false;
       }
     });
   }

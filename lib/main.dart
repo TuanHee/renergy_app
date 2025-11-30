@@ -14,16 +14,16 @@ import 'common/services/location_handler.dart';
 void main() async {
   await Global.init();
 
-  try {
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp();
-    }
-    await Future.delayed(Duration(milliseconds: 1000));
+  // try {
+  //   if (Firebase.apps.isEmpty) {
+  //     await Firebase.initializeApp();
+  //   }
+  //   await Future.delayed(Duration(milliseconds: 1000));
 
-    await NotificationService.init();
-  } catch (e, st) {
-    print('Firebase initializeApp error: $e\n$st');
-  }
+  //   await NotificationService.init();
+  // } catch (e, st) {
+  //   print('Firebase initializeApp error: $e\n$st');
+  // }
 
   final mainController = Get.put(MainController());
   mainController.position = await LocationHandler.getCurrentLocation();

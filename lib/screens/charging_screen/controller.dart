@@ -49,7 +49,7 @@ class ChargingController extends GetxController {
         update();
       }
     } catch (e, stackTrace) {
-      onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
+      onErrorCallback?.call('Error fetching charging order: $e, $stackTrace');
     }
   }
 }

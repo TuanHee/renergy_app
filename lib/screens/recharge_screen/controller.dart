@@ -16,6 +16,7 @@ class RechargeController extends GetxController {
   int remainSecond = 15 * 60;
   ChargingStats? chargingStats;
   bool canRecharge = true;
+  bool isfetching = false;
 
   Order? order;
 
@@ -75,6 +76,10 @@ class RechargeController extends GetxController {
     }
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       try {
+        if (isfetching) {
+          return;
+        }
+        isfetching = true;
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
         if (res.data['status'] >= 200 && res.data['status'] < 300) {
@@ -88,6 +93,8 @@ class RechargeController extends GetxController {
         update();
       } catch (e, stackTrace) {
         print('pollChargingStatus error: $e, $stackTrace');
+      } finally {
+        isfetching = false;
       }
     });
   }
