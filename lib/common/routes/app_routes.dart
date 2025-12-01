@@ -18,6 +18,7 @@ class AppRoutes {
   static const String card = '/card';
   static const String editCard = '/edit-card';
   static const String terms = '/terms';
+  static const String privacy = '/privacy';
   static const String recharge = '/recharge';
   static const String car = '/car';
   static const String addCar = '/add-car';
@@ -118,6 +119,12 @@ class AppRoutes {
         page: () => const TermsScreenView(),
         transition: Transition.fadeIn,
         binding: TermsBinding(),
+      ),
+      GetPage(
+        name: privacy,
+        page: () => const PrivacyScreenView(),
+        transition: Transition.fadeIn,
+        binding: PrivacyBinding(),
       ),
       GetPage(
         name: recharge,

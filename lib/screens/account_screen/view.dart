@@ -69,9 +69,10 @@ class AccountScreenView extends StatelessWidget {
                                 label: 'FAQ',
                               ),
                               const SizedBox(height: 12),
-                              const _AccountActionTile(
+                              _AccountActionTile(
                                 icon: Icons.privacy_tip_outlined,
                                 label: 'Privacy Policy',
+                                onTap: () => Get.toNamed(AppRoutes.privacy),
                               ),
                               const SizedBox(height: 12),
                               _AccountActionTile(
