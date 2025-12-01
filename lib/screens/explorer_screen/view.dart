@@ -12,6 +12,7 @@ import 'package:renergy_app/components/float_bar.dart';
 import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ExplorerScreenView extends StatefulWidget {
   const ExplorerScreenView({super.key});
@@ -40,7 +41,7 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
     _initialCameraPosition = CameraPosition(
       target: LatLng(
         Get.find<MainController>().position?.latitude ?? 0,
-      Get.find<MainController>().position?.longitude ?? 0,
+        Get.find<MainController>().position?.longitude ?? 0,
       ),
       zoom: 12.0,
     );
@@ -49,12 +50,15 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
       onMapCreated: _onMapCreated,
       initialCameraPosition: _initialCameraPosition,
       mapToolbarEnabled: true,
+      markers: Get.find<ExplorerController>().buildMarkers(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GetBuilder<ExplorerController>(
+      builder: (controller) {
+        return Scaffold(
           appBar: AppBar(
             title: const Text(
               'RECHARGE',
@@ -90,24 +94,37 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                         final self = pos == null ? null : LatLng(pos.latitude, pos.longitude);
                         return Positioned.fill(
                           child: GoogleMap(
-                            initialCameraPosition: _initialCameraPosition,
-                            onMapCreated: _onMapCreated,
                             mapType: MapType.normal,
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition: _initialCameraPosition,
                             mapToolbarEnabled: true,
-                            markers: controller.buildMarkers(self),
+                            markers: controller.buildMarkers(),
                           ),
                         );
                       },
                     ),
-                   
                     Positioned(
                       right: 12,
                       top: 20,
                       child: Column(
                         children: [
-                          _circleIconButton(Icons.refresh),
+                          _circleIconButton(
+                            Icons.refresh,
+                            onPressed: () async {
+                              final c = Get.find<ExplorerController>();
+                              await c.rebuildMarkers(onErrorCallback: (msg) {
+                                Snackbar.showError(msg, context);
+                              });
+                            },
+                          ),
                           const SizedBox(height: 12),
-                          _circleIconButton(Icons.gps_fixed),
+                          _circleIconButton(
+                            Icons.gps_fixed,
+                            onPressed: () async {
+                              final c = Get.find<ExplorerController>();
+                              await c.goToSelfLocation();
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -118,12 +135,24 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
               GetBuilder<ExplorerController>(
                 builder: (controller) => _BottomSheetPanel(controller: controller),
               ),
+              // Modal carousel bottom sheet overlay
+              GetBuilder<ExplorerController>(
+                builder: (controller) {
+                  if (!controller.showCarousel) return const SizedBox.shrink();
+                  return Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _StationCarouselBottomSheet(controller: controller),
+                  );
+                },
+              ),
             ],
           ),
-          // Bottom navigation bar
           bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
         );
-  
+      },
+    );
   }
 
   @override
@@ -436,27 +465,33 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                               ],
                             ),
                           )
-                        else
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 220,
-                              child: PageView.builder(
-                                itemCount: widget.controller.filteredStations.length,
-                                controller: PageController(viewportFraction: 0.9),
-                                onPageChanged: (index) {
-                                  final station = widget.controller.filteredStations[index];
-                                  widget.controller.setSelectedStation(station);
-                                },
-                                itemBuilder: (context, index) {
-                                  final station = widget.controller.filteredStations[index];
-                                  return _StationCarouselCard(
-                                    station: station,
-                                    controller: widget.controller,
-                                  );
-                                },
-                              ),
-                            ),
+                          else if (!widget.controller.showCarousel)
+                          SliverList.builder(
+                            itemCount:
+                                widget.controller.filteredStations.length > 10
+                                    ? 10
+                                    : widget.controller.filteredStations.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  _StationItem(
+                                    station: widget
+                                        .controller
+                                        .filteredStations[index],
+                                  ),
+                                  Divider(
+                                    height: 1,
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ],
+                              );
+                            },
+                          )
+                          else
+                          const SliverToBoxAdapter(
+                            child: SizedBox.shrink(),
                           ),
+                        
                       ],
                     ),
                   ),
@@ -575,6 +610,8 @@ class _StationItem extends StatelessWidget {
                         Text(
                           station.description!,
                           style: TextStyle(color: muted, fontSize: 12),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                       const SizedBox(height: 6),
@@ -607,6 +644,78 @@ class _StationItem extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                await showModalBottomSheet(
+                                  context: context,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                  ),
+                                  builder: (ctx) {
+                                    return SafeArea(
+                                      top: false,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Open with',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            ListTile(
+                                              leading: const Icon(Icons.map, color: Colors.redAccent),
+                                              title: const Text('Google Maps'),
+                                              onTap: () async {
+                                                Navigator.of(ctx).pop();
+                                                final lat = double.tryParse(station.latitude ?? '');
+                                                final lon = double.tryParse(station.longitude ?? '');
+                                                if (lat == null || lon == null) return;
+                                                final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+                                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                                              },
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                                              title: const Text('Waze'),
+                                              onTap: () async {
+                                                Navigator.of(ctx).pop();
+                                                final lat = double.tryParse(station.latitude ?? '');
+                                                final lon = double.tryParse(station.longitude ?? '');
+                                                if (lat == null || lon == null) return;
+                                                final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
+                                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                                              },
+                                            ),
+                                            const SizedBox(height: 8),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: const Text('Navigate'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
+                              },
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700, foregroundColor: Colors.white),
+                              child: const Text('Charge'),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 );
@@ -630,14 +739,6 @@ class _StationCarouselCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
-        ],
-        border: Border.all(color: Colors.grey.shade200),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -704,8 +805,57 @@ class _StationCarouselCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () {
-                          controller.openExternalNavigation(station);
+                        onPressed: () async {
+                          await showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                            ),
+                            builder: (ctx) {
+                              return SafeArea(
+                                top: false,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Open with',
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      ListTile(
+                                        leading: const Icon(Icons.map, color: Colors.redAccent),
+                                        title: const Text('Google Maps'),
+                                        onTap: () async {
+                                          Navigator.of(ctx).pop();
+                                          final lat = double.tryParse(station.latitude ?? '');
+                                          final lon = double.tryParse(station.longitude ?? '');
+                                          if (lat == null || lon == null) return;
+                                          final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                                        title: const Text('Waze'),
+                                        onTap: () async {
+                                          Navigator.of(ctx).pop();
+                                          final lat = double.tryParse(station.latitude ?? '');
+                                          final lon = double.tryParse(station.longitude ?? '');
+                                          if (lat == null || lon == null) return;
+                                          final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        },
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         },
                         child: const Text('Navigate'),
                       ),
@@ -716,7 +866,7 @@ class _StationCarouselCard extends StatelessWidget {
                         onPressed: () {
                           Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700, foregroundColor: Colors.white),
                         child: const Text('Charge'),
                       ),
                     ),
@@ -731,7 +881,7 @@ class _StationCarouselCard extends StatelessWidget {
   }
 }
 
-Widget _circleIconButton(IconData icon) {
+Widget _circleIconButton(IconData icon, {VoidCallback? onPressed}) {
   return Container(
     width: 44,
     height: 44,
@@ -743,7 +893,7 @@ Widget _circleIconButton(IconData icon) {
       ],
     ),
     child: IconButton(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Icon(icon, color: Colors.black87),
     ),
   );
@@ -780,5 +930,182 @@ class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
     return minHeight != oldDelegate.minHeight ||
         maxHeight != oldDelegate.maxHeight ||
         builder != oldDelegate.builder;
+  }
+}
+
+class _StationCarouselBottomSheet extends StatefulWidget {
+  final ExplorerController controller;
+  const _StationCarouselBottomSheet({required this.controller});
+
+  @override
+  State<_StationCarouselBottomSheet> createState() => _StationCarouselBottomSheetState();
+}
+
+class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    final stations = widget.controller.filteredStations;
+    final initialIndex = stations.indexWhere(
+      (s) => s.id == widget.controller.selectedStationId,
+    );
+    _pageController = PageController(initialPage: initialIndex >= 0 ? initialIndex : 0, viewportFraction: 0.92);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showNavigationOptions(Station station) async {
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Open with',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const Icon(Icons.map, color: Colors.redAccent),
+                  title: const Text('Google Maps'),
+                  onTap: () async {
+                    Navigator.of(ctx).pop();
+                    await _openGoogleMaps(station);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                  title: const Text('Waze'),
+                  onTap: () async {
+                    Navigator.of(ctx).pop();
+                    await _openWaze(station);
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openGoogleMaps(Station station) async {
+    final lat = double.tryParse(station.latitude ?? '');
+    final lon = double.tryParse(station.longitude ?? '');
+    if (lat == null || lon == null) return;
+    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _openWaze(Station station) async {
+    final lat = double.tryParse(station.latitude ?? '');
+    final lon = double.tryParse(station.longitude ?? '');
+    if (lat == null || lon == null) return;
+    final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final stations = widget.controller.filteredStations;
+    final selectedId = widget.controller.selectedStationId;
+    final selectedIndex = stations.indexWhere((s) => s.id == selectedId);
+    final Station? currentStation =
+        selectedIndex >= 0 ? stations[selectedIndex] : (stations.isNotEmpty ? stations[0] : null);
+
+    return SafeArea(
+      top: false,
+      child: Material(
+        elevation: 8,
+        color: Colors.transparent,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 236, 241, 242),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 12,
+                offset: Offset(0, -4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.only(top: 10, bottom: 16),
+          height: 320,
+          child: Column(
+            children: [
+              // Drag handle and close
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      onPressed: () => widget.controller.closeCarousel(),
+                      icon: const Icon(Icons.close, color: Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: stations.length,
+                  onPageChanged: (index) {
+                    final station = stations[index];
+                    widget.controller.setSelectedStation(station);
+                    final markerIdString = 'station_${station.id ?? station.name ?? ''}';
+                    widget.controller.mapController?.showMarkerInfoWindow(MarkerId(markerIdString));
+                  },
+                  itemBuilder: (context, index) {
+                    final station = stations[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
+                          ],
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: _StationItem(station: station),
+                          ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 4),
+              // Quick actions
+              const SizedBox.shrink(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

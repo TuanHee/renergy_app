@@ -35,7 +35,7 @@ class StationController extends GetxController {
     
     isLoading = false;
     if(vehicles.isNotEmpty){
-      selectCar(vehicles.firstWhere((car) => car.isDefault == true).id);
+      selectCar(vehicles.firstWhere((car) => car.isDefault == true, orElse: () => vehicles.first).id);
     }
     update();
   }

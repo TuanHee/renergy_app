@@ -31,6 +31,8 @@ class ExplorerController extends GetxController {
   BitmapDescriptor? stationMarkerIcon;
   GoogleMapController? mapController;
   int? selectedStationId;
+  // Add UI flag to control modal carousel visibility when a marker is tapped
+  bool showCarousel = false;
 
   @override
   void onInit() async {
@@ -209,13 +211,14 @@ class ExplorerController extends GetxController {
     return returnStations;
   }
 
-  Set<Marker> buildMarkers(LatLng? self) {
+  Set<Marker> buildMarkers() {
+    final self = Get.find<MainController>().position;
     final result = <Marker>{};
     if (self != null) {
       result.add(
         Marker(
           markerId: const MarkerId('self'),
-          position: self,
+          position: LatLng(self.latitude, self.longitude),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
           zIndex: 2,
         ),
@@ -238,11 +241,30 @@ class ExplorerController extends GetxController {
             snippet: station.shortDescription ?? station.description ?? '',
           ),
           zIndex: (station.id != null && station.id == selectedStationId) ? 3 : 1,
+          onTap: () {
+            setSelectedStation(station);
+            showCarousel = true;
+            update();
+          },
         ),
       );
     }
 
     return result;
+  }
+
+  // Re-fetch stations and rebuild markers
+  Future<void> rebuildMarkers({Function(String msg)? onErrorCallback}) async {
+    await fetchStations(onErrorCallback: onErrorCallback);
+    update();
+  }
+
+  // Center map camera to user's current location
+  Future<void> goToSelfLocation() async {
+    final pos = Get.find<MainController>().position;
+    if (pos == null) return;
+    final target = CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 16);
+    await mapController?.animateCamera(CameraUpdate.newCameraPosition(target));
   }
 
   Future<void> _loadAppMarkerIcon() async {
@@ -304,6 +326,11 @@ class ExplorerController extends GetxController {
     selectedStationId = station.id;
     update();
     moveCameraToStation(station);
+  }
+  // Provide a method to close the carousel modal if needed
+  void closeCarousel() {
+    showCarousel = false;
+    update();
   }
 
   Future<void> moveCameraToStation(Station station) async {
