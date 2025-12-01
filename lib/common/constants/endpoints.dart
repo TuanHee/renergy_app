@@ -19,4 +19,5 @@ class Endpoints {
   static String pdf(int id) => '$orders/$id/pdf';
   static String profile = 'my-profile';
   static String updateProfile = 'update-profile';
+  static String reportReasons = 'station-reports/reasons';
 }

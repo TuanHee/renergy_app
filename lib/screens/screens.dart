@@ -22,3 +22,4 @@ export 'get_help_screen/get_help_screen.dart';
 export 'faq_screen/faq_screen.dart';
 export 'faq_category_screen/faq_category_screen.dart';
 export 'register_screen/register_screen.dart';
+export 'report_screen/report_screen.dart';

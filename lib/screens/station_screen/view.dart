@@ -314,7 +314,9 @@ class _StationScreenViewState extends State<StationScreenView> {
 
                       // Report Station
                       OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.toNamed(AppRoutes.report, arguments: controller.station);
+                        },
                         icon: const Icon(Icons.flag),
                         label: const Text('Report this station'),
                         style: OutlinedButton.styleFrom(
@@ -466,9 +468,7 @@ class _StationScreenViewState extends State<StationScreenView> {
       highlightColor: Colors.transparent,
       hoverColor: Colors.transparent,
       splashColor: Colors.transparent,
-      onTap: () => bay.status == BayStatus.available
-          ? controller.selectBay(bay.id!)
-          : null,
+      onTap: () => bay.status == BayStatus.available ? controller.selectBay(bay.id!) : null,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
@@ -480,110 +480,57 @@ class _StationScreenViewState extends State<StationScreenView> {
             width: 1,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          bay.name!,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '${bay.port?.outputPower ?? '-'}kW ${bay.port?.currentType ?? '-'}',
-                      ),
-                    ],
-                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 6,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: bay.status == BayStatus.available
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.red.withValues(alpha: 0.1),
+                      color: Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      bay.status?.value.toUpperCase() ?? '',
-                      style: TextStyle(
-                        color: bay.status == BayStatus.available
-                            ? Colors.green.shade700
-                            : Colors.red.shade700,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
+                      bay.name ?? '-',
+                      style: const TextStyle(fontSize: 16),
                     ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    '${bay.port?.outputPower ?? '-'}kW ${bay.port?.currentType ?? '-'}',
                   ),
                 ],
               ),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: ClipRect(
-                child: isSelected
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(color: Colors.grey.shade200),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Radio<int>(
-                                  value: bay.id!,
-                                  groupValue: controller.selectedBay,
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      controller.selectBay(value);
-                                    }
-                                  },
-                                  activeColor: Colors.red,
-                                ),
-                                SizedBox(width: 8),
-                                Icon(
-                                  Icons.ev_station,
-                                  size: 16,
-                                  color: Colors.grey.shade600,
-                                ),
-                                SizedBox(width: 16),
-                                Text(bay.port!.portType ?? 'Unknown'),
-                              ],
-                            ),
-                            Text('RM 0.99 / Kwh'),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: bay.status == BayStatus.available
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  bay.status?.value.toUpperCase() ?? '',
+                  style: TextStyle(
+                    color: bay.status == BayStatus.available
+                        ? Colors.green.shade700
+                        : Colors.red.shade700,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

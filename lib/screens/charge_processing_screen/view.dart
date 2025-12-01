@@ -219,11 +219,10 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      if(controller.chargingStats?.meter?.soc != null &&
+                                                controller.chargingStats!.meter!.soc!.toStringAsFixed(0) != '0')
                                       Text(
-                                        controller.chargingStats?.meter?.soc ==
-                                                null
-                                            ? '-'
-                                            : '${controller.chargingStats!.meter!.soc!.toStringAsFixed(0)}%',
+                                        '${controller.chargingStats!.meter!.soc!.toStringAsFixed(0)}%',
                                         style: const TextStyle(
                                           fontSize: 42,
                                           fontWeight: FontWeight.bold,
@@ -234,12 +233,15 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                       AnimatedBuilder(
                                         animation: _pulseAnimation,
                                         builder: (context, child) {
+                                          final bool isZeroOrNullSoc =
+                                              controller.chargingStats?.meter?.soc == null ||
+                                              controller.chargingStats!.meter!.soc!.toStringAsFixed(0) == '0';
                                           return Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Icon(
                                                 Icons.bolt,
-                                                size: 16,
+                                                size: isZeroOrNullSoc ? 24 : 16,
                                                 color: Color.lerp(
                                                   const Color.fromARGB(
                                                     255,
@@ -257,11 +259,11 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                                 ),
                                               ),
                                               const SizedBox(width: 4),
-                                              const Text(
+                                              Text(
                                                 'Charging',
                                                 style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Color(0xFF6B7280),
+                                                  fontSize: isZeroOrNullSoc ? 18 : 14,
+                                                  color: const Color(0xFF6B7280),
                                                 ),
                                               ),
                                             ],
@@ -274,6 +276,33 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Stop Charging Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: _stopCharging,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFDC2626),
+                              side: const BorderSide(
+                                color: Color(0xFFDC2626),
+                                width: 2,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Stop Charging',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
 
                         const SizedBox(height: 40),
@@ -396,34 +425,6 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 '${ controller.chargingStats?.order?.charging_price != null ? controller.chargingStats!.order!.charging_price!.toStringAsFixed(2) : '-'}',
                               ),
                             ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Stop Charging Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: _stopCharging,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFFDC2626),
-                              side: const BorderSide(
-                                color: Color(0xFFDC2626),
-                                width: 2,
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Stop Charging',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                           ),
                         ),
 
