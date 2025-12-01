@@ -2,7 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart';
+import 'dart:ui' as ui;
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bookmark.dart';
@@ -23,10 +27,16 @@ class ExplorerController extends GetxController {
   bool isfetching = false;
   List<Station>? filteredList;
   TextEditingController searchController = TextEditingController();
+  BitmapDescriptor? appMarkerIcon;
+  BitmapDescriptor? stationMarkerIcon;
+  GoogleMapController? mapController;
+  int? selectedStationId;
 
   @override
   void onInit() async {
     super.onInit();
+    await _loadAppMarkerIcon();
+    await _loadStationMarkerIcon();
   }
 
   @override
@@ -197,5 +207,122 @@ class ExplorerController extends GetxController {
     }
 
     return returnStations;
+  }
+
+  Set<Marker> buildMarkers(LatLng? self) {
+    final result = <Marker>{};
+    if (self != null) {
+      result.add(
+        Marker(
+          markerId: const MarkerId('self'),
+          position: self,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          zIndex: 2,
+        ),
+      );
+    }
+
+    for (final station in filteredStations) {
+      final lat = double.tryParse(station.latitude ?? '');
+      final lon = double.tryParse(station.longitude ?? '');
+      if (lat == null || lon == null) {
+        continue;
+      }
+      result.add(
+        Marker(
+          markerId: MarkerId('station_${station.id ?? station.name ?? ''}'),
+          position: LatLng(lat, lon),
+          icon: stationMarkerIcon ?? BitmapDescriptor.defaultMarker,
+          infoWindow: InfoWindow(
+            title: station.name ?? '',
+            snippet: station.shortDescription ?? station.description ?? '',
+          ),
+          zIndex: (station.id != null && station.id == selectedStationId) ? 3 : 1,
+        ),
+      );
+    }
+
+    return result;
+  }
+
+  Future<void> _loadAppMarkerIcon() async {
+    if (appMarkerIcon != null) return;
+    try {
+      appMarkerIcon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(),
+        'assets/icons/app_icon.jpg',
+      );
+    } catch (_) {
+      appMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+    }
+  }
+
+  Future<void> _loadStationMarkerIcon() async {
+    if (stationMarkerIcon != null) return;
+    try {
+      stationMarkerIcon = await _createPinIcon('assets/icons/app_icon.jpg');
+    } catch (_) {
+      stationMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+    }
+  }
+
+  Future<BitmapDescriptor> _createPinIcon(String assetPath) async {
+    const width = 120;
+    const height = 140;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()));
+    final pinPaint = Paint()..color = Colors.red.shade700..isAntiAlias = true;
+    final tipPaint = Paint()..color = Colors.red.shade800..isAntiAlias = true;
+    final center = Offset(width / 2, 60);
+    canvas.drawCircle(center, 40, pinPaint);
+    final path = Path()
+      ..moveTo(width / 2, height.toDouble())
+      ..lineTo((width / 2) - 20, 90)
+      ..lineTo((width / 2) + 20, 90)
+      ..close();
+    canvas.drawPath(path, tipPaint);
+    final innerPaint = Paint()..color = Colors.white..isAntiAlias = true;
+    canvas.drawCircle(center, 26, innerPaint);
+    final data = await rootBundle.load(assetPath);
+    final codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: 44,
+      targetHeight: 44,
+    );
+    final frame = await codec.getNextFrame();
+    final img = frame.image;
+    final src = Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble());
+    final dst = Rect.fromCenter(center: center, width: 44, height: 44);
+    canvas.drawImageRect(img, src, dst, Paint());
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(width, height);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  void setSelectedStation(Station station) {
+    selectedStationId = station.id;
+    update();
+    moveCameraToStation(station);
+  }
+
+  Future<void> moveCameraToStation(Station station) async {
+    final lat = double.tryParse(station.latitude ?? '');
+    final lon = double.tryParse(station.longitude ?? '');
+    if (lat == null || lon == null) {
+      return;
+    }
+    final target = CameraPosition(target: LatLng(lat, lon), zoom: 16);
+    await mapController?.animateCamera(CameraUpdate.newCameraPosition(target));
+  }
+
+  Future<void> openExternalNavigation(Station station) async {
+    final lat = double.tryParse(station.latitude ?? '');
+    final lon = double.tryParse(station.longitude ?? '');
+    if (lat == null || lon == null) {
+      return;
+    }
+    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+    await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 }

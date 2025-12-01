@@ -10,6 +10,7 @@ import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/float_bar.dart';
 import 'package:renergy_app/global.dart';
+import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
 class ExplorerScreenView extends StatefulWidget {
@@ -26,6 +27,7 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    Get.find<ExplorerController>().mapController = controller;
   }
 
   @override
@@ -35,8 +37,11 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
     if (mapsImpl is GoogleMapsFlutterAndroid) {
       mapsImpl.useAndroidViewSurface = true;
     }
-    _initialCameraPosition = const CameraPosition(
-      target: LatLng(37.7749, -122.4194),
+    _initialCameraPosition = CameraPosition(
+      target: LatLng(
+        Get.find<MainController>().position?.latitude ?? 0,
+      Get.find<MainController>().position?.longitude ?? 0,
+      ),
       zoom: 12.0,
     );
     _map = GoogleMap(
@@ -79,18 +84,22 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                 width: MediaQuery.of(context).size.width,
                 child: Stack(
                   children: [
-                     Positioned.fill(child: _map ?? const Center(child: Text('Map Loading...'),)),
-                    // MapSample(),
-                    // Container(
-                    //   color: const Color(0xFFE9EEF4),
-                    //   child: const Center(
-                    //     child: Text(
-                    //       'Map Placeholder',
-                    //       style: TextStyle(color: Colors.grey),
-                    //     ),
-                    //   ),
-                    // ),
-                    // Map floating controls (right side)
+                    GetBuilder<ExplorerController>(
+                      builder: (controller) {
+                        final pos = Get.find<MainController>().position;
+                        final self = pos == null ? null : LatLng(pos.latitude, pos.longitude);
+                        return Positioned.fill(
+                          child: GoogleMap(
+                            initialCameraPosition: _initialCameraPosition,
+                            onMapCreated: _onMapCreated,
+                            mapType: MapType.normal,
+                            mapToolbarEnabled: true,
+                            markers: controller.buildMarkers(self),
+                          ),
+                        );
+                      },
+                    ),
+                   
                     Positioned(
                       right: 12,
                       top: 20,
@@ -428,24 +437,25 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                             ),
                           )
                         else
-                          SliverList.builder(
-                            itemCount:
-                                widget.controller.filteredStations.length,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  _StationItem(
-                                    station: widget
-                                        .controller
-                                        .filteredStations[index],
-                                  ),
-                                  Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ],
-                              );
-                            },
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: 220,
+                              child: PageView.builder(
+                                itemCount: widget.controller.filteredStations.length,
+                                controller: PageController(viewportFraction: 0.9),
+                                onPageChanged: (index) {
+                                  final station = widget.controller.filteredStations[index];
+                                  widget.controller.setSelectedStation(station);
+                                },
+                                itemBuilder: (context, index) {
+                                  final station = widget.controller.filteredStations[index];
+                                  return _StationCarouselCard(
+                                    station: station,
+                                    controller: widget.controller,
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                       ],
                     ),
@@ -604,6 +614,118 @@ class _StationItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _StationCarouselCard extends StatelessWidget {
+  final Station station;
+  final ExplorerController controller;
+  const _StationCarouselCard({required this.station, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = Colors.grey.shade600;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
+        ],
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              'https://picsum.photos/500/300',
+              width: 96,
+              height: 84,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    MyBadge(
+                      label: '${(station.type ?? 'Public')[0].toUpperCase()}${(station.type ?? 'Public').substring(1)}',
+                      color: const Color(0xFF0BB07B),
+                    ),
+                    const SizedBox(width: 8),
+                    MyBadge(
+                      label: 'Showroom',
+                      color: Colors.black87,
+                      dark: true,
+                    ),
+                    const Spacer(),
+                    Icon(Icons.star_border, color: Colors.grey),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  station.name ?? '',
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.route, size: 14, color: muted),
+                    const SizedBox(width: 4),
+                    Text('3.8 km', style: TextStyle(color: muted, fontSize: 12)),
+                    const SizedBox(width: 8),
+                    Icon(Icons.ev_station, size: 14, color: muted),
+                    const SizedBox(width: 4),
+                    Text((station.bays?.length ?? 0).toString(), style: TextStyle(color: muted, fontSize: 12)),
+                    const SizedBox(width: 8),
+                    Text(
+                      station.isActive ? 'Open' : 'Closed',
+                      style: TextStyle(
+                        color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          controller.openExternalNavigation(station);
+                        },
+                        child: const Text('Navigate'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
+                        child: const Text('Charge'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
