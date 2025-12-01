@@ -59,9 +59,10 @@ class AccountScreenView extends StatelessWidget {
                                 label: 'Report History',
                               ),
                               const SizedBox(height: 12),
-                              const _AccountActionTile(
+                              _AccountActionTile(
                                 icon: Icons.support_agent,
                                 label: 'Get Help',
+                                onTap: () => Get.toNamed(AppRoutes.getHelp),
                               ),
                               const SizedBox(height: 12),
                               const _AccountActionTile(
