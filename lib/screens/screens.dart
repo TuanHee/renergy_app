@@ -16,4 +16,5 @@ export 'car_screen/car_screen.dart';
 export 'edit_car_screen/edit_car_screen.dart';
 export 'payment_result_screen/payment_result_screen.dart';
 export 'filter_screen/filter_screen.dart';
+export 'terms_screen/terms_screen.dart';
 export 'register_screen/register_screen.dart';

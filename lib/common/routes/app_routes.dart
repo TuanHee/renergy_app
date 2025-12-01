@@ -17,6 +17,7 @@ class AppRoutes {
   static const String chargeProcessing = '/charge-processing';
   static const String card = '/card';
   static const String editCard = '/edit-card';
+  static const String terms = '/terms';
   static const String recharge = '/recharge';
   static const String car = '/car';
   static const String addCar = '/add-car';
@@ -111,6 +112,12 @@ class AppRoutes {
         page: () => const EditCardScreenView(),
         transition: Transition.fadeIn,
         binding: EditCardBinding(),
+      ),
+      GetPage(
+        name: terms,
+        page: () => const TermsScreenView(),
+        transition: Transition.fadeIn,
+        binding: TermsBinding(),
       ),
       GetPage(
         name: recharge,
