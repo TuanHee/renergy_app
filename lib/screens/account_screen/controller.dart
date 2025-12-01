@@ -1,12 +1,17 @@
 import 'package:get/get.dart';
+import 'package:renergy_app/common/models/customer.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/storage_service.dart';
 import 'package:renergy_app/global.dart';
 
 import '../../common/constants/storage.dart';
+import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/common/constants/endpoints.dart';
 
 class AccountController extends GetxController {
   bool isLoading = true;
+  Customer? customer;
+  String? errorMessage;
 
   @override
   void onInit() {
@@ -19,7 +24,22 @@ class AccountController extends GetxController {
     update();
 
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 300));
+      final res = await Api().get(Endpoints.user);
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
+        final profileJson = (data is Map<String, dynamic>)
+            ? (data['user'] ?? data['customer'] ?? data)
+            : null;
+        if (profileJson is Map<String, dynamic>) {
+          print('fetchAccountJson: $profileJson');
+          customer = Customer.fromJson(profileJson);
+          print('Customer: ${customer?.toJson()}');
+        }
+      } else {
+        errorMessage = res.data['message']?.toString();
+      }
+    } catch (e) {
+      errorMessage = e.toString();
     } finally {
       isLoading = false;
       update();

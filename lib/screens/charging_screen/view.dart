@@ -193,7 +193,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         : Colors.grey.shade600;
                     final title = order.invoiceNo ?? '';
                     final carPlate =
-                        order.customer?.customerVehiclePlate ?? '-';
+                        order.customer?.vehiclePlate ?? '-';
                     return Card(
                       color: Colors.white,
                       elevation: 0,

@@ -101,11 +101,11 @@ class PaymentResultController extends GetxController {
     if (order!.customer != null) {
       addSummaryItem(
         'Vehicle Model',
-        toDisplayString(order!.customer!.customerVehicleModel),
+        toDisplayString(order!.customer!.vehicleModel),
       );
       addSummaryItem(
         'Vehicle Plate',
-        toDisplayString(order!.customer!.customerVehiclePlate),
+        toDisplayString(order!.customer!.vehiclePlate),
       );
     }
   }

@@ -1,7 +1,7 @@
 import 'package:renergy_app/common/models/bay.dart';
 import 'package:renergy_app/common/models/order_line.dart';
 import 'package:renergy_app/common/models/station.dart';
-import 'package:renergy_app/common/models/customer.dart';
+import 'package:renergy_app/common/models/order_customer.dart';
 
 class Order {
   int? id;
@@ -31,7 +31,7 @@ class Order {
   double? taxAmount;
   double? netAmount;
   String? completedAt;
-  Customer? customer;
+  OrderCustomer? customer;
 
   Order({
     this.id,
@@ -102,14 +102,14 @@ class Order {
       netAmount: json['net_amount'] == null ? null : double.parse(json['net_amount'].toString()),
       completedAt: json['completed_at'],
       customer: json['customer'] != null
-          ? Customer.fromJson(json['customer'])
+          ? OrderCustomer.fromJson(json['customer'])
           : (json['customer_id'] != null ||
                   json['customer_name'] != null ||
                   json['customer_phone'] != null ||
                   json['customer_email'] != null ||
                   json['customer_vehicle_model'] != null ||
                   json['customer_vehicle_plate'] != null)
-              ? Customer.fromJson(json)
+              ? OrderCustomer.fromJson(json)
               : null,
     );
   }
