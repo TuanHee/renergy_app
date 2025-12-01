@@ -49,77 +49,71 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-    initialCameraPosition: _initialCameraPosition,
-    onMapCreated: _onMapCreated,
-    mapType: MapType.normal,
-    mapToolbarEnabled: true,
-  );
-    // return Scaffold(
-    //       appBar: AppBar(
-    //         title: const Text(
-    //           'RECHARGE',
-    //           style: TextStyle(
-    //             color: Colors.white,
-    //             fontSize: 18,
-    //             fontWeight: FontWeight.w700,
-    //             letterSpacing: 1.0,
-    //           ),
-    //         ),
-    //         actions: [
-    //           if (Global.isLoginValid)
-    //             IconButton(
-    //               onPressed: () {},
-    //               icon: const Icon(
-    //                 Icons.notifications_none,
-    //                 color: Colors.white,
-    //               ),
-    //             ),
-    //         ],
-    //       ),
-    //       body: Stack(
-    //         children: [
-    //           // Map background and header
-    //           SizedBox(
-    //             height: MediaQuery.of(context).size.height,
-    //             width: MediaQuery.of(context).size.width,
-    //             child: Stack(
-    //               children: [
-    //                  Positioned.fill(child: _map ?? const Center(child: Text('Map Loading...'),)),
-    //                 // MapSample(),
-    //                 // Container(
-    //                 //   color: const Color(0xFFE9EEF4),
-    //                 //   child: const Center(
-    //                 //     child: Text(
-    //                 //       'Map Placeholder',
-    //                 //       style: TextStyle(color: Colors.grey),
-    //                 //     ),
-    //                 //   ),
-    //                 // ),
-    //                 // Map floating controls (right side)
-    //                 Positioned(
-    //                   right: 12,
-    //                   top: 20,
-    //                   child: Column(
-    //                     children: [
-    //                       _circleIconButton(Icons.refresh),
-    //                       const SizedBox(height: 12),
-    //                       _circleIconButton(Icons.gps_fixed),
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //           ),
-    //           // Draggable bottom sheet
-    //           GetBuilder<ExplorerController>(
-    //             builder: (controller) => _BottomSheetPanel(controller: controller),
-    //           ),
-    //         ],
-    //       ),
-    //       // Bottom navigation bar
-    //       bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
-    //     );
+    return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'RECHARGE',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.0,
+              ),
+            ),
+            actions: [
+              if (Global.isLoginValid)
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.notifications_none,
+                    color: Colors.white,
+                  ),
+                ),
+            ],
+          ),
+          body: Stack(
+            children: [
+              // Map background and header
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Stack(
+                  children: [
+                     Positioned.fill(child: _map ?? const Center(child: Text('Map Loading...'),)),
+                    // MapSample(),
+                    // Container(
+                    //   color: const Color(0xFFE9EEF4),
+                    //   child: const Center(
+                    //     child: Text(
+                    //       'Map Placeholder',
+                    //       style: TextStyle(color: Colors.grey),
+                    //     ),
+                    //   ),
+                    // ),
+                    // Map floating controls (right side)
+                    Positioned(
+                      right: 12,
+                      top: 20,
+                      child: Column(
+                        children: [
+                          _circleIconButton(Icons.refresh),
+                          const SizedBox(height: 12),
+                          _circleIconButton(Icons.gps_fixed),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Draggable bottom sheet
+              GetBuilder<ExplorerController>(
+                builder: (controller) => _BottomSheetPanel(controller: controller),
+              ),
+            ],
+          ),
+          // Bottom navigation bar
+          bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
+        );
   
   }
 

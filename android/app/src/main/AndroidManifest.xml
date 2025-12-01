@@ -45,7 +45,7 @@
             </intent-filter>
         </service>
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyAA2Z7cBo1w3CHuQBgai9P8Wig6Xxqef_o"/>
+               android:value="AIzaSyCEG_qObZsbce6D4-eJlLhgUQuYNUwNikw"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
