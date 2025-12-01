@@ -65,9 +65,10 @@ class AccountScreenView extends StatelessWidget {
                                 onTap: () => Get.toNamed(AppRoutes.getHelp),
                               ),
                               const SizedBox(height: 12),
-                              const _AccountActionTile(
+                              _AccountActionTile(
                                 icon: Icons.help_outline,
                                 label: 'FAQ',
+                                onTap: () => Get.toNamed(AppRoutes.faqCategory),
                               ),
                               const SizedBox(height: 12),
                               _AccountActionTile(
