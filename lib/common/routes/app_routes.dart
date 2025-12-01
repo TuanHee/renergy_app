@@ -51,7 +51,7 @@ class AppRoutes {
       ),
       GetPage(
         name: explorer,
-        page: () => const ExplorerScreenView(),
+        page: () => ExplorerScreenView(),
         transition: Transition.fadeIn,
         binding: ExplorerBinding(),
       ),

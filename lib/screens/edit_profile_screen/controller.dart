@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:renergy_app/common/models/customer.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
@@ -14,6 +16,8 @@ class EditProfileController extends GetxController {
   bool isSaving = false;
   String? errorMessage;
   Customer? customer;
+  File? avatar;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void onInit() {
@@ -36,6 +40,14 @@ class EditProfileController extends GetxController {
     final val = v?.trim() ?? '';
     if (val.isEmpty) return 'Please enter your name';
     return null;
+  }
+
+  Future<void> pickAvatar() async {
+    final file = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (file != null) {
+      avatar = File(file.path);
+      update();
+    }
   }
 
   String? validatePhone(String? v) {

@@ -32,37 +32,30 @@ class EditProfileScreenView extends StatelessWidget {
                       const SizedBox(height: 8),
                       Column(
                         children: [
-                          Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              const CircleAvatar(
-                                radius: 40,
-                                backgroundColor: Colors.black12,
-                                child: Icon(
-                                  Icons.person,
-                                  size: 40,
-                                  color: Colors.black54,
+                          GestureDetector(
+                            onTap: controller.pickAvatar,
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                CircleAvatar(
+                                  radius: 40,
+                                  backgroundColor: Colors.black12,
+                                  backgroundImage: controller.avatar != null ? FileImage(controller.avatar!) : null,
+                                  child: controller.avatar == null
+                                      ? const Icon(Icons.person, size: 40, color: Colors.black54)
+                                      : null,
                                 ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                    ),
-                                  ],
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                                  ),
+                                  padding: const EdgeInsets.all(4),
+                                  child: const Icon(Icons.camera_alt, size: 16, color: Colors.black87),
                                 ),
-                                padding: const EdgeInsets.all(4),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  size: 16,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 16),
                         ],

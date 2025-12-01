@@ -20,7 +20,7 @@ class MapSampleState extends State<MapSample> {
       Get.find<MainController>().position?.latitude ?? 0,
       Get.find<MainController>().position?.longitude ?? 0,
     ),
-    zoom: 14.4746,
+    zoom: 15,
   );
 
   static const CameraPosition _kLake = CameraPosition(

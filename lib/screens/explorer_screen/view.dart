@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/common/models/station.dart';
@@ -8,75 +12,121 @@ import 'package:renergy_app/components/float_bar.dart';
 import 'package:renergy_app/global.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
 
-class ExplorerScreenView extends StatelessWidget {
+class ExplorerScreenView extends StatefulWidget {
   const ExplorerScreenView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return GetBuilder<ExplorerController>(
-      builder: (controller) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'RECHARGE',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
-              ),
-            ),
-            actions: [
-              if (Global.isLoginValid)
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none, color: Colors.white),
-              ),
-            ],
-          ),
-          body: Stack(
-            children: [
-              // Map background and header
-              Column(
-                children: [
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Container(
-                          color: const Color(0xFFE9EEF4),
-                          child: const Center(
-                            child: Text(
-                              'Map Placeholder',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                        // Map floating controls (right side)
-                        Positioned(
-                          right: 12,
-                          top: 20,
-                          child: Column(
-                            children: [
-                              _circleIconButton(Icons.refresh),
-                              const SizedBox(height: 12),
-                              _circleIconButton(Icons.gps_fixed),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              // Draggable bottom sheet
-              _BottomSheetPanel(controller: controller),
-            ],
-          ),
-          // Bottom navigation bar
-          bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
-        );
-      },
+  State<ExplorerScreenView> createState() => _ExplorerScreenViewState();
+}
+
+class _ExplorerScreenViewState extends State<ExplorerScreenView> {
+  GoogleMapController? mapController;
+  late final CameraPosition _initialCameraPosition;
+  GoogleMap? _map;
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final mapsImpl = GoogleMapsFlutterPlatform.instance;
+    if (mapsImpl is GoogleMapsFlutterAndroid) {
+      mapsImpl.useAndroidViewSurface = true;
+    }
+    _initialCameraPosition = const CameraPosition(
+      target: LatLng(37.7749, -122.4194),
+      zoom: 12.0,
     );
+    _map = GoogleMap(
+      mapType: MapType.normal,
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: _initialCameraPosition,
+      mapToolbarEnabled: true,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+    initialCameraPosition: _initialCameraPosition,
+    onMapCreated: _onMapCreated,
+    mapType: MapType.normal,
+    mapToolbarEnabled: true,
+  );
+    // return Scaffold(
+    //       appBar: AppBar(
+    //         title: const Text(
+    //           'RECHARGE',
+    //           style: TextStyle(
+    //             color: Colors.white,
+    //             fontSize: 18,
+    //             fontWeight: FontWeight.w700,
+    //             letterSpacing: 1.0,
+    //           ),
+    //         ),
+    //         actions: [
+    //           if (Global.isLoginValid)
+    //             IconButton(
+    //               onPressed: () {},
+    //               icon: const Icon(
+    //                 Icons.notifications_none,
+    //                 color: Colors.white,
+    //               ),
+    //             ),
+    //         ],
+    //       ),
+    //       body: Stack(
+    //         children: [
+    //           // Map background and header
+    //           SizedBox(
+    //             height: MediaQuery.of(context).size.height,
+    //             width: MediaQuery.of(context).size.width,
+    //             child: Stack(
+    //               children: [
+    //                  Positioned.fill(child: _map ?? const Center(child: Text('Map Loading...'),)),
+    //                 // MapSample(),
+    //                 // Container(
+    //                 //   color: const Color(0xFFE9EEF4),
+    //                 //   child: const Center(
+    //                 //     child: Text(
+    //                 //       'Map Placeholder',
+    //                 //       style: TextStyle(color: Colors.grey),
+    //                 //     ),
+    //                 //   ),
+    //                 // ),
+    //                 // Map floating controls (right side)
+    //                 Positioned(
+    //                   right: 12,
+    //                   top: 20,
+    //                   child: Column(
+    //                     children: [
+    //                       _circleIconButton(Icons.refresh),
+    //                       const SizedBox(height: 12),
+    //                       _circleIconButton(Icons.gps_fixed),
+    //                     ],
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //           ),
+    //           // Draggable bottom sheet
+    //           GetBuilder<ExplorerController>(
+    //             builder: (controller) => _BottomSheetPanel(controller: controller),
+    //           ),
+    //         ],
+    //       ),
+    //       // Bottom navigation bar
+    //       bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
+    //     );
+  
+  }
+
+  @override
+  void dispose() {
+    mapController?.dispose();
+    super.dispose();
   }
 }
 
@@ -104,22 +154,22 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final controller = widget.controller;
       await Future.wait([
-          controller.fetchBookmark(
-            onErrorCallback: (msg) {
-              if (mounted) Snackbar.showError(msg, context);
-            },
-          ),
-          controller.pollChargingOrder(
-            onErrorCallback: (msg) {
-              if (mounted) Snackbar.showError(msg, context);
-            },
-          ),
-          controller.fetchStations(
-            onErrorCallback: (msg) {
-              if (mounted) Snackbar.showError(msg, context);
-            },
-          ),
-        ]);
+        controller.fetchBookmark(
+          onErrorCallback: (msg) {
+            if (mounted) Snackbar.showError(msg, context);
+          },
+        ),
+        controller.pollChargingOrder(
+          onErrorCallback: (msg) {
+            if (mounted) Snackbar.showError(msg, context);
+          },
+        ),
+        controller.fetchStations(
+          onErrorCallback: (msg) {
+            if (mounted) Snackbar.showError(msg, context);
+          },
+        ),
+      ]);
     });
   }
 
@@ -186,9 +236,11 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: RefreshIndicator(
-                    onRefresh: () => widget.controller.fetchStations(onErrorCallback: (msg){
-                      Snackbar.showError(msg, context);
-                    },),
+                    onRefresh: () => widget.controller.fetchStations(
+                      onErrorCallback: (msg) {
+                        Snackbar.showError(msg, context);
+                      },
+                    ),
                     child: CustomScrollView(
                       controller: scrollController,
                       slivers: [
@@ -211,12 +263,20 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                         _toggleSheet();
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(top: 8, bottom: 6),
+                                        margin: const EdgeInsets.only(
+                                          top: 8,
+                                          bottom: 6,
+                                        ),
                                         child: Center(
                                           child: Icon(
-                                            _currentSize <= (_collapsedSize + _expandedSize) / 2
-                                                ? Icons.keyboard_arrow_up_rounded
-                                                : Icons.keyboard_arrow_down_rounded,
+                                            _currentSize <=
+                                                    (_collapsedSize +
+                                                            _expandedSize) /
+                                                        2
+                                                ? Icons
+                                                      .keyboard_arrow_up_rounded
+                                                : Icons
+                                                      .keyboard_arrow_down_rounded,
                                             color: Colors.red.shade700,
                                             size: 22,
                                           ),
@@ -225,11 +285,12 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                     ),
                                     RichText(
                                       text: TextSpan(
-                                        style: theme.textTheme.titleLarge?.copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 20,
-                                        ),
+                                        style: theme.textTheme.titleLarge
+                                            ?.copyWith(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 20,
+                                            ),
                                         children: const [
                                           TextSpan(text: 'Welcome to '),
                                           TextSpan(
@@ -245,10 +306,11 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                     const SizedBox(height: 2),
                                     Text(
                                       'Charge anytime, anywhere',
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                      ),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.black54,
+                                            fontSize: 14,
+                                          ),
                                     ),
                                     const SizedBox(height: 12),
                                     Row(
@@ -256,30 +318,49 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                         Expanded(
                                           child: Container(
                                             height: 44,
-                                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                            ),
                                             decoration: BoxDecoration(
                                               color: Colors.grey.shade100,
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: Colors.grey.shade300),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: Colors.grey.shade300,
+                                              ),
                                             ),
                                             child: Row(
                                               children: [
-                                                Icon(Icons.search, color: Colors.grey.shade600),
+                                                Icon(
+                                                  Icons.search,
+                                                  color: Colors.grey.shade600,
+                                                ),
                                                 const SizedBox(width: 8),
                                                 Expanded(
                                                   child: TextField(
-                                                    controller: widget.controller.searchController,
+                                                    controller: widget
+                                                        .controller
+                                                        .searchController,
                                                     onChanged: (value) {
-                                                      widget.controller.update();
+                                                      widget.controller
+                                                          .update();
                                                     },
-                                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                                      color: Colors.black87,
-                                                    ),
+                                                    style: theme
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          color: Colors.black87,
+                                                        ),
                                                     decoration: InputDecoration(
                                                       hintText: 'Search',
-                                                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                                                        color: Colors.grey.shade600,
-                                                      ),
+                                                      hintStyle: theme
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            color: Colors
+                                                                .grey
+                                                                .shade600,
+                                                          ),
                                                       border: InputBorder.none,
                                                       isDense: true,
                                                     ),
@@ -292,10 +373,19 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                         const SizedBox(width: 12),
                                         GestureDetector(
                                           onTap: () async {
-                                            final filteredStations = await Get.toNamed(AppRoutes.filter);
+                                            final filteredStations =
+                                                await Get.toNamed(
+                                                  AppRoutes.filter,
+                                                );
                                             if (filteredStations != null) {
-                                              widget.controller.filteredList = filteredStations as List<Station>;
-                                              widget.controller.searchController.text = '';
+                                              widget.controller.filteredList =
+                                                  filteredStations
+                                                      as List<Station>;
+                                              widget
+                                                      .controller
+                                                      .searchController
+                                                      .text =
+                                                  '';
                                               widget.controller.update();
                                             }
                                           },
@@ -304,8 +394,11 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                             height: 44,
                                             decoration: BoxDecoration(
                                               color: Colors.grey.shade100,
-                                              borderRadius: BorderRadius.circular(10),
-                                              border: Border.all(color: Colors.grey.shade300),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: Colors.grey.shade300,
+                                              ),
                                             ),
                                             child: const Icon(
                                               Icons.tune,
@@ -342,14 +435,20 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                           )
                         else
                           SliverList.builder(
-                            itemCount: widget.controller.filteredStations.length,
+                            itemCount:
+                                widget.controller.filteredStations.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
                                   _StationItem(
-                                    station: widget.controller.filteredStations[index],
+                                    station: widget
+                                        .controller
+                                        .filteredStations[index],
                                   ),
-                                  Divider(height: 1, color: Colors.grey.shade200),
+                                  Divider(
+                                    height: 1,
+                                    color: Colors.grey.shade200,
+                                  ),
                                 ],
                               );
                             },
@@ -364,17 +463,18 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
         ),
         GetBuilder<ExplorerController>(
           builder: (controller) {
-            return controller.status == null ? SizedBox.shrink():
-            Positioned(
-              right: 0,
-              top: 0,
-              child: FloatBar(
-                title: OrderStatus.title(controller.status),
-                subtitle: OrderStatus.subtitle(controller.status),
-                onClick: () => {Get.toNamed(AppRoutes.charging)},
-              ),
-            );
-          }
+            return controller.status == null
+                ? SizedBox.shrink()
+                : Positioned(
+                    right: 0,
+                    top: 0,
+                    child: FloatBar(
+                      title: OrderStatus.title(controller.status),
+                      subtitle: OrderStatus.subtitle(controller.status),
+                      onClick: () => {Get.toNamed(AppRoutes.charging)},
+                    ),
+                  );
+          },
         ),
       ],
     );
@@ -405,13 +505,15 @@ class _StationItem extends StatelessWidget {
               height: 54,
               fit: BoxFit.cover,
             ),
-            
+
             const SizedBox(width: 8),
 
             // Details
             GetBuilder<ExplorerController>(
               builder: (controller) {
-                final bookmarkIndex = controller.bookmarks.indexWhere((bookmark) => bookmark.stationId == station.id);
+                final bookmarkIndex = controller.bookmarks.indexWhere(
+                  (bookmark) => bookmark.stationId == station.id,
+                );
                 return Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,8 +535,9 @@ class _StationItem extends StatelessWidget {
                           InkWell(
                             onTap: () async {
                               try {
-                                if (bookmarkIndex >=0) {
-                                  final bookmarkId = controller.bookmarks[bookmarkIndex].id;
+                                if (bookmarkIndex >= 0) {
+                                  final bookmarkId =
+                                      controller.bookmarks[bookmarkIndex].id;
                                   await controller.removeBookmark(bookmarkId);
                                 } else {
                                   await controller.storeBookmark(station);
@@ -444,8 +547,10 @@ class _StationItem extends StatelessWidget {
                               }
                             },
                             child: Icon(
-                              bookmarkIndex >=0 ? Icons.star : Icons.star_border,
-                              color: bookmarkIndex >=0
+                              bookmarkIndex >= 0
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: bookmarkIndex >= 0
                                   ? Colors.orange
                                   : Colors.grey,
                             ),
@@ -460,7 +565,8 @@ class _StationItem extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      if (station.description != null && station.description!.isNotEmpty) ...[
+                      if (station.description != null &&
+                          station.description!.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
                           station.description!,
@@ -472,7 +578,10 @@ class _StationItem extends StatelessWidget {
                         children: [
                           Icon(Icons.route, size: 14, color: muted),
                           const SizedBox(width: 4),
-                          Text('3.9 km', style: TextStyle(color: muted, fontSize: 12)),
+                          Text(
+                            '3.9 km',
+                            style: TextStyle(color: muted, fontSize: 12),
+                          ),
                           const SizedBox(width: 8),
                           Icon(Icons.ev_station, size: 14, color: muted),
                           const SizedBox(width: 4),
@@ -529,7 +638,11 @@ class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double maxHeight;
   final Widget Function(BuildContext) builder;
 
-  _FixedHeaderDelegate({required this.minHeight, required this.maxHeight, required this.builder});
+  _FixedHeaderDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.builder,
+  });
 
   @override
   double get minExtent => minHeight;
@@ -538,12 +651,18 @@ class _FixedHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return builder(context);
   }
 
   @override
   bool shouldRebuild(covariant _FixedHeaderDelegate oldDelegate) {
-    return minHeight != oldDelegate.minHeight || maxHeight != oldDelegate.maxHeight || builder != oldDelegate.builder;
+    return minHeight != oldDelegate.minHeight ||
+        maxHeight != oldDelegate.maxHeight ||
+        builder != oldDelegate.builder;
   }
 }

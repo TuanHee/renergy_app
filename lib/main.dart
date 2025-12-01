@@ -10,20 +10,26 @@ import 'package:renergy_app/global.dart';
 import 'common/constants/server.dart';
 import 'common/services/firebase_notification.dart';
 import 'common/services/location_handler.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 
 void main() async {
   await Global.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  final mapsImpl = GoogleMapsFlutterPlatform.instance;
+  if (mapsImpl is GoogleMapsFlutterAndroid) {
+    mapsImpl.useAndroidViewSurface = false;
+  }
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp();
+    }
+    await Future.delayed(Duration(milliseconds: 1000));
 
-  // try {
-  //   if (Firebase.apps.isEmpty) {
-  //     await Firebase.initializeApp();
-  //   }
-  //   await Future.delayed(Duration(milliseconds: 1000));
-
-  //   await NotificationService.init();
-  // } catch (e, st) {
-  //   print('Firebase initializeApp error: $e\n$st');
-  // }
+    await NotificationService.init();
+  } catch (e, st) {
+    print('Firebase initializeApp error: $e\n$st');
+  }
 
   final mainController = Get.put(MainController());
   mainController.position = await LocationHandler.getCurrentLocation();
@@ -60,16 +66,17 @@ class DebugWrapper extends StatelessWidget {
         children: [
           child,
           if (kDebugMode || serverApiUrl != "https://zeropowerstation.my")
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              color: Colors.red.withOpacity(0.7),
-              child: const Text(
-                kDebugMode
-                    ? "DEBUG MODE"
-                      : "STAGING MODE",
+            Positioned(
+              top: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                color: Colors.red.withOpacity(0.7),
+                child: const Text(
+                  kDebugMode ? "DEBUG MODE" : "STAGING MODE",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -77,7 +84,7 @@ class DebugWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-          ),
+            ),
         ],
       ),
     );
