@@ -11,6 +11,7 @@ class AppRoutes {
   static const String charging = '/charging';
   static const String bookmark = '/bookmark';
   static const String account = '/account';
+  static const String editProfile = '/edit-profile';
   static const String chargingStation = '/charging-station';
   static const String plugInLoading = '/plug-in-loading';
   static const String chargeProcessing = '/charge-processing';
@@ -68,6 +69,13 @@ class AppRoutes {
         page: () => const AccountScreenView(),
         transition: Transition.fadeIn,
         binding: AccountBinding(),
+        middlewares: authMiddleware,
+      ),
+      GetPage(
+        name: editProfile,
+        page: () => const EditProfileScreenView(),
+        transition: Transition.fadeIn,
+        binding: EditProfileBinding(),
         middlewares: authMiddleware,
       ),
       GetPage(

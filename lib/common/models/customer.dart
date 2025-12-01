@@ -21,6 +21,9 @@ class Customer {
   String? favoriteLocation;
   double? totalCharging;
   double? totalSpend;
+  double? totalC02;
+  double? totalDuration;
+  
   String? fcmToken;
   String? createdAt;
   String? updatedAt;
@@ -48,6 +51,8 @@ class Customer {
     this.favoriteLocation,
     this.totalCharging,
     this.totalSpend,
+    this.totalC02,
+    this.totalDuration,
     this.fcmToken,
     this.createdAt,
     this.updatedAt,
@@ -91,6 +96,12 @@ class Customer {
       totalSpend: json['total_spend'] == null
           ? null
           : double.parse(json['total_spend'].toString()),
+      totalC02: json['total_co2'] == null
+          ? null
+          : double.parse(json['total_co2'].toString()),
+      totalDuration: json['total_duration'] == null
+          ? null
+          : double.parse(json['total_duration'].toString()),
       fcmToken: json['fcm_token'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
@@ -121,6 +132,8 @@ class Customer {
       'favorite_location': favoriteLocation,
       'total_charging': totalCharging,
       'total_spend': totalSpend,
+      'total_co2': totalC02,
+      'total_duration': totalDuration,
       'fcm_token': fcmToken,
       'created_at': createdAt,
       'updated_at': updatedAt,

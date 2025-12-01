@@ -32,22 +32,22 @@ android {
         versionName = flutter.versionName
     }
 
-    android {
     signingConfigs {
-        release {
-        storeFile file("release-key.jks")
-        storePassword "TechweiserRenergy"
-        keyAlias "release"
-        keyPassword "TechweiserRenergy"
-    }
+        create("release") {
+            storeFile = file("release-key.jks")
+            storePassword = "TechweiserRenergy"
+            keyAlias = "release"
+            keyPassword = "TechweiserRenergy"
+        }
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
-}
 }
 
 dependencies{

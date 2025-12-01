@@ -13,6 +13,10 @@ class AccountScreenView extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text('Account'),
+            centerTitle: true,
+          ),
           body: controller.isLoading
               ? const Center(
                   child: CircularProgressIndicator(),
@@ -26,7 +30,7 @@ class AccountScreenView extends StatelessWidget {
                       children: [
                         _AccountHeader(
                           onProfileTap: () {
-                            // TODO: Implement profile navigation
+                            Get.toNamed(AppRoutes.editProfile);
                           },
                         ),
                         const SizedBox(height: 16),
@@ -77,15 +81,13 @@ class AccountScreenView extends StatelessWidget {
                               const SizedBox(height: 28),
                               SizedBox(
                                 width: double.infinity,
-                                child: ElevatedButton(
+                                child: OutlinedButton(
                                   onPressed: () {
                                     controller.logout();
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFE74C3C),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    side: BorderSide(color: Colors.grey.shade300),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -93,7 +95,7 @@ class AccountScreenView extends StatelessWidget {
                                   child: const Text(
                                     'Logout',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -101,30 +103,20 @@ class AccountScreenView extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.symmetric(vertical: 2),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: TextButton(
-                                  onPressed: () {
-                                    // TODO: Implement account deletion
-                                  },
-                                  child: const Text(
-                                    'Delete Account',
-                                    style: TextStyle(
-                                      color: Color(0xFF666666),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              const Text(
-                                'Renergy Version 1.0.7 (9)',
-                                style: TextStyle(
+                              // TextButton(
+                              //   onPressed: () {},
+                              //   child: const Text(
+                              //     'Delete Account',
+                              //     style: TextStyle(
+                              //       color: Color(0xFF666666),
+                              //       fontWeight: FontWeight.w600,
+                              //     ),
+                              //   ),
+                              // ),
+                              // const SizedBox(height: 24),
+                              Text(
+                                'Renergy Version ${controller.appVersion}',
+                                style: const TextStyle(
                                   color: Color(0xFF999999),
                                   fontSize: 12,
                                 ),
@@ -155,9 +147,10 @@ class _AccountHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AccountController>();
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       decoration: const BoxDecoration(
         color: Color(0xFFE60012),
         borderRadius: BorderRadius.only(
@@ -169,22 +162,37 @@ class _AccountHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Account',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+              const CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.person,
+                  size: 32,
+                  color: Color(0xFFE60012),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${controller.customer?.name ?? 'User'}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               TextButton(
                 onPressed: onProfileTap,
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -199,42 +207,6 @@ class _AccountHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: Color(0xFFE60012),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Tuan Hee Teo',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    'Output (kWh)',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
           const SizedBox(height: 28),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -244,20 +216,20 @@ class _AccountHeader extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
+              children: [
                 _AccountMetric(
                   label: 'Output (kWh)',
-                  value: '0',
+                  value: '${controller.customer?.totalCharging ?? 0}',
                 ),
                 _MetricDivider(),
                 _AccountMetric(
                   label: 'Total Duration (h)',
-                  value: '0',
+                  value: '${controller.customer?.totalDuration ?? 0}',
                 ),
                 _MetricDivider(),
                 _AccountMetric(
                   label: 'CO2 (g)',
-                  value: '0',
+                  value:  '${controller.customer?.totalC02 ?? 0}',
                 ),
               ],
             ),
@@ -329,9 +301,11 @@ class _AccountActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFFF7F7F7),
-      borderRadius: BorderRadius.circular(16),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -339,10 +313,7 @@ class _AccountActionTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: const Color(0xFFE60012),
-              ),
+              Icon(icon, color: const Color(0xFF333333)),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -354,10 +325,7 @@ class _AccountActionTile extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(
-                Icons.chevron_right,
-                color: Color(0xFF999999),
-              ),
+              const Icon(Icons.chevron_right, color: Color(0xFF999999)),
             ],
           ),
         ),

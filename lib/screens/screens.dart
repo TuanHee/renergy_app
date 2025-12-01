@@ -4,6 +4,7 @@ export 'explorer_screen/explorer_screen.dart';
 export 'charging_screen/charging_screen.dart';
 export 'bookmark_screen/bookmark_screen.dart';
 export 'account_screen/account_screen.dart';
+export 'edit_profile_screen/edit_profile_screen.dart';
 export 'station_screen/station_screen.dart';
 export 'plug_in_loading_screen/plug_in_loading_screen.dart';
 export 'charge_processing_screen/charge_processing_screen.dart';
