@@ -36,6 +36,7 @@ class PlugInLoadingController extends GetxController {
   }
 
   void countDownWaitingTime() {
+    print('countDownWaitingTime in plug_in_loading_screen');
     DateTime? endTime = chargingStats?.order?.createdAt != null
         ? DateTime.parse(
             chargingStats!.order!.createdAt!,
@@ -66,6 +67,7 @@ class PlugInLoadingController extends GetxController {
 
   Future<void> fetchChargingStats() async {
     try {
+      print('fetchChargingStats in plug_in_loading_screen');
       if (isfetching) {
         return;
       }
@@ -82,7 +84,6 @@ class PlugInLoadingController extends GetxController {
 
         if (data['charging_stats'] != null) {
           chargingStats = ChargingStats.fromJson(data['charging_stats']);
-          print('charging_stats: ${chargingStats?.toJson()}');
 
           if (countdownTimer == null) {
             pollWaitingTime();

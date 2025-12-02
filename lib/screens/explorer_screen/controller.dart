@@ -161,12 +161,17 @@ class ExplorerController extends GetxController {
     if (!Global.isLoginValid) {
       return;
     }
-    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {});
+    
+    await fetchChargingOrder();
+    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      await fetchChargingOrder();
+    });
   }
 
   Future<void> fetchChargingOrder({
     Function(String msg)? onErrorCallback,
   }) async {
+    print('fetchChargingOrder in explorer_screen');
     try {
       if (isfetching) {
         return;

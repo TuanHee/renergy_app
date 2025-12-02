@@ -37,6 +37,8 @@ class ChargeProcessingController extends GetxController {
 
   Future<void> fetchChargingStatus()async{
     try{
+    print('fetchChargingStatus in charge_processing_screen');
+
         final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
       if (res.data['status'] >= 200 && res.data['status'] < 300) {

@@ -54,20 +54,23 @@ class RechargeController extends GetxController {
   }
 
   void countDownWaitingTime() {
-    print('countDownWaitingTime');
-    print('stopAt: ${chargingStats?.stopAt}');
-    DateTime? endTime = DateTime.tryParse(chargingStats?.stopAt ?? '')?.toLocal().add(const Duration(seconds: waitingTime)) ?? null;
+    print('countDownWaitingTime in recharge_screen');
+    DateTime? endTime =
+        DateTime.tryParse(
+          chargingStats?.stopAt ?? '',
+        )?.toLocal().add(const Duration(seconds: waitingTime)) ??
+        null;
     remainSecond = endTime != null
         ? (endTime.millisecondsSinceEpoch -
-            DateTime.now().millisecondsSinceEpoch) ~/
-        1000
+                  DateTime.now().millisecondsSinceEpoch) ~/
+              1000
         : null;
     update();
   }
 
   Future<void> pollChargingStatus() async {
     apiTimer?.cancel();
-    if(!Global.isLoginValid){
+    if (!Global.isLoginValid) {
       return;
     }
     await fetchChargingStats();
@@ -77,34 +80,40 @@ class RechargeController extends GetxController {
   }
 
   Future<void> fetchChargingStats() async {
-    print('fetchChargingStats');
+    if (isClosed) {
+      return;
+    }
+    print('fetchChargingStats in recharge_screen');
     try {
-        if (isfetching) {
-          return;
-        }
-        isfetching = true;
-        final res = await Api().get(Endpoints.chargingStats(order!.id!));
+      if (isfetching) {
+        return;
+      }
+      isfetching = true;
+      final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
 
-          if (data['charging_stats']['status'] is String) {
-            chargingStats = ChargingStats.fromJson(data['charging_stats']);
-            if(countdownTimer == null){
-              pollWaitingTime();
-            }
+        if (data['charging_stats']['status'] is String) {
+          chargingStats = ChargingStats.fromJson(data['charging_stats']);
+          if (countdownTimer == null) {
+            pollWaitingTime();
           }
         }
-        ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
-        update();
-      } catch (e) {
-        if(Get.context == null){
-          return;
-        }
-        Snackbar.showError(e.toString(), Get.context!);
-      } finally {
-        isfetching = false;
       }
+      if (isClosed) {
+        return;
+      }
+      ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
+      update();
+    } catch (e) {
+      if (Get.context == null) {
+        return;
+      }
+      Snackbar.showError(e.toString(), Get.context!);
+    } finally {
+      isfetching = false;
+    }
   }
 
   Future<void> restart() async {

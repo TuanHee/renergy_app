@@ -35,7 +35,6 @@ class AccountController extends GetxController {
             : null;
         if (profileJson is Map<String, dynamic>) {
           customer = Customer.fromJson(profileJson);
-          print('Customer: ${customer?.toJson()}');
         }
       } else {
         errorMessage = res.data['message']?.toString();
