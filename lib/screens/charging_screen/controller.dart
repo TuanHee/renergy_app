@@ -45,7 +45,6 @@ class ChargingController extends GetxController {
         final data = res.data['data'];
         chargingStats = ChargingStats.fromJson(data['charging_stats']);
         chargingStats?.order = Order.fromJson(data['order']);
-        print('fetchChargingOrder: ${chargingStats?.toJson()}');
         update();
       }
     } catch (e, stackTrace) {

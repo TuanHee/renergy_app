@@ -54,8 +54,6 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<RechargeController>();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -67,76 +65,87 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
         ),
       ),
       bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
-            decoration: BoxDecoration(color: Colors.white),
+      body: GetBuilder<RechargeController>(
+        builder: (controller) => Center(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Illustration
-                Container(
-                  width: 160,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle,
-                    color: Color(0xFF2E7D32),
-                    size: 96,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Your charging session has finished',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Please leave the parking spot so others can charge. Or start a new session if you need more energy.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-
-                if(controller.remainSecond != null)
-                GetBuilder<RechargeController>(
-                  builder: (controller) => Text(
-                    '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-                if(controller.canRecharge)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _startRecharge(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD32F2F),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              decoration: BoxDecoration(color: Colors.white),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Illustration
+                  Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      shape: BoxShape.circle,
                     ),
-                    child: const Text('Recharge'),
+                    child: const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF2E7D32),
+                      size: 96,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Your charging session has finished',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Please leave the parking spot so others can charge. Or start a new session if you need more energy.',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+        
+                  if(controller.remainSecond != null)
+                  GetBuilder<RechargeController>(
+                    builder: (controller) => Text(
+                      '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                  ),
+        
+                  const SizedBox(height: 4),
+                  if(controller.canRecharge)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _startRecharge(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD32F2F),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Recharge'),
+                    ),
+                  ),
+        
+                  const SizedBox(height: 4),
+                  TextButton(
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.getHelp);
+                  },
+                  child: Text(
+                    'Having trouble? Contact support',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[400],
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 12),
-                Text(
-                  'Need assistance? Contact support.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

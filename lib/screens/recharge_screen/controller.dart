@@ -9,6 +9,8 @@ import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
+import '../plug_in_loading_screen/controller.dart';
+
 class RechargeController extends GetxController {
   bool isLoading = true;
 
@@ -37,15 +39,7 @@ class RechargeController extends GetxController {
       canRecharge = args['canRecharge'] as bool? ?? true;
     }
 
-    // cards = [
-    //   CreditCard(
-    //     cardNumber: '**** **** **** 9010',
-    //     cardHolder: 'John Doe',
-    //     expiryDate: '12/25',
-    //     cvv: '123',
-    //     cardType: CardType.visa,
-    //   ),
-    // ];
+    await pollChargingStatus();
   }
 
   String secondToMinute(int second) {
@@ -60,7 +54,9 @@ class RechargeController extends GetxController {
   }
 
   void countDownWaitingTime() {
-    DateTime? endTime = DateTime.tryParse(chargingStats?.stopAt ?? '')?.toLocal() ?? null;
+    print('countDownWaitingTime');
+    print('stopAt: ${chargingStats?.stopAt}');
+    DateTime? endTime = DateTime.tryParse(chargingStats?.stopAt ?? '')?.toLocal().add(const Duration(seconds: waitingTime)) ?? null;
     remainSecond = endTime != null
         ? (endTime.millisecondsSinceEpoch -
             DateTime.now().millisecondsSinceEpoch) ~/
@@ -81,6 +77,7 @@ class RechargeController extends GetxController {
   }
 
   Future<void> fetchChargingStats() async {
+    print('fetchChargingStats');
     try {
         if (isfetching) {
           return;
@@ -94,7 +91,7 @@ class RechargeController extends GetxController {
           if (data['charging_stats']['status'] is String) {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);
             if(countdownTimer == null){
-              countDownWaitingTime();
+              pollWaitingTime();
             }
           }
         }

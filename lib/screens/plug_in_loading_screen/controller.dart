@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
-import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
@@ -25,8 +23,9 @@ class PlugInLoadingController extends GetxController {
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order?;
-
+    await pollChargingStatus();
     update();
+    
   }
 
   void pollWaitingTime() {
@@ -47,7 +46,6 @@ class PlugInLoadingController extends GetxController {
                   DateTime.now().millisecondsSinceEpoch) ~/
               1000
         : null;
-    print('remainSecond: $remainSecond');
     update();
   }
 
@@ -84,6 +82,8 @@ class PlugInLoadingController extends GetxController {
 
         if (data['charging_stats'] != null) {
           chargingStats = ChargingStats.fromJson(data['charging_stats']);
+          print('charging_stats: ${chargingStats?.toJson()}');
+
           if (countdownTimer == null) {
             pollWaitingTime();
           }

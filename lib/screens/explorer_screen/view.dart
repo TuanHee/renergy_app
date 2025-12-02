@@ -527,445 +527,244 @@ class _StationItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
           children: [
-            Image.network(
-              'https://picsum.photos/500/300',
-              width: 72,
-              height: 54,
-              fit: BoxFit.cover,
-            ),
-
-            const SizedBox(width: 8),
-
-            // Details
-            GetBuilder<ExplorerController>(
-              builder: (controller) {
-                final bookmarkIndex = controller.bookmarks.indexWhere(
-                  (bookmark) => bookmark.stationId == station.id,
-                );
-                return Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          MyBadge(
-                            label:
-                                '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
-                            color: const Color(0xFF0BB07B),
-                          ),
-                          const SizedBox(width: 8),
-                          MyBadge(
-                            label: 'Showroom',
-                            color: Colors.black87,
-                            dark: true,
-                          ),
-                          const Spacer(),
-                          InkWell(
-                            onTap: () async {
-                              try {
-                                if (bookmarkIndex >= 0) {
-                                  final bookmarkId =
-                                      controller.bookmarks[bookmarkIndex].id;
-                                  await controller.removeBookmark(bookmarkId);
-                                } else {
-                                  await controller.storeBookmark(station);
-                                }
-                              } catch (e) {
-                                Snackbar.showError(e.toString(), context);
-                              }
-                            },
-                            child: Icon(
-                              bookmarkIndex >= 0
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: bookmarkIndex >= 0
-                                  ? Colors.orange
-                                  : Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        station.name ?? '',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (station.description != null &&
-                          station.description!.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          station.description!,
-                          style: TextStyle(color: muted, fontSize: 12),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(Icons.route, size: 14, color: muted),
-                          const SizedBox(width: 4),
-                          Text(
-                            '3.9 km',
-                            style: TextStyle(color: muted, fontSize: 12),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(Icons.ev_station, size: 14, color: muted),
-                          const SizedBox(width: 4),
-                          Text(
-                            station.bays!.length.toString(),
-                            style: TextStyle(color: muted, fontSize: 12),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            station.isActive ? 'Available' : 'Unavailable',
-                            style: TextStyle(
-                              color: Colors.green.shade700,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(Icons.bolt, size: 14, color: Colors.green),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                await showModalBottomSheet(
-                                  context: context,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(16),
-                                    ),
-                                  ),
-                                  builder: (ctx) {
-                                    return SafeArea(
-                                      top: false,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Open with',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            ListTile(
-                                              leading: const Icon(
-                                                Icons.map,
-                                                color: Colors.redAccent,
-                                              ),
-                                              title: const Text('Google Maps'),
-                                              onTap: () async {
-                                                Navigator.of(ctx).pop();
-                                                final lat = double.tryParse(
-                                                  station.latitude ?? '',
-                                                );
-                                                final lon = double.tryParse(
-                                                  station.longitude ?? '',
-                                                );
-                                                if (lat == null || lon == null)
-                                                  return;
-                                                final url = Uri.parse(
-                                                  'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
-                                                );
-                                                await launchUrl(
-                                                  url,
-                                                  mode: LaunchMode
-                                                      .externalApplication,
-                                                );
-                                              },
-                                            ),
-                                            ListTile(
-                                              leading: const Icon(
-                                                Icons.navigation,
-                                                color: Colors.blueAccent,
-                                              ),
-                                              title: const Text('Waze'),
-                                              onTap: () async {
-                                                Navigator.of(ctx).pop();
-                                                final lat = double.tryParse(
-                                                  station.latitude ?? '',
-                                                );
-                                                final lon = double.tryParse(
-                                                  station.longitude ?? '',
-                                                );
-                                                if (lat == null || lon == null)
-                                                  return;
-                                                final url = Uri.parse(
-                                                  'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
-                                                );
-                                                await launchUrl(
-                                                  url,
-                                                  mode: LaunchMode
-                                                      .externalApplication,
-                                                );
-                                              },
-                                            ),
-                                            const SizedBox(height: 8),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: const Text('Navigate'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Get.toNamed(
-                                  AppRoutes.chargingStation,
-                                  arguments: station.id,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade700,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Charge'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StationCarouselCard extends StatelessWidget {
-  final Station station;
-  final ExplorerController controller;
-  const _StationCarouselCard({required this.station, required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final muted = Colors.grey.shade600;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              'https://picsum.photos/500/300',
-              width: 96,
-              height: 84,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    MyBadge(
-                      label:
-                          '${(station.type ?? 'Public')[0].toUpperCase()}${(station.type ?? 'Public').substring(1)}',
-                      color: const Color(0xFF0BB07B),
-                    ),
-                    const SizedBox(width: 8),
-                    MyBadge(
-                      label: 'Showroom',
-                      color: Colors.black87,
-                      dark: true,
-                    ),
-                    const Spacer(),
-                    Icon(Icons.star_border, color: Colors.grey),
-                  ],
+                Image.network(
+                  'https://picsum.photos/500/300',
+                  width: 108,
+                  height: 81,
+                  fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  station.name ?? '',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.route, size: 14, color: muted),
-                    const SizedBox(width: 4),
-                    Text(
-                      '3.8 km',
-                      style: TextStyle(color: muted, fontSize: 12),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(Icons.ev_station, size: 14, color: muted),
-                    const SizedBox(width: 4),
-                    Text(
-                      (station.bays?.length ?? 0).toString(),
-                      style: TextStyle(color: muted, fontSize: 12),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      station.isActive ? 'Open' : 'Closed',
-                      style: TextStyle(
-                        color: station.isActive
-                            ? Colors.green.shade700
-                            : Colors.red.shade700,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          await showModalBottomSheet(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
+
+                const SizedBox(width: 8),
+
+                // Details
+                GetBuilder<ExplorerController>(
+                  builder: (controller) {
+                    final bookmarkIndex = controller.bookmarks.indexWhere(
+                      (bookmark) => bookmark.stationId == station.id,
+                    );
+                    return Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              MyBadge(
+                                label:
+                                    '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
+                                color: const Color(0xFF0BB07B),
                               ),
-                            ),
-                            builder: (ctx) {
-                              return SafeArea(
-                                top: false,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Open with',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      ListTile(
-                                        leading: const Icon(
-                                          Icons.map,
-                                          color: Colors.redAccent,
-                                        ),
-                                        title: const Text('Google Maps'),
-                                        onTap: () async {
-                                          Navigator.of(ctx).pop();
-                                          final lat = double.tryParse(
-                                            station.latitude ?? '',
-                                          );
-                                          final lon = double.tryParse(
-                                            station.longitude ?? '',
-                                          );
-                                          if (lat == null || lon == null)
-                                            return;
-                                          final url = Uri.parse(
-                                            'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
-                                          );
-                                          await launchUrl(
-                                            url,
-                                            mode:
-                                                LaunchMode.externalApplication,
-                                          );
-                                        },
-                                      ),
-                                      ListTile(
-                                        leading: const Icon(
-                                          Icons.navigation,
-                                          color: Colors.blueAccent,
-                                        ),
-                                        title: const Text('Waze'),
-                                        onTap: () async {
-                                          Navigator.of(ctx).pop();
-                                          final lat = double.tryParse(
-                                            station.latitude ?? '',
-                                          );
-                                          final lon = double.tryParse(
-                                            station.longitude ?? '',
-                                          );
-                                          if (lat == null || lon == null)
-                                            return;
-                                          final url = Uri.parse(
-                                            'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
-                                          );
-                                          await launchUrl(
-                                            url,
-                                            mode:
-                                                LaunchMode.externalApplication,
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
-                                  ),
+                              const SizedBox(width: 8),
+                              MyBadge(
+                                label: 'Showroom',
+                                color: Colors.black87,
+                                dark: true,
+                              ),
+                              const Spacer(),
+                              InkWell(
+                                onTap: () async {
+                                  try {
+                                    if (bookmarkIndex >= 0) {
+                                      final bookmarkId = controller
+                                          .bookmarks[bookmarkIndex]
+                                          .id;
+                                      await controller.removeBookmark(
+                                        bookmarkId,
+                                      );
+                                    } else {
+                                      await controller.storeBookmark(station);
+                                    }
+                                  } catch (e) {
+                                    Snackbar.showError(e.toString(), context);
+                                  }
+                                },
+                                child: Icon(
+                                  bookmarkIndex >= 0
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: bookmarkIndex >= 0
+                                      ? Colors.orange
+                                      : Colors.grey,
                                 ),
-                              );
-                            },
-                          );
-                        },
-                        child: const Text('Navigate'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            station.name ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (station.description != null &&
+                              station.description!.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              station.description!,
+                              style: TextStyle(color: muted, fontSize: 12),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(Icons.route, size: 14, color: muted),
+                              const SizedBox(width: 4),
+                              Text(
+                                '3.9 km',
+                                style: TextStyle(color: muted, fontSize: 12),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(Icons.ev_station, size: 14, color: muted),
+                              const SizedBox(width: 4),
+                              Text(
+                                station.bays!.length.toString(),
+                                style: TextStyle(color: muted, fontSize: 12),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                station.isActive ? 'Available' : 'Unavailable',
+                                style: TextStyle(
+                                  color: Colors.green.shade700,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.bolt,
+                                size: 14,
+                                color: Colors.green,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          const SizedBox(height: 8),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.toNamed(
-                            AppRoutes.chargingStation,
-                            arguments: station.id,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade700,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Charge'),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ],
             ),
-          ),
-        ],
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        builder: (ctx) {
+                          return SafeArea(
+                            top: false,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Open with',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.map,
+                                      color: Colors.redAccent,
+                                    ),
+                                    title: const Text('Google Maps'),
+                                    onTap: () async {
+                                      Navigator.of(ctx).pop();
+                                      final lat = double.tryParse(
+                                        station.latitude ?? '',
+                                      );
+                                      final lon = double.tryParse(
+                                        station.longitude ?? '',
+                                      );
+                                      if (lat == null || lon == null) return;
+                                      final url = Uri.parse(
+                                        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+                                      );
+                                      await launchUrl(
+                                        url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.navigation,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    title: const Text('Waze'),
+                                    onTap: () async {
+                                      Navigator.of(ctx).pop();
+                                      final lat = double.tryParse(
+                                        station.latitude ?? '',
+                                      );
+                                      final lon = double.tryParse(
+                                        station.longitude ?? '',
+                                      );
+                                      if (lat == null || lon == null) return;
+                                      final url = Uri.parse(
+                                        'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+                                      );
+                                      await launchUrl(
+                                        url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: const Text('Navigate'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed(
+                        AppRoutes.chargingStation,
+                        arguments: station.id,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Charge'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
