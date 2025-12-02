@@ -6,6 +6,7 @@ import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
 class RechargeController extends GetxController {
@@ -13,7 +14,7 @@ class RechargeController extends GetxController {
 
   Timer? apiTimer;
   Timer? countdownTimer;
-  int remainSecond = 15 * 60;
+  int? remainSecond;
   ChargingStats? chargingStats;
   bool canRecharge = true;
   bool isfetching = false;
@@ -35,7 +36,6 @@ class RechargeController extends GetxController {
       }
       canRecharge = args['canRecharge'] as bool? ?? true;
     }
-    countDownWaitingTime();
 
     // cards = [
     //   CreditCard(
@@ -52,31 +52,36 @@ class RechargeController extends GetxController {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  void countDownWaitingTime() {
-    DateTime endTime =
-        DateTime.tryParse(chargingStats?.stopAt ?? '') ?? DateTime.now();
-
+  void pollWaitingTime() {
+    countDownWaitingTime();
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (chargingStats?.status != ChargingStatsStatus.completed.name) {
-        timer.cancel();
-        return;
-      }
-
-      remainSecond =
-          (endTime.millisecondsSinceEpoch -
-              DateTime.now().millisecondsSinceEpoch) ~/
-          1000;
-      update();
+      countDownWaitingTime();
     });
   }
 
-  Future<void> pollChargingStatus(BuildContext context) async {
+  void countDownWaitingTime() {
+    DateTime? endTime = DateTime.tryParse(chargingStats?.stopAt ?? '')?.toLocal() ?? null;
+    remainSecond = endTime != null
+        ? (endTime.millisecondsSinceEpoch -
+            DateTime.now().millisecondsSinceEpoch) ~/
+        1000
+        : null;
+    update();
+  }
+
+  Future<void> pollChargingStatus() async {
     apiTimer?.cancel();
     if(!Global.isLoginValid){
       return;
     }
+    await fetchChargingStats();
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      try {
+      await fetchChargingStats();
+    });
+  }
+
+  Future<void> fetchChargingStats() async {
+    try {
         if (isfetching) {
           return;
         }
@@ -88,16 +93,21 @@ class RechargeController extends GetxController {
 
           if (data['charging_stats']['status'] is String) {
             chargingStats = ChargingStats.fromJson(data['charging_stats']);
+            if(countdownTimer == null){
+              countDownWaitingTime();
+            }
           }
         }
         ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
         update();
-      } catch (e, stackTrace) {
-        print('pollChargingStatus error: $e, $stackTrace');
+      } catch (e) {
+        if(Get.context == null){
+          return;
+        }
+        Snackbar.showError(e.toString(), Get.context!);
       } finally {
         isfetching = false;
       }
-    });
   }
 
   Future<void> restart() async {

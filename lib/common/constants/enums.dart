@@ -117,9 +117,6 @@ enum ChargingStatsStatus {
     if (chargingStat?.status == null) throw 'Charging stats status is null';
     if (chargingStat?.order == null) throw 'Charging stats order is null';
 
-          print('chargingStat?.status: ${chargingStat?.status}');
-          print('chargingStat?.order?.status: ${chargingStat?.order?.status}');
-
     switch (chargingStat?.status) {
       case ChargingStatsStatus.open:
         if (page == chargingProcessPage.plugIn) {

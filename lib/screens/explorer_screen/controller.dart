@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 import 'package:get/get.dart';
+import 'package:renergy_app/components/snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
@@ -23,7 +24,7 @@ class ExplorerController extends GetxController {
   List<Bookmark> bookmarks = [];
   Order? chargingOrder;
   String? status;
-  Timer? chargingOrderTimer;
+  Timer? apiTimer;
   bool isfetching = false;
   List<Station>? filteredList;
   TextEditingController searchController = TextEditingController();
@@ -43,7 +44,7 @@ class ExplorerController extends GetxController {
 
   @override
   void onClose() {
-    chargingOrderTimer?.cancel();
+    apiTimer?.cancel();
     super.onClose();
   }
 
@@ -61,7 +62,6 @@ class ExplorerController extends GetxController {
         throw res.data['message'] ?? 'Failed to fetch stations';
       }
     } catch (e) {
-      
       onErrorCallback?.call(e.toString());
     } finally {
       isLoading = false;
@@ -77,7 +77,7 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> fetchBookmark({Function(String msg)? onErrorCallback}) async {
-    if(!Global.isLoginValid){
+    if (!Global.isLoginValid) {
       return;
     }
     try {
@@ -100,7 +100,7 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> storeBookmark(Station station) async {
-    if(!Global.isLoginValid){
+    if (!Global.isLoginValid) {
       Get.offAllNamed(AppRoutes.login);
       return;
     }
@@ -126,7 +126,7 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> removeBookmark(int? bookmarkId) async {
-    if(!Global.isLoginValid){
+    if (!Global.isLoginValid) {
       Get.offAllNamed(AppRoutes.login);
       return;
     }
@@ -154,55 +154,66 @@ class ExplorerController extends GetxController {
     }
   }
 
-  Future<void> pollChargingOrder({Function(String msg)? onErrorCallback}) async {
-    chargingOrderTimer?.cancel();
-    if(!Global.isLoginValid){
+  Future<void> pollChargingOrder({
+    Function(String msg)? onErrorCallback,
+  }) async {
+    apiTimer?.cancel();
+    if (!Global.isLoginValid) {
       return;
     }
-    chargingOrderTimer = Timer.periodic(const Duration(seconds: 2), (
-      timer,
-    ) async {
-      try {
-        if (isfetching) {
-          return;
-        }
-        isfetching = true;
-        final res = await Api().get(Endpoints.activeOrder);
+    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {});
+  }
 
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
-          final newStatus = data['status'];
-          final newOrder = data['order'] != null ? Order.fromJson(data['order']) : null;
-          final changedStatus = newStatus != null && status != newStatus;
-          final changedOrder = (chargingOrder?.id ?? -1) != (newOrder?.id ?? -1);
-
-          if (changedStatus || changedOrder) {
-            status = newStatus ?? status;
-            chargingOrder = newOrder;
-            
-            update();
-          }
-        }
-      } catch (e, stackTrace) {
-        onErrorCallback?.call('Error polling charging order: $e, $stackTrace');
-      } finally {
-        isfetching = false;
+  Future<void> fetchChargingOrder({
+    Function(String msg)? onErrorCallback,
+  }) async {
+    try {
+      if (isfetching) {
+        return;
       }
-    });
+      isfetching = true;
+      final res = await Api().get(Endpoints.activeOrder);
+
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
+        final newStatus = data['status'];
+        final newOrder = data['order'] != null
+            ? Order.fromJson(data['order'])
+            : null;
+        final changedStatus = newStatus != null && status != newStatus;
+        final changedOrder = (chargingOrder?.id ?? -1) != (newOrder?.id ?? -1);
+
+        if (changedStatus || changedOrder) {
+          status = newStatus ?? status;
+          chargingOrder = newOrder;
+
+          update();
+        }
+      }
+    } catch (e) {
+      if(Get.context == null) return;
+      Snackbar.showError('Error fetching charging order: $e', Get.context!);
+    } finally {
+      isfetching = false;
+    }
   }
 
   List<Station> get filteredStations {
     List<Station> returnStations = [];
     returnStations = filteredList == null ? stations : filteredList!;
-    
-    if(searchController.text.isNotEmpty){
+
+    if (searchController.text.isNotEmpty) {
       final query = searchController.text.toLowerCase();
-      returnStations = returnStations.where((s) => (s.name ?? '').toLowerCase().contains(query)).toList();
+      returnStations = returnStations
+          .where((s) => (s.name ?? '').toLowerCase().contains(query))
+          .toList();
     }
 
     final position = Get.find<MainController>().position;
-    if(position != null){
-      returnStations.sort((a, b) => a.distanceTo(position).compareTo(b.distanceTo(position)));
+    if (position != null) {
+      returnStations.sort(
+        (a, b) => a.distanceTo(position).compareTo(b.distanceTo(position)),
+      );
     }
 
     return returnStations;
@@ -216,7 +227,9 @@ class ExplorerController extends GetxController {
         Marker(
           markerId: const MarkerId('self'),
           position: LatLng(self.latitude, self.longitude),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
           zIndex: 2,
         ),
       );
@@ -237,7 +250,9 @@ class ExplorerController extends GetxController {
             title: station.name ?? '',
             snippet: station.shortDescription ?? station.description ?? '',
           ),
-          zIndex: (station.id != null && station.id == selectedStationId) ? 3 : 1,
+          zIndex: (station.id != null && station.id == selectedStationId)
+              ? 3
+              : 1,
           onTap: () {
             setSelectedStation(station);
             showCarousel = true;
@@ -260,7 +275,10 @@ class ExplorerController extends GetxController {
   Future<void> goToSelfLocation() async {
     final pos = Get.find<MainController>().position;
     if (pos == null) return;
-    final target = CameraPosition(target: LatLng(pos.latitude, pos.longitude), zoom: 16);
+    final target = CameraPosition(
+      target: LatLng(pos.latitude, pos.longitude),
+      zoom: 16,
+    );
     await mapController?.animateCamera(CameraUpdate.newCameraPosition(target));
   }
 
@@ -272,7 +290,9 @@ class ExplorerController extends GetxController {
         'assets/icons/app_icon.jpg',
       );
     } catch (_) {
-      appMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+      appMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueRed,
+      );
     }
   }
 
@@ -281,7 +301,9 @@ class ExplorerController extends GetxController {
     try {
       stationMarkerIcon = await _createPinIcon('assets/icons/app_icon.jpg');
     } catch (_) {
-      stationMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+      stationMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueRed,
+      );
     }
   }
 
@@ -289,9 +311,16 @@ class ExplorerController extends GetxController {
     const width = 120;
     const height = 140;
     final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()));
-    final pinPaint = Paint()..color = Colors.red.shade700..isAntiAlias = true;
-    final tipPaint = Paint()..color = Colors.red.shade800..isAntiAlias = true;
+    final canvas = Canvas(
+      recorder,
+      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+    );
+    final pinPaint = Paint()
+      ..color = Colors.red.shade700
+      ..isAntiAlias = true;
+    final tipPaint = Paint()
+      ..color = Colors.red.shade800
+      ..isAntiAlias = true;
     final center = Offset(width / 2, 60);
     canvas.drawCircle(center, 40, pinPaint);
     final path = Path()
@@ -300,7 +329,9 @@ class ExplorerController extends GetxController {
       ..lineTo((width / 2) + 20, 90)
       ..close();
     canvas.drawPath(path, tipPaint);
-    final innerPaint = Paint()..color = Colors.white..isAntiAlias = true;
+    final innerPaint = Paint()
+      ..color = Colors.white
+      ..isAntiAlias = true;
     canvas.drawCircle(center, 26, innerPaint);
     final data = await rootBundle.load(assetPath);
     final codec = await ui.instantiateImageCodec(
@@ -310,7 +341,12 @@ class ExplorerController extends GetxController {
     );
     final frame = await codec.getNextFrame();
     final img = frame.image;
-    final src = Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble());
+    final src = Rect.fromLTWH(
+      0,
+      0,
+      img.width.toDouble(),
+      img.height.toDouble(),
+    );
     final dst = Rect.fromCenter(center: center, width: 44, height: 44);
     canvas.drawImageRect(img, src, dst, Paint());
     final picture = recorder.endRecording();
@@ -324,6 +360,7 @@ class ExplorerController extends GetxController {
     update();
     moveCameraToStation(station);
   }
+
   // Provide a method to close the carousel modal if needed
   void closeCarousel() {
     showCarousel = false;
@@ -346,9 +383,9 @@ class ExplorerController extends GetxController {
     if (lat == null || lon == null) {
       return;
     }
-    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+    );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 }
-
-  

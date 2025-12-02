@@ -29,20 +29,12 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       begin: 0.3,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchPlugStatus();
-    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _fetchPlugStatus() async {
-    await Get.find<PlugInLoadingController>().pollChargingStatus(context);
   }
 
   void _stopPending() {
@@ -232,7 +224,7 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                         Expanded(
                           child: _buildInfoItem(
                             'Station',
-                            '${controller.chargingStats?.order?.station?.name ?? 'N/A'}',
+                            '${controller.chargingStats?.order?.station?.name ?? controller.chargingStats?.order?.stationName?? 'N/A'}',
                           ),
                         ),
                       ],
@@ -243,13 +235,13 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
                         Expanded(
                           child: _buildInfoItem(
                             'Power Output',
-                            '${controller.chargingStats?.order?.bay?.port?.outputPower ?? 0} kW',
+                            '${controller.chargingStats?.order?.bay?.port?.outputPower ?? controller.chargingStats?.order?.port?.outputPower ?? 'N/A'} kW',
                           ),
                         ),
                         Expanded(
                           child: _buildInfoItem(
                             'Type',
-                            '${controller.chargingStats?.order?.bay?.port?.portType ?? 0}',
+                            '${controller.chargingStats?.order?.bay?.port?.portType ?? controller.chargingStats?.order?.port?.portType ?? 'N/A'}',
                           ),
                         ),
                       ],
@@ -260,11 +252,12 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
               const SizedBox(height: 24),
 
               // Waiting Time
+              
               GetBuilder<PlugInLoadingController>(
-                builder: (controller) => Text(
-                  '${controller.remainSecond <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond.abs())}${controller.remainSecond <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                builder: (controller) => controller.remainSecond != null ?Text(
+                  '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
+                ): const SizedBox.shrink(),
               ),
               const SizedBox(height: 4),
 

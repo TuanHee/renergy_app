@@ -47,7 +47,7 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<RechargeController>().pollChargingStatus(context);
+      Get.find<RechargeController>().pollChargingStatus();
     });
     super.initState();
   }
@@ -105,10 +105,10 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
                 ),
                 const SizedBox(height: 24),
 
-                // Waiting Time
+                if(controller.remainSecond != null)
                 GetBuilder<RechargeController>(
                   builder: (controller) => Text(
-                    '${controller.remainSecond <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond.abs())}${controller.remainSecond <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                    '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ),

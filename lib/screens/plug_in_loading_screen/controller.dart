@@ -7,6 +7,7 @@ import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
 const int waitingTime = 15 * 60;
@@ -15,7 +16,7 @@ class PlugInLoadingController extends GetxController {
   Order? order;
   ChargingStats? chargingStats;
 
-  int remainSecond = waitingTime;
+  int? remainSecond;
   Timer? countdownTimer;
   Timer? apiTimer;
   bool isfetching = false;
@@ -25,71 +26,87 @@ class PlugInLoadingController extends GetxController {
     super.onInit();
     order = Get.arguments as Order?;
 
-    countDownWaitingTime();
     update();
   }
 
-  void countDownWaitingTime() {
-    DateTime endTime = chargingStats?.startAt == null
-        ? DateTime.now().add(Duration(seconds: waitingTime))
-        : DateTime.tryParse(
-            chargingStats!.startAt!,
-          )!.add(Duration(seconds: waitingTime));
-
+  void pollWaitingTime() {
+    countDownWaitingTime();
     countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-
-      remainSecond =
-          (endTime.millisecondsSinceEpoch -
-              DateTime.now().millisecondsSinceEpoch) ~/
-          1000;
-      update();
+      countDownWaitingTime();
     });
+  }
+
+  void countDownWaitingTime() {
+    DateTime? endTime = chargingStats?.order?.createdAt != null
+        ? DateTime.parse(
+            chargingStats!.order!.createdAt!,
+          ).add(Duration(seconds: waitingTime)).toLocal()
+        : null;
+    remainSecond = endTime != null
+        ? (endTime.millisecondsSinceEpoch -
+                  DateTime.now().millisecondsSinceEpoch) ~/
+              1000
+        : null;
+    print('remainSecond: $remainSecond');
+    update();
   }
 
   String secondToMinute(int second) {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  Future<void> pollChargingStatus(BuildContext context) async {
+  Future<void> pollChargingStatus() async {
     apiTimer?.cancel();
-    if(!Global.isLoginValid){
+    if (!Global.isLoginValid) {
       return;
     }
+    await fetchChargingStats();
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      try {
-        if (isfetching) {
-          return;
-        }
-        isfetching = true;
-        if (order?.id == null) {
-          timer.cancel();
-          throw ('Order id is null');
-        }
-
-        final res = await Api().get(Endpoints.chargingStats(order!.id!));
-
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
-
-          if (data['charging_stats'] != null) {
-            chargingStats = ChargingStats.fromJson(data['charging_stats']);
-          }
-        }
-
-        if (chargingStats?.status != null) {
-          await ChargingStatsStatus.page(chargingStats, chargingProcessPage.plugIn);
-          if(chargingStats?.status != ChargingStatsStatus.open){
-            timer.cancel();
-          }
-        }
-        
-        update();
-      } catch (e, stackTrace) {
-        print('pollChargingStatus error: $e, $stackTrace');
-      } finally {
-        isfetching = false;
-      }
+      await fetchChargingStats();
     });
+  }
+
+  Future<void> fetchChargingStats() async {
+    try {
+      if (isfetching) {
+        return;
+      }
+      isfetching = true;
+      if (order?.id == null) {
+        apiTimer?.cancel();
+        throw ('Order id is null');
+      }
+
+      final res = await Api().get(Endpoints.chargingStats(order!.id!));
+
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
+
+        if (data['charging_stats'] != null) {
+          chargingStats = ChargingStats.fromJson(data['charging_stats']);
+          if (countdownTimer == null) {
+            pollWaitingTime();
+          }
+        }
+      }
+
+      if (chargingStats?.status != null) {
+        await ChargingStatsStatus.page(
+          chargingStats,
+          chargingProcessPage.plugIn,
+        );
+        if (chargingStats?.status != ChargingStatsStatus.open) {
+          apiTimer?.cancel();
+        }
+      }
+
+      update();
+    } catch (e) {
+      if(Get.context == null) return;
+      Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
+    } finally {
+      isfetching = false;
+    }
   }
 
   Future<void> cancelPending() async {

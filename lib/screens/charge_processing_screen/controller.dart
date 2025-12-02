@@ -6,6 +6,7 @@ import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
 class ChargeProcessingController extends GetxController {
@@ -13,7 +14,7 @@ class ChargeProcessingController extends GetxController {
   String status = ChargingStatsStatus.charging.name;
   Order? order;
   ChargingStats? chargingStats;
-  Timer? pollingTimer;
+  Timer? apiTimer;
   bool isfetching = false;
 
   @override
@@ -24,12 +25,19 @@ class ChargeProcessingController extends GetxController {
   }
 
   void pollChargingStatus() async {
-    pollingTimer?.cancel();
+    apiTimer?.cancel();
     if (order?.id == null || !Global.isLoginValid) {
       return;
     }
-    pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      final res = await Api().get(Endpoints.chargingStats(order!.id!));
+    await fetchChargingStatus();
+    apiTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      await fetchChargingStatus();
+    });
+  }
+
+  Future<void> fetchChargingStatus()async{
+    try{
+        final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
       if (res.data['status'] >= 200 && res.data['status'] < 300) {
         final data = res.data['data'];
@@ -48,7 +56,12 @@ class ChargeProcessingController extends GetxController {
         );
         update();
       }
-    });
+      } catch (e) {
+        if(Get.context == null){
+          return;
+        }
+        Snackbar.showError(e.toString(), Get.context!);
+      }
   }
 
   Future<void> stopCharging() async {
@@ -64,7 +77,7 @@ class ChargeProcessingController extends GetxController {
 
   @override
   void onClose() {
-    pollingTimer?.cancel();
+    apiTimer?.cancel();
     super.onClose();
   }
 }

@@ -304,7 +304,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                           ),
                         ),
 
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 16),
 
                         // Charging Stats Cards
                         Row(
@@ -314,13 +314,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.speed,
                                 label: 'Port Type',
                                 value:
-                                    controller
-                                        .chargingStats
-                                        ?.order
-                                        ?.bay
-                                        ?.port
-                                        ?.portType ??
-                                    '-',
+                                    '${controller.chargingStats?.order?.bay?.port?.portType ?? controller.chargingStats?.order?.port?.portType ?? 'N/A'}',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -329,7 +323,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.access_time,
                                 label: 'Output Power (kW)',
                                 value:
-                                    '${controller.chargingStats?.order?.bay?.port?.outputPower ?? 0} kW',
+                                    '${controller.chargingStats?.order?.bay?.port?.outputPower ?? controller.chargingStats?.order?.port?.outputPower ?? 'N/A'} kW',
                               ),
                             ),
                           ],
@@ -344,7 +338,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.battery_charging_full,
                                 label: 'Energy Added',
                                 value:
-                                    '${((controller.chargingStats?.meter?.usage ?? 0) / 1000).toStringAsFixed(1)} kWh',
+                                    '${((controller.chargingStats?.order?.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -353,7 +347,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.attach_money,
                                 label: 'Current Cost',
                                 value:
-                                    'RM ${controller.chargingStats?.meter?.usage != null && controller.chargingStats?.order?.charging_price != null ? ((controller.chargingStats!.meter!.usage! / 1000) * controller.chargingStats!.order!.charging_price!).toStringAsFixed(2) : '-'}',
+                                    'RM ${controller.chargingStats?.order?.totalChargingTimeMinutes != null && controller.chargingStats?.order?.charging_price != null ? ((controller.chargingStats!.order!.totalChargingTimeMinutes!) * controller.chargingStats!.order!.charging_price!).toStringAsFixed(2) : '-'}',
                               ),
                             ),
                           ],
@@ -401,12 +395,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                               const SizedBox(height: 12),
                               _buildDetailRow(
                                 'Location',
-                                controller
-                                        .chargingStats
-                                        ?.order
-                                        ?.station
-                                        ?.name ??
-                                    '-',
+                                '${controller.chargingStats?.order?.station?.name ?? controller.chargingStats?.order?.stationName?? 'N/A'}',
                               ),
                               const SizedBox(height: 12),
                               _buildDetailRow(

@@ -3,6 +3,8 @@ import 'package:renergy_app/common/models/order_line.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/models/order_customer.dart';
 
+import 'port.dart';
+
 class Order {
   int? id;
   int? stationId;
@@ -18,7 +20,7 @@ class Order {
   String? updatedAt;
   List<OrderLine>? lines;
   Bay? bay;
-  double? totalUsage;
+  double? totalUsage; 
   double? totalChargeableIdleTimeMinutes;
   double? totalChargingTimeMinutes;
   double? charging_price;
@@ -32,6 +34,7 @@ class Order {
   double? netAmount;
   String? completedAt;
   OrderCustomer? customer;
+  Port? port;
 
   Order({
     this.id,
@@ -62,6 +65,7 @@ class Order {
     this.netAmount,
     this.completedAt,
     this.customer,
+    this.port,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -111,6 +115,7 @@ class Order {
                   json['customer_vehicle_plate'] != null)
               ? OrderCustomer.fromJson(json)
               : null,
+      port: json['charger_port'] == null ? null : Port.fromJson(json['charger_port']),
     );
   }
   
