@@ -24,21 +24,22 @@ class CardController extends GetxController {
     //     cardType: CardType.visa,
     //   ),
     // ];
+    await fetchCardIndex();
   }
 
-  Future<void> fetchCarIndex() async {
+  Future<void> fetchCardIndex() async {
     isLoading = true;
     update();
     try {
-      final res = await Api().get(Endpoints.vehicles);
+      final res = await Api().get(Endpoints.paymentMethods);
       if (res.data['status'] != 200) {
-        throw res.data['message'] ?? 'Failed to fetch cars';
+        throw res.data['message'] ?? 'Failed to fetch payment methods';
       }
       final data = res.data['data'];
-      final vehicles = (data is Map && data['cards'] is List)
+      final cardsJson = (data is Map && data['cards'] is List)
           ? List<Map<String, dynamic>>.from(data['cards'])
           : <Map<String, dynamic>>[];
-      cards = vehicles.map((json) => CreditCard.fromJson(json)).toList();
+      cards = cardsJson.map((json) => CreditCard.fromJson(json)).toList();
       update();
     } catch (e) {
       rethrow;

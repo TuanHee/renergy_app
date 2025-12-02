@@ -233,9 +233,8 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                       AnimatedBuilder(
                                         animation: _pulseAnimation,
                                         builder: (context, child) {
-                                          final bool isZeroOrNullSoc =
-                                              controller.chargingStats?.meter?.soc == null ||
-                                              controller.chargingStats!.meter!.soc!.toStringAsFixed(0) == '0';
+                                          final num? soc = controller.chargingStats?.meter?.soc;
+                                          final bool isZeroOrNullSoc = soc == null || soc.toStringAsFixed(0) == '0';
                                           return Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [

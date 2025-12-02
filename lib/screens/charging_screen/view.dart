@@ -24,6 +24,12 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         controller.fetchChargingHistory(),
         controller.fetchChargingOrder(),
       ]);
+
+      if(!mounted){
+        return;
+      }
+
+      
       if (!isStayPage && controller.chargingStats != null) {
         await ChargingStatsStatus.page(
           controller.chargingStats,

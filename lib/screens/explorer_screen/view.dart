@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -24,10 +23,13 @@ class ExplorerScreenView extends StatefulWidget {
 class _ExplorerScreenViewState extends State<ExplorerScreenView> {
   GoogleMapController? mapController;
   late final CameraPosition _initialCameraPosition;
-  GoogleMap? _map;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    if (!Get.isRegistered<ExplorerController>()) {
+      Get.put(ExplorerController());
+    }
+
     Get.find<ExplorerController>().mapController = controller;
   }
 
@@ -44,13 +46,6 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
         Get.find<MainController>().position?.longitude ?? 0,
       ),
       zoom: 12.0,
-    );
-    _map = GoogleMap(
-      mapType: MapType.normal,
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: _initialCameraPosition,
-      mapToolbarEnabled: true,
-      markers: Get.find<ExplorerController>().buildMarkers(),
     );
   }
 
@@ -90,8 +85,6 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                   children: [
                     GetBuilder<ExplorerController>(
                       builder: (controller) {
-                        final pos = Get.find<MainController>().position;
-                        final self = pos == null ? null : LatLng(pos.latitude, pos.longitude);
                         return Positioned.fill(
                           child: GoogleMap(
                             mapType: MapType.normal,
@@ -112,9 +105,11 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                             Icons.refresh,
                             onPressed: () async {
                               final c = Get.find<ExplorerController>();
-                              await c.rebuildMarkers(onErrorCallback: (msg) {
-                                Snackbar.showError(msg, context);
-                              });
+                              await c.rebuildMarkers(
+                                onErrorCallback: (msg) {
+                                  Snackbar.showError(msg, context);
+                                },
+                              );
                             },
                           ),
                           const SizedBox(height: 12),
@@ -133,7 +128,8 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
               ),
               // Draggable bottom sheet
               GetBuilder<ExplorerController>(
-                builder: (controller) => _BottomSheetPanel(controller: controller),
+                builder: (controller) =>
+                    _BottomSheetPanel(controller: controller),
               ),
               // Modal carousel bottom sheet overlay
               GetBuilder<ExplorerController>(
@@ -209,7 +205,6 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
   void dispose() {
     _sheetController.removeListener(_handleSheetSizeChanged);
     _sheetController.dispose();
-    widget.controller.stopPollingChargingOrder();
     super.dispose();
   }
 
@@ -465,12 +460,12 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                               ],
                             ),
                           )
-                          else if (!widget.controller.showCarousel)
+                        else if (!widget.controller.showCarousel)
                           SliverList.builder(
                             itemCount:
                                 widget.controller.filteredStations.length > 10
-                                    ? 10
-                                    : widget.controller.filteredStations.length,
+                                ? 10
+                                : widget.controller.filteredStations.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
@@ -487,11 +482,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                               );
                             },
                           )
-                          else
-                          const SliverToBoxAdapter(
-                            child: SizedBox.shrink(),
-                          ),
-                        
+                        else
+                          const SliverToBoxAdapter(child: SizedBox.shrink()),
                       ],
                     ),
                   ),
@@ -653,44 +645,81 @@ class _StationItem extends StatelessWidget {
                                 await showModalBottomSheet(
                                   context: context,
                                   shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
                                   ),
                                   builder: (ctx) {
                                     return SafeArea(
                                       top: false,
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             const Text(
                                               'Open with',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                             const SizedBox(height: 8),
                                             ListTile(
-                                              leading: const Icon(Icons.map, color: Colors.redAccent),
+                                              leading: const Icon(
+                                                Icons.map,
+                                                color: Colors.redAccent,
+                                              ),
                                               title: const Text('Google Maps'),
                                               onTap: () async {
                                                 Navigator.of(ctx).pop();
-                                                final lat = double.tryParse(station.latitude ?? '');
-                                                final lon = double.tryParse(station.longitude ?? '');
-                                                if (lat == null || lon == null) return;
-                                                final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
-                                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                                                final lat = double.tryParse(
+                                                  station.latitude ?? '',
+                                                );
+                                                final lon = double.tryParse(
+                                                  station.longitude ?? '',
+                                                );
+                                                if (lat == null || lon == null)
+                                                  return;
+                                                final url = Uri.parse(
+                                                  'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+                                                );
+                                                await launchUrl(
+                                                  url,
+                                                  mode: LaunchMode
+                                                      .externalApplication,
+                                                );
                                               },
                                             ),
                                             ListTile(
-                                              leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                                              leading: const Icon(
+                                                Icons.navigation,
+                                                color: Colors.blueAccent,
+                                              ),
                                               title: const Text('Waze'),
                                               onTap: () async {
                                                 Navigator.of(ctx).pop();
-                                                final lat = double.tryParse(station.latitude ?? '');
-                                                final lon = double.tryParse(station.longitude ?? '');
-                                                if (lat == null || lon == null) return;
-                                                final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
-                                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                                                final lat = double.tryParse(
+                                                  station.latitude ?? '',
+                                                );
+                                                final lon = double.tryParse(
+                                                  station.longitude ?? '',
+                                                );
+                                                if (lat == null || lon == null)
+                                                  return;
+                                                final url = Uri.parse(
+                                                  'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+                                                );
+                                                await launchUrl(
+                                                  url,
+                                                  mode: LaunchMode
+                                                      .externalApplication,
+                                                );
                                               },
                                             ),
                                             const SizedBox(height: 8),
@@ -708,9 +737,15 @@ class _StationItem extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
+                                Get.toNamed(
+                                  AppRoutes.chargingStation,
+                                  arguments: station.id,
+                                );
                               },
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700, foregroundColor: Colors.white),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade700,
+                                foregroundColor: Colors.white,
+                              ),
                               child: const Text('Charge'),
                             ),
                           ),
@@ -759,7 +794,8 @@ class _StationCarouselCard extends StatelessWidget {
                 Row(
                   children: [
                     MyBadge(
-                      label: '${(station.type ?? 'Public')[0].toUpperCase()}${(station.type ?? 'Public').substring(1)}',
+                      label:
+                          '${(station.type ?? 'Public')[0].toUpperCase()}${(station.type ?? 'Public').substring(1)}',
                       color: const Color(0xFF0BB07B),
                     ),
                     const SizedBox(width: 8),
@@ -775,7 +811,10 @@ class _StationCarouselCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   station.name ?? '',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -784,16 +823,24 @@ class _StationCarouselCard extends StatelessWidget {
                   children: [
                     Icon(Icons.route, size: 14, color: muted),
                     const SizedBox(width: 4),
-                    Text('3.8 km', style: TextStyle(color: muted, fontSize: 12)),
+                    Text(
+                      '3.8 km',
+                      style: TextStyle(color: muted, fontSize: 12),
+                    ),
                     const SizedBox(width: 8),
                     Icon(Icons.ev_station, size: 14, color: muted),
                     const SizedBox(width: 4),
-                    Text((station.bays?.length ?? 0).toString(), style: TextStyle(color: muted, fontSize: 12)),
+                    Text(
+                      (station.bays?.length ?? 0).toString(),
+                      style: TextStyle(color: muted, fontSize: 12),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       station.isActive ? 'Open' : 'Closed',
                       style: TextStyle(
-                        color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                        color: station.isActive
+                            ? Colors.green.shade700
+                            : Colors.red.shade700,
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                       ),
@@ -809,44 +856,81 @@ class _StationCarouselCard extends StatelessWidget {
                           await showModalBottomSheet(
                             context: context,
                             shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
                             ),
                             builder: (ctx) {
                               return SafeArea(
                                 top: false,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         'Open with',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                       const SizedBox(height: 8),
                                       ListTile(
-                                        leading: const Icon(Icons.map, color: Colors.redAccent),
+                                        leading: const Icon(
+                                          Icons.map,
+                                          color: Colors.redAccent,
+                                        ),
                                         title: const Text('Google Maps'),
                                         onTap: () async {
                                           Navigator.of(ctx).pop();
-                                          final lat = double.tryParse(station.latitude ?? '');
-                                          final lon = double.tryParse(station.longitude ?? '');
-                                          if (lat == null || lon == null) return;
-                                          final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
-                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                          final lat = double.tryParse(
+                                            station.latitude ?? '',
+                                          );
+                                          final lon = double.tryParse(
+                                            station.longitude ?? '',
+                                          );
+                                          if (lat == null || lon == null)
+                                            return;
+                                          final url = Uri.parse(
+                                            'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+                                          );
+                                          await launchUrl(
+                                            url,
+                                            mode:
+                                                LaunchMode.externalApplication,
+                                          );
                                         },
                                       ),
                                       ListTile(
-                                        leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                                        leading: const Icon(
+                                          Icons.navigation,
+                                          color: Colors.blueAccent,
+                                        ),
                                         title: const Text('Waze'),
                                         onTap: () async {
                                           Navigator.of(ctx).pop();
-                                          final lat = double.tryParse(station.latitude ?? '');
-                                          final lon = double.tryParse(station.longitude ?? '');
-                                          if (lat == null || lon == null) return;
-                                          final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
-                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                          final lat = double.tryParse(
+                                            station.latitude ?? '',
+                                          );
+                                          final lon = double.tryParse(
+                                            station.longitude ?? '',
+                                          );
+                                          if (lat == null || lon == null)
+                                            return;
+                                          final url = Uri.parse(
+                                            'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+                                          );
+                                          await launchUrl(
+                                            url,
+                                            mode:
+                                                LaunchMode.externalApplication,
+                                          );
                                         },
                                       ),
                                       const SizedBox(height: 8),
@@ -864,9 +948,15 @@ class _StationCarouselCard extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
+                          Get.toNamed(
+                            AppRoutes.chargingStation,
+                            arguments: station.id,
+                          );
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700, foregroundColor: Colors.white),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text('Charge'),
                       ),
                     ),
@@ -938,10 +1028,12 @@ class _StationCarouselBottomSheet extends StatefulWidget {
   const _StationCarouselBottomSheet({required this.controller});
 
   @override
-  State<_StationCarouselBottomSheet> createState() => _StationCarouselBottomSheetState();
+  State<_StationCarouselBottomSheet> createState() =>
+      _StationCarouselBottomSheetState();
 }
 
-class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet> {
+class _StationCarouselBottomSheetState
+    extends State<_StationCarouselBottomSheet> {
   late final PageController _pageController;
 
   @override
@@ -951,7 +1043,10 @@ class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet
     final initialIndex = stations.indexWhere(
       (s) => s.id == widget.controller.selectedStationId,
     );
-    _pageController = PageController(initialPage: initialIndex >= 0 ? initialIndex : 0, viewportFraction: 0.92);
+    _pageController = PageController(
+      initialPage: initialIndex >= 0 ? initialIndex : 0,
+      viewportFraction: 0.92,
+    );
   }
 
   @override
@@ -989,7 +1084,10 @@ class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.navigation, color: Colors.blueAccent),
+                  leading: const Icon(
+                    Icons.navigation,
+                    color: Colors.blueAccent,
+                  ),
                   title: const Text('Waze'),
                   onTap: () async {
                     Navigator.of(ctx).pop();
@@ -1009,7 +1107,9 @@ class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet
     final lat = double.tryParse(station.latitude ?? '');
     final lon = double.tryParse(station.longitude ?? '');
     if (lat == null || lon == null) return;
-    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+    );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
@@ -1027,8 +1127,9 @@ class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet
     final stations = widget.controller.filteredStations;
     final selectedId = widget.controller.selectedStationId;
     final selectedIndex = stations.indexWhere((s) => s.id == selectedId);
-    final Station? currentStation =
-        selectedIndex >= 0 ? stations[selectedIndex] : (stations.isNotEmpty ? stations[0] : null);
+    final Station? currentStation = selectedIndex >= 0
+        ? stations[selectedIndex]
+        : (stations.isNotEmpty ? stations[0] : null);
 
     return SafeArea(
       top: false,
@@ -1074,26 +1175,36 @@ class _StationCarouselBottomSheetState extends State<_StationCarouselBottomSheet
                   onPageChanged: (index) {
                     final station = stations[index];
                     widget.controller.setSelectedStation(station);
-                    final markerIdString = 'station_${station.id ?? station.name ?? ''}';
-                    widget.controller.mapController?.showMarkerInfoWindow(MarkerId(markerIdString));
+                    final markerIdString =
+                        'station_${station.id ?? station.name ?? ''}';
+                    widget.controller.mapController?.showMarkerInfoWindow(
+                      MarkerId(markerIdString),
+                    );
                   },
                   itemBuilder: (context, index) {
                     final station = stations[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.grey.shade200),
                           boxShadow: const [
-                            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
                           ],
                         ),
                         child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: _StationItem(station: station),
-                          ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: _StationItem(station: station),
+                        ),
                       ),
                     );
                   },

@@ -24,43 +24,29 @@ class ChargeProcessingController extends GetxController {
   }
 
   void pollChargingStatus() async {
+    pollingTimer?.cancel();
     if (order?.id == null || !Global.isLoginValid) {
       return;
     }
     pollingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      try {
-        if (isfetching) {
-          return;
-        }
-        isfetching = true;
-        final res = await Api().get(Endpoints.chargingStats(order!.id!));
+      final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
-        if (res.data['status'] >= 200 && res.data['status'] < 300) {
-          final data = res.data['data'];
+      if (res.data['status'] >= 200 && res.data['status'] < 300) {
+        final data = res.data['data'];
 
-          if (data['charging_stats']['status'] is String) {
-            status = data['charging_stats']['status'];
-          }
-
-          chargingStats = ChargingStats.fromJson(
-            res.data['data']['charging_stats'],
-          );
-
-          ChargingStatsStatus.page(chargingStats!, chargingProcessPage.chargingProcessing);
-          update();
+        if (data['charging_stats']['status'] is String) {
+          status = data['charging_stats']['status'];
         }
 
-        if (chargingStats?.status == ChargingStatsStatus.completed) {
-          timer.cancel();
-          Get.toNamed(
-            AppRoutes.recharge,
-            arguments: Get.find<ChargeProcessingController>().order,
-          );
-        }
-      } catch (e) {
-        print('Polling Error: $e');
-      } finally {
-        isfetching = false;
+        chargingStats = ChargingStats.fromJson(
+          res.data['data']['charging_stats'],
+        );
+
+        ChargingStatsStatus.page(
+          chargingStats!,
+          chargingProcessPage.chargingProcessing,
+        );
+        update();
       }
     });
   }

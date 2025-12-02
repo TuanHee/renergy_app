@@ -155,6 +155,7 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> pollChargingOrder({Function(String msg)? onErrorCallback}) async {
+    chargingOrderTimer?.cancel();
     if(!Global.isLoginValid){
       return;
     }
@@ -188,10 +189,6 @@ class ExplorerController extends GetxController {
         isfetching = false;
       }
     });
-  }
-
-  void stopPollingChargingOrder() {
-    chargingOrderTimer?.cancel();
   }
 
   List<Station> get filteredStations {
@@ -353,3 +350,5 @@ class ExplorerController extends GetxController {
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 }
+
+  

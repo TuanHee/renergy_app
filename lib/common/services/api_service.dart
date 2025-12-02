@@ -21,6 +21,7 @@ class Api {
         followRedirects: false,
         contentType: 'application/json; charset=utf-8',
         responseType: ResponseType.json,
+        validateStatus: (status) => true
       ),
     );
 
@@ -287,6 +288,9 @@ class Api {
         }
       }
     } on DioException catch (e) {
+      print("DIO ERROR: ${e.type}");
+  print("STATUS: ${e.response?.statusCode}");
+  print("DATA: ${e.response?.data}");
       if (e.response?.statusCode == 401) {
         StorageService.to.remove(storageAccessToken);
         Global.isLoginValid = false;

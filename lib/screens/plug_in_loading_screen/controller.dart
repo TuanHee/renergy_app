@@ -51,6 +51,7 @@ class PlugInLoadingController extends GetxController {
   }
 
   Future<void> pollChargingStatus(BuildContext context) async {
+    apiTimer?.cancel();
     if(!Global.isLoginValid){
       return;
     }

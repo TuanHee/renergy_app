@@ -129,7 +129,7 @@ class _CardScreenViewState extends State<CardScreenView> {
                         final result = await Get.toNamed(AppRoutes.editCard, arguments: card);
                         if (result == true) {
                           try {
-                            await Get.find<CardController>().fetchCarIndex();
+                            await Get.find<CardController>().fetchCardIndex();
                           } catch (e) {
                             Snackbar.showError(e.toString(), context);
                           }

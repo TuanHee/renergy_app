@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 
+bool _isNavigating = false;
+
 class MainBottomNavBar extends StatelessWidget {
   final int currentIndex;
 
-  const MainBottomNavBar({
-    super.key,
-    required this.currentIndex,
-  });
+  const MainBottomNavBar({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +15,11 @@ class MainBottomNavBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -1)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, -1),
+          ),
         ],
       ),
       child: SafeArea(
@@ -26,6 +29,8 @@ class MainBottomNavBar extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           onTap: (index) {
+            if (_isNavigating) return;
+            _isNavigating = true;
             // Navigate to corresponding route
             switch (index) {
               case 0:
@@ -41,14 +46,27 @@ class MainBottomNavBar extends StatelessWidget {
                 Get.offAllNamed(AppRoutes.account);
                 break;
             }
+            _isNavigating = false;
           },
           selectedItemColor: Colors.red,
           unselectedItemColor: Colors.grey,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-            BottomNavigationBarItem(icon: Icon(Icons.ev_station), label: 'Charging'),
-            BottomNavigationBarItem(icon: Icon(Icons.bookmark_border), label: 'Bookmark'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Account'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.explore),
+              label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.ev_station),
+              label: 'Charging',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bookmark_border),
+              label: 'Bookmark',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              label: 'Account',
+            ),
           ],
         ),
       ),
