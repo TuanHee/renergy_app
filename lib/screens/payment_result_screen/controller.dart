@@ -61,6 +61,10 @@ class PaymentResultController extends GetxController {
     items.clear();
     if (order == null) return;
     addSummaryItem(
+      'Transaction Id',
+      toDisplayString(order!.id?.toString().padLeft(4, '0') ?? '-'),
+    );
+    addSummaryItem(
       'Station',
       toDisplayString(order!.stationName ?? order!.station?.name),
     );
