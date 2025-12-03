@@ -29,7 +29,7 @@ class MainBottomNavBar extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           onTap: (index) {
-            if (_isNavigating) return;
+            if (currentIndex == index || _isNavigating) return;
             _isNavigating = true;
             // Navigate to corresponding route
             switch (index) {

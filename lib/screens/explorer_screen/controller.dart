@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -40,11 +39,13 @@ class ExplorerController extends GetxController {
     super.onInit();
     await _loadAppMarkerIcon();
     await _loadStationMarkerIcon();
+    pollChargingOrder();
   }
 
   @override
   void onClose() {
     apiTimer?.cancel();
+    apiTimer = null;
     super.onClose();
   }
 
@@ -164,6 +165,10 @@ class ExplorerController extends GetxController {
     
     await fetchChargingOrder();
     apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      if (isClosed) {
+        timer.cancel();
+        return;
+      }
       await fetchChargingOrder();
     });
   }
@@ -171,6 +176,7 @@ class ExplorerController extends GetxController {
   Future<void> fetchChargingOrder({
     Function(String msg)? onErrorCallback,
   }) async {
+    if (isClosed) return;
     print('fetchChargingOrder in explorer_screen');
     try {
       if (isfetching) {

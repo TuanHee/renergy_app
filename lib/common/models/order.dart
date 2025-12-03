@@ -151,6 +151,7 @@ class Order {
       'net_amount': netAmount,
       'completed_at': completedAt,
       'customer': customer?.toJson(),
+      'charger_port': port?.toJson(),
     };
   }
 
