@@ -42,35 +42,14 @@ class CreditCard {
     };
   }
 
-  List<Color> get brandColors {
-    final v = (brand ?? '').toLowerCase();
-    if (v.contains('visa')) {
-      return [Colors.blue.shade700, Colors.blue.shade900];
-    }
-    if (v.contains('master')) {
-      return [Colors.orange.shade700, Colors.red.shade700];
-    }
-    if (v.contains('amex') || v.contains('american')) {
-      return [Colors.teal.shade700, Colors.teal.shade900];
-    }
-    if (v.contains('discover')) {
-      return [Colors.purple.shade700, Colors.purple.shade900];
-    }
-    return [Colors.grey.shade600, Colors.grey.shade800];
-  }
-
   String get brandLogo {
     final v = (brand ?? '').toLowerCase();
-    if (v.contains('visa')) return 'images/visa_logo.png';
-    if (v.contains('master')) return 'images/mastercard_logo.png';
-    if (v.contains('amex') || v.contains('american')) return 'images/amex_logo.png';
-    if (v.contains('discover')) return 'images/discover_logo.png';
-    return 'images/card_logo.png';
-  }
+    print(v);
 
-  IconData get typeIcon {
-    final v = (type ?? '').toLowerCase();
-    if (v.contains('visa')) return Icons.credit_card;
-    return Icons.card_giftcard;
+    if (v.contains('visa')) return 'assets/images/visa_logo.png';
+    if (v.contains('master')) return 'assets/images/mastercard_logo.png';
+    if (v.contains('amex') || v.contains('american')) return 'assets/images/amex_logo.png';
+    if (v.contains('unionpay')) return 'assets/images/unionpay_logo.png';
+    return 'assets/images/no_card.png';
   }
 }

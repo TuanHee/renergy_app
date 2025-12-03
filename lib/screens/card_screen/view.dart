@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 
@@ -27,7 +28,7 @@ class _CardScreenViewState extends State<CardScreenView> {
     });
   }
 
-  void _deleteCard(int index) {
+  void _deleteCard(CreditCard card) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -40,15 +41,10 @@ class _CardScreenViewState extends State<CardScreenView> {
           ),
           TextButton(
             onPressed: () async {
-              try {
-                await Get.find<CardController>().deleteCard(index);
-              } catch (e) {
-                Snackbar.showError(e.toString(), context);
-              } finally {
+                await Get.find<CardController>().deleteCard(card);
                 if (mounted) {
                   Navigator.pop(context);
                 }
-              }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
@@ -126,18 +122,25 @@ class _CardScreenViewState extends State<CardScreenView> {
                     final card = controller.cards[index];
                     return GestureDetector(
                       onTap: () async {
-                        final result = await Get.toNamed(AppRoutes.editCard, arguments: card);
-                        if (result == true) {
-                          try {
-                            await Get.find<CardController>().fetchCardIndex();
-                          } catch (e) {
-                            Snackbar.showError(e.toString(), context);
-                          }
-                        }
+                        // final result = await Get.toNamed(AppRoutes.editCard, arguments: card);
+                        // if (result == true) {
+                        //   try {
+                        //     await Get.find<CardController>().fetchCardIndex();
+                        //   } catch (e) {
+                        //     Snackbar.showError(e.toString(), context);
+                        //   }
+                        // }
                       },
                       child: CardWidget(
                         card: card,
-                        onDelete: () => _deleteCard(index),
+                        onDelete: () => _deleteCard(card),
+                        onSetDefault: () async {
+                          try {
+                            await Get.find<CardController>().setDefaultCard(card);
+                          } catch (e) {
+                            Snackbar.showError(e.toString(), context);
+                          }
+                        },
                       ),
                     );
                   },

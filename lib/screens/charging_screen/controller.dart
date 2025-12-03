@@ -27,11 +27,8 @@ class ChargingController extends GetxController {
           res.data['data'] ??
           res.data;
       orderHistories = Order.listFromJson(list);
-      print(orderHistories.length);
       orderHistories.forEach((element) {
-        print(element.toJson());
       });
-      print(orderHistories);
     } catch (e) {
       onErrorCallback?.call('Error fetching charging history: $e');
       // rethrow;

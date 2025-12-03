@@ -33,9 +33,7 @@ class ChargeProcessingController extends GetxController {
     if (order?.id == null || !Global.isLoginValid) {
       return;
     }
-    // If a global timer is already running, just fetch once and return
     if (ChargeProcessingController.globalApiTimer != null) {
-      print('ChargeProcessing polling already active');
       await fetchChargingStatus();
       return;
     }
