@@ -4,17 +4,16 @@ import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
 import 'package:renergy_app/common/models/order.dart';
-import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
 class ChargeProcessingController extends GetxController {
+  static Timer? globalApiTimer;
   bool isLoading = true;
   String status = ChargingStatsStatus.charging.name;
   Order? order;
   ChargingStats? chargingStats;
-  Timer? apiTimer;
   bool isfetching = false;
 
   @override
@@ -24,22 +23,44 @@ class ChargeProcessingController extends GetxController {
     update();
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    pollChargingStatus();
+  }
+
   void pollChargingStatus() async {
-    apiTimer?.cancel();
     if (order?.id == null || !Global.isLoginValid) {
       return;
     }
-    await fetchChargingStatus();
-    apiTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    // If a global timer is already running, just fetch once and return
+    if (ChargeProcessingController.globalApiTimer != null) {
+      print('ChargeProcessing polling already active');
       await fetchChargingStatus();
-    });
+      return;
+    }
+    ChargeProcessingController.globalApiTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) async {
+        final c = Get.isRegistered<ChargeProcessingController>()
+            ? Get.find<ChargeProcessingController>()
+            : null;
+        if (c == null || c.isClosed) {
+          timer.cancel();
+          ChargeProcessingController.globalApiTimer = null;
+          return;
+        }
+        await c.fetchChargingStatus();
+      },
+    );
+    await fetchChargingStatus();
   }
 
-  Future<void> fetchChargingStatus()async{
-    try{
-    print('fetchChargingStatus in charge_processing_screen');
+  Future<void> fetchChargingStatus() async {
+    try {
+      print('fetchChargingStatus in charge_processing_screen');
 
-        final res = await Api().get(Endpoints.chargingStats(order!.id!));
+      final res = await Api().get(Endpoints.chargingStats(order!.id!));
 
       if (res.data['status'] >= 200 && res.data['status'] < 300) {
         final data = res.data['data'];
@@ -58,12 +79,12 @@ class ChargeProcessingController extends GetxController {
         );
         update();
       }
-      } catch (e) {
-        if(Get.context == null){
-          return;
-        }
-        Snackbar.showError(e.toString(), Get.context!);
+    } catch (e) {
+      if (Get.context == null) {
+        return;
       }
+      Snackbar.showError(e.toString(), Get.context!);
+    }
   }
 
   Future<void> stopCharging() async {
@@ -79,7 +100,8 @@ class ChargeProcessingController extends GetxController {
 
   @override
   void onClose() {
-    apiTimer?.cancel();
+    ChargeProcessingController.globalApiTimer?.cancel();
+      ChargeProcessingController.globalApiTimer = null;
     super.onClose();
   }
 }

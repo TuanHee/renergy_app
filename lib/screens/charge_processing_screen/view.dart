@@ -39,10 +39,6 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<ChargeProcessingController>().pollChargingStatus();
-    });
   }
 
   @override

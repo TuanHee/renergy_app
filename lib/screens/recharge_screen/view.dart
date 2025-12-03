@@ -31,7 +31,7 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
           TextButton(
             onPressed: () async {
               try {
-                await Get.find<RechargeController>().restart();
+                await Get.find<RechargeController>().recharge();
                 Get.back();
               } catch (e) {
                 Snackbar.showError(e.toString(), context);

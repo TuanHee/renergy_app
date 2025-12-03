@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
@@ -20,6 +19,7 @@ class RechargeController extends GetxController {
   ChargingStats? chargingStats;
   bool canRecharge = true;
   bool isfetching = false;
+  static Timer? globalApiTimer;
 
   Order? order;
 
@@ -39,7 +39,13 @@ class RechargeController extends GetxController {
       canRecharge = args['canRecharge'] as bool? ?? true;
     }
 
-    await pollChargingStatus();
+    update();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    pollChargingStatus();
   }
 
   String secondToMinute(int second) {
@@ -69,20 +75,41 @@ class RechargeController extends GetxController {
   }
 
   Future<void> pollChargingStatus() async {
-    apiTimer?.cancel();
     if (!Global.isLoginValid) {
       return;
     }
-    await fetchChargingStats();
-    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+    if (RechargeController.globalApiTimer != null) {
+      print('Recharge polling already active');
       await fetchChargingStats();
-    });
+      return;
+    }
+    RechargeController.globalApiTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (timer) async {
+        final c = Get.isRegistered<RechargeController>()
+            ? Get.find<RechargeController>()
+            : null;
+        if (c == null || c.isClosed) {
+          timer.cancel();
+          RechargeController.globalApiTimer = null;
+          return;
+        }
+        await c.fetchChargingStats();
+      },
+    );
+    await fetchChargingStats();
+  }
+
+  @override
+  void onClose() {
+    countdownTimer?.cancel();
+    RechargeController.globalApiTimer?.cancel();
+    RechargeController.globalApiTimer = null;
+    apiTimer?.cancel();
+    super.onClose();
   }
 
   Future<void> fetchChargingStats() async {
-    if (isClosed) {
-      return;
-    }
     print('fetchChargingStats in recharge_screen');
     try {
       if (isfetching) {
@@ -90,19 +117,16 @@ class RechargeController extends GetxController {
       }
       isfetching = true;
       final res = await Api().get(Endpoints.chargingStats(order!.id!));
-
+  
       if (res.data['status'] >= 200 && res.data['status'] < 300) {
         final data = res.data['data'];
-
+  
         if (data['charging_stats']['status'] is String) {
           chargingStats = ChargingStats.fromJson(data['charging_stats']);
           if (countdownTimer == null) {
             pollWaitingTime();
           }
         }
-      }
-      if (isClosed) {
-        return;
       }
       ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
       update();
@@ -115,8 +139,7 @@ class RechargeController extends GetxController {
       isfetching = false;
     }
   }
-
-  Future<void> restart() async {
+  Future<void> recharge() async {
     if (order?.id == null) {
       return;
     }
@@ -125,12 +148,5 @@ class RechargeController extends GetxController {
     if (res.data['status'] != 200) {
       throw 'Stop Charging Error: ${res.data['status']}';
     }
-  }
-
-  @override
-  void onClose() {
-    countdownTimer?.cancel();
-    apiTimer?.cancel();
-    super.onClose();
   }
 }

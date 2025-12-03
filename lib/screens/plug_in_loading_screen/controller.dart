@@ -18,14 +18,45 @@ class PlugInLoadingController extends GetxController {
   Timer? countdownTimer;
   Timer? apiTimer;
   bool isfetching = false;
+  static Timer? globalApiTimer;
 
   @override
   void onInit() async {
     super.onInit();
     order = Get.arguments as Order?;
-    await pollChargingStatus();
     update();
-    
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    pollChargingStatus();
+  }
+
+  Future<void> pollChargingStatus() async {
+    if (!Global.isLoginValid) {
+      return;
+    }
+    if (PlugInLoadingController.globalApiTimer != null) {
+      print('PlugInLoading polling already active');
+      await fetchChargingStats();
+      return;
+    }
+    PlugInLoadingController.globalApiTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (timer) async {
+        final c = Get.isRegistered<PlugInLoadingController>()
+            ? Get.find<PlugInLoadingController>()
+            : null;
+        if (c == null || c.isClosed) {
+          timer.cancel();
+          PlugInLoadingController.globalApiTimer = null;
+          return;
+        }
+        await c.fetchChargingStats();
+      },
+    );
+    await fetchChargingStats();
   }
 
   void pollWaitingTime() {
@@ -54,17 +85,6 @@ class PlugInLoadingController extends GetxController {
     return '${second ~/ 60}:${second % 60 < 10 ? '0${second % 60}' : second % 60}';
   }
 
-  Future<void> pollChargingStatus() async {
-    apiTimer?.cancel();
-    if (!Global.isLoginValid) {
-      return;
-    }
-    await fetchChargingStats();
-    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      await fetchChargingStats();
-    });
-  }
-
   Future<void> fetchChargingStats() async {
     try {
       print('fetchChargingStats in plug_in_loading_screen');
@@ -73,7 +93,8 @@ class PlugInLoadingController extends GetxController {
       }
       isfetching = true;
       if (order?.id == null) {
-        apiTimer?.cancel();
+        PlugInLoadingController.globalApiTimer?.cancel();
+        PlugInLoadingController.globalApiTimer = null;
         throw ('Order id is null');
       }
 
@@ -97,7 +118,8 @@ class PlugInLoadingController extends GetxController {
           chargingProcessPage.plugIn,
         );
         if (chargingStats?.status != ChargingStatsStatus.open) {
-          apiTimer?.cancel();
+          PlugInLoadingController.globalApiTimer?.cancel();
+          PlugInLoadingController.globalApiTimer = null;
         }
       }
 
@@ -125,6 +147,8 @@ class PlugInLoadingController extends GetxController {
   @override
   void onClose() {
     countdownTimer?.cancel();
+    PlugInLoadingController.globalApiTimer?.cancel();
+    PlugInLoadingController.globalApiTimer = null;
     apiTimer?.cancel();
     super.onClose();
   }

@@ -18,12 +18,12 @@ import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
 
 class ExplorerController extends GetxController {
+  static Timer? globalApiTimer;
   bool isLoading = true;
   List<Station> stations = [];
   List<Bookmark> bookmarks = [];
   Order? chargingOrder;
   String? status;
-  Timer? apiTimer;
   bool isfetching = false;
   List<Station>? filteredList;
   TextEditingController searchController = TextEditingController();
@@ -31,21 +31,39 @@ class ExplorerController extends GetxController {
   BitmapDescriptor? stationMarkerIcon;
   GoogleMapController? mapController;
   int? selectedStationId;
-  // Add UI flag to control modal carousel visibility when a marker is tapped
   bool showCarousel = false;
+  bool shouldStopPolling = false;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
+    _initAsync();
+  }
+
+  Future<void> _initAsync() async {
     await _loadAppMarkerIcon();
+    if (isClosed) return;
+
     await _loadStationMarkerIcon();
+    if (isClosed) return;
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    if (shouldStopPolling) return;
     pollChargingOrder();
   }
 
   @override
   void onClose() {
-    apiTimer?.cancel();
-    apiTimer = null;
+    globalApiTimer?.cancel();
+    globalApiTimer = null;
+    shouldStopPolling = true;
+    if (ExplorerController.globalApiTimer != null) {
+      ExplorerController.globalApiTimer!.cancel();
+      ExplorerController.globalApiTimer = null;
+    }
     super.onClose();
   }
 
@@ -158,25 +176,35 @@ class ExplorerController extends GetxController {
   Future<void> pollChargingOrder({
     Function(String msg)? onErrorCallback,
   }) async {
-    apiTimer?.cancel();
     if (!Global.isLoginValid) {
       return;
     }
-    
-    await fetchChargingOrder();
-    apiTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      if (isClosed) {
-        timer.cancel();
-        return;
-      }
+    // If a global timer is already running, just fetch once and return
+    if (ExplorerController.globalApiTimer != null) {
       await fetchChargingOrder();
-    });
+      return;
+    }
+    ExplorerController.globalApiTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (timer) async {
+        // Obtain the latest controller instance (current page)
+        final c = Get.isRegistered<ExplorerController>()
+            ? Get.find<ExplorerController>()
+            : null;
+        if (c == null || c.isClosed || c.shouldStopPolling) {
+          timer.cancel();
+          ExplorerController.globalApiTimer = null;
+          return;
+        }
+        await c.fetchChargingOrder();
+      },
+    );
+    await fetchChargingOrder();
   }
 
   Future<void> fetchChargingOrder({
     Function(String msg)? onErrorCallback,
   }) async {
-    if (isClosed) return;
     print('fetchChargingOrder in explorer_screen');
     try {
       if (isfetching) {
@@ -202,7 +230,7 @@ class ExplorerController extends GetxController {
         }
       }
     } catch (e) {
-      if(Get.context == null) return;
+      if (Get.context == null) return;
       Snackbar.showError('Error fetching charging order: $e', Get.context!);
     } finally {
       isfetching = false;
