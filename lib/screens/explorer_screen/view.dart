@@ -555,11 +555,11 @@ class _StationItem extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               if (station.category != null)
-                              MyBadge(
-                                label: station.category!,
-                                color: Colors.black87,
-                                dark: true,
-                              ),
+                                MyBadge(
+                                  label: station.category!,
+                                  color: Colors.black87,
+                                  dark: true,
+                                ),
                               const Spacer(),
                               InkWell(
                                 onTap: () async {
@@ -607,15 +607,58 @@ class _StationItem extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
-                          
-                          const SizedBox(height: 4),
-                          const SizedBox(height: 8),
                         ],
                       ),
                     );
                   },
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.schedule, size: 16, color: muted),
+                      const SizedBox(width: 4),
+                      Text(
+                        DateTime.now().weekday == DateTime.monday
+                            ? '09:00 am - 11:59 pm'
+                            : '12:00 am - 11:59 pm',
+                        style: TextStyle(color: muted, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.route, size: 16, color: muted),
+                      const SizedBox(width: 4),
+                      Text('3.9 km', style: TextStyle(color: muted, fontSize: 13)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.ev_station, size: 16, color: muted),
+                      const SizedBox(width: 4),
+                      Text(
+                        station.bays!.length.toString(),
+                        style: TextStyle(color: muted, fontSize: 13),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        station.isActive ? 'Available' : 'Unavailable',
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             Row(
