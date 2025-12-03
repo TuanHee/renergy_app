@@ -49,22 +49,32 @@ class Station {
   factory Station.fromJson(Map<String, dynamic> json) {
     return Station(
       id: json['id'] == null ? null : int.parse(json['id'].toString()),
-      companyId: json['company_id'] == null ? null : int.parse(json['company_id'].toString()),
+      companyId: json['company_id'] == null
+          ? null
+          : int.parse(json['company_id'].toString()),
       name: json['name'],
       type: json['type'],
       category: json['category'],
       shortDescription: json['short_description'],
       description: json['description'],
-      isActive: json['is_active'] == null ? false : bool.parse(json['is_active'].toString()),
+      isActive: json['is_active'] == null
+          ? false
+          : bool.parse(json['is_active'].toString()),
       address1: json['address1'],
       address2: json['address2'],
       state: json['state'],
-      countryId: json['country_id'] == null ? null : int.parse(json['country_id'].toString()),
+      countryId: json['country_id'] == null
+          ? null
+          : int.parse(json['country_id'].toString()),
       latitude: json['latitude'],
       longitude: json['longitude'],
       maxCurrent: json['max_current'],
-      isAllowReserve: json['is_allow_reserve'] == null ? false : bool.parse(json['is_allow_reserve'].toString()),
-      feeSetId: json['fee_set_id'] == null ? null : int.parse(json['fee_set_id'].toString()),
+      isAllowReserve: json['is_allow_reserve'] == null
+          ? false
+          : bool.parse(json['is_allow_reserve'].toString()),
+      feeSetId: json['fee_set_id'] == null
+          ? null
+          : int.parse(json['fee_set_id'].toString()),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       bays: json['bays'] == null ? null : Bay.listFromJson(json['bays']),
@@ -97,13 +107,21 @@ class Station {
   }
 
   static List<Station> listFromJson(dynamic json) {
-    return json == null ? [] : List<Station>.from(json.map((x) => Station.fromJson(x)));
+    return json == null
+        ? []
+        : List<Station>.from(json.map((x) => Station.fromJson(x)));
   }
 
   double distanceTo(Position position) {
     final lat = double.tryParse(latitude ?? '');
     final lon = double.tryParse(longitude ?? '');
     if (lat == null || lon == null) return double.maxFinite;
-    return Geolocator.distanceBetween(position.latitude, position.longitude, lat, lon);
+    return Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          lat,
+          lon,
+        ) /
+        1000;
   }
 }

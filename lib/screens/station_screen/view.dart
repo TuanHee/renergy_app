@@ -4,6 +4,7 @@ import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bay.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
+import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/station_screen/station_screen.dart';
 
 class StationScreenView extends StatefulWidget {
@@ -91,8 +92,8 @@ class _StationScreenViewState extends State<StationScreenView> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _statusItem(Icons.check_circle, 'Open', Colors.green),
-                      _statusItem(Icons.location_on, '3.9 km', Colors.black),
-                      _statusItem(Icons.ev_station, '2', Colors.black),
+                      _statusItem(Icons.location_on, '${controller.station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km', Colors.black),
+                      _statusItem(Icons.ev_station, '${controller.station.bays!.length}', Colors.black),
                       _statusItem(Icons.check, 'Available', Colors.green),
                     ],
                   ),
@@ -555,7 +556,8 @@ class _StationScreenViewState extends State<StationScreenView> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  bay.status?.value.toUpperCase() ?? '',
+                  // bay.status?.value.toUpperCase() ?? '',
+                  bay.status == BayStatus.reserved ? 'OCCUPIED' : bay.status?.value.toUpperCase() ?? '',
                   style: TextStyle(
                     color: bay.status == BayStatus.available
                         ? Colors.green.shade700

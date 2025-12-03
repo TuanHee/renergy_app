@@ -652,7 +652,10 @@ class _StationItem extends StatelessWidget {
                     children: [
                       Icon(Icons.route, size: 16, color: muted),
                       const SizedBox(width: 4),
-                      Text('3.9 km', style: TextStyle(color: muted, fontSize: 13)),
+                      Text(
+                        '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                        style: TextStyle(color: muted, fontSize: 13),
+                      ),
                     ],
                   ),
                   Row(
@@ -663,7 +666,12 @@ class _StationItem extends StatelessWidget {
                         station.bays!.length.toString(),
                         style: TextStyle(color: muted, fontSize: 13),
                       ),
-                      const SizedBox(width: 4),
+                      
+                    ],
+                  ),
+
+                  Row(
+                    children: [
                       Text(
                         station.isActive ? 'Available' : 'Unavailable',
                         style: TextStyle(
@@ -672,6 +680,8 @@ class _StationItem extends StatelessWidget {
                           fontSize: 13,
                         ),
                       ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.check, size: 16, color: Colors.green.shade700),
                     ],
                   ),
                 ],

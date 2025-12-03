@@ -42,9 +42,8 @@ class NotificationController extends GetxController {
         final data = res.data['data'];
         print('data: $data');
 
-        if (data['notifications'] is List) {
+        if (data['notifications'] is List && data['notifications'].isNotEmpty) {
           notifications = AppNotification.listFromJson(data['notifications']);
-          print(notifications.first.toJson());
         }
       } else {
         throw res.data['message'] ??
