@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/common/services/firebase_notification.dart';
 import 'package:renergy_app/common/services/storage_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
@@ -75,7 +76,6 @@ class RegisterController extends GetxController {
         'password': passwordController.text,
         'password_confirmation': confirmPasswordController.text,
       };
-      print('register payload: $payload');
       final res = await Api().post(Endpoints.register, data: payload);
 
       if (res.data['status'] != 200) {
@@ -84,7 +84,7 @@ class RegisterController extends GetxController {
 
       StorageService.to.setString(storageAccessToken, res.data['data']['_token']);
       Global.isLoginValid = true;
-      print(StorageService.to.getString(storageAccessToken));
+      await NotificationService.initializeToken();
       
       Get.offAllNamed(AppRoutes.explorer);
       if (Get.context != null) {

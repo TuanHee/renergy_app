@@ -46,7 +46,7 @@ class NotificationService {
       badge: true,
       sound: true,
     );
-    await _initializeToken();
+    await initializeToken();
     _setupForegroundNotificationListener();
 
     // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
@@ -55,7 +55,7 @@ class NotificationService {
     // }
   }
 
-  static Future<void> _initializeToken() async {
+  static Future<void> initializeToken() async {
     try {
       final token = await _firebaseMessaging.getToken();
       print('FCM token: $token');

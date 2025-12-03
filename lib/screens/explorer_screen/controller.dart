@@ -33,6 +33,7 @@ class ExplorerController extends GetxController {
   int? selectedStationId;
   bool showCarousel = false;
   bool shouldStopPolling = false;
+  int unreadNotificationCount = 0;
 
   @override
   void onInit() {
@@ -41,6 +42,8 @@ class ExplorerController extends GetxController {
   }
 
   Future<void> _initAsync() async {
+    fetchUnreadNotificationCount();
+
     await _loadAppMarkerIcon();
     if (isClosed) return;
 
@@ -84,6 +87,29 @@ class ExplorerController extends GetxController {
       onErrorCallback?.call(e.toString());
     } finally {
       isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> fetchUnreadNotificationCount({
+    Function(String msg)? onErrorCallback,
+  }) async {
+    try {
+      final res = await Api().get(Endpoints.unreadNotificationCount);
+
+      if (res.data['status'] == 200) {
+        final data = res.data['data'];
+
+        if (data['unread_count'] is int) {
+          unreadNotificationCount = data['unread_count'];
+        }
+      } else {
+        throw res.data['message'] ??
+            'Failed to fetch unread notification count';
+      }
+    } catch (e) {
+      onErrorCallback?.call(e.toString());
+    } finally {
       update();
     }
   }

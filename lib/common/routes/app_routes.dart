@@ -29,6 +29,7 @@ class AppRoutes {
   static const String paymentResult = '/payment-result';
   static const String filter = '/filter';
   static const String report = '/report';
+  static const String notification = '/notification';
 
   // Initial route
   static const String initial = splash;
@@ -194,6 +195,13 @@ class AppRoutes {
         page: () => const ReportScreenView(),
         transition: Transition.fadeIn,
         binding: ReportBinding(),
+      ),
+      GetPage(
+        name: notification,
+        page: () => const NotificationScreenView(),
+        transition: Transition.fadeIn,
+        binding: NotificationBinding(),
+        middlewares: authMiddleware,
       ),
       GetPage(
         name: register, 

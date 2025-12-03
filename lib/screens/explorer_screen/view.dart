@@ -66,11 +66,28 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
             ),
             actions: [
               if (Global.isLoginValid)
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.white,
+                Badge(
+                  backgroundColor: Colors.transparent,
+                  alignment: AlignmentDirectional.topEnd,
+                  offset: const Offset(-6, 0),
+                  isLabelVisible: controller.unreadNotificationCount > 0,
+                  label: Text(
+                    controller.unreadNotificationCount > 99
+                        ? '99'
+                        : controller.unreadNotificationCount.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.notification);
+                    },
+                    icon: const Icon(
+                      Icons.notifications_none,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
             ],

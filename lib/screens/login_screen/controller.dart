@@ -6,6 +6,7 @@ import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/common/services/storage_service.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/global.dart';
+import 'package:renergy_app/common/services/firebase_notification.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -63,8 +64,8 @@ class LoginController extends GetxController {
       }
 
       StorageService.to.setString(storageAccessToken, res.data['data']['_token']);
+      await NotificationService.initializeToken();
       Global.isLoginValid = true;
-      print(StorageService.to.getString(storageAccessToken));
       
       Get.offAllNamed(AppRoutes.explorer);
 

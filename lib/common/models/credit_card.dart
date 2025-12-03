@@ -44,7 +44,6 @@ class CreditCard {
 
   String get brandLogo {
     final v = (brand ?? '').toLowerCase();
-    print(v);
 
     if (v.contains('visa')) return 'assets/images/visa_logo.png';
     if (v.contains('master')) return 'assets/images/mastercard_logo.png';

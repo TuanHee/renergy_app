@@ -152,7 +152,6 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final order = controller.orderHistories[index];
-                    print('order: ${order.toJson()}');
 
                     final amount = order.netAmount == null
                         ? '-'
