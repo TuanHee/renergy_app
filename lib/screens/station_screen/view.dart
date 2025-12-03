@@ -6,6 +6,7 @@ import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/station_screen/station_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StationScreenView extends StatefulWidget {
   const StationScreenView({super.key});
@@ -440,7 +441,90 @@ class _StationScreenViewState extends State<StationScreenView> {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        builder: (ctx) {
+                          return SafeArea(
+                            top: false,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Open with',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.map,
+                                      color: Colors.redAccent,
+                                    ),
+                                    title: const Text('Google Maps'),
+                                    onTap: () async {
+                                      Navigator.of(ctx).pop();
+                                      final lat = double.tryParse(
+                                        controller.station.latitude ?? '',
+                                      );
+                                      final lon = double.tryParse(
+                                        controller.station.longitude ?? '',
+                                      );
+                                      if (lat == null || lon == null) return;
+                                      final url = Uri.parse(
+                                        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+                                      );
+                                      await launchUrl(
+                                        url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.navigation,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    title: const Text('Waze'),
+                                    onTap: () async {
+                                      Navigator.of(ctx).pop();
+                                      final lat = double.tryParse(
+                                        controller.station.latitude ?? '',
+                                      );
+                                      final lon = double.tryParse(
+                                        controller.station.longitude ?? '',
+                                      );
+                                      if (lat == null || lon == null) return;
+                                      final url = Uri.parse(
+                                        'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+                                      );
+                                      await launchUrl(
+                                        url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                           icon: const Icon(Icons.navigation),
                           label: const Text('Navigate'),
                           style: OutlinedButton.styleFrom(
