@@ -1,11 +1,13 @@
 class Meter {
   int? usage;
   int? soc;
+  int? power;
   String? timestamp;
 
   Meter({
     this.usage,
     this.soc,
+    this.power,
     this.timestamp,
   });
 
@@ -13,6 +15,7 @@ class Meter {
     return Meter(
       usage: json['usage'] == null ? null : int.parse(json['usage'].toString()),
       soc: json['soc'] == null ? null : int.parse(json['soc'].toString()),
+      power: json['power'] == null ? null : int.parse(json['power'].toString()),
       timestamp: json['timestamp'],
     );
   }
@@ -20,6 +23,7 @@ class Meter {
     return {
       'usage': usage,
       'soc': soc,
+      'power': power,
       'timestamp': timestamp,
     };
   }

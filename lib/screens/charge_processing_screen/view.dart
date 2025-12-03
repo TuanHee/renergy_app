@@ -319,7 +319,7 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
                                 icon: Icons.access_time,
                                 label: 'Output Power (kW)',
                                 value:
-                                    '${controller.chargingStats?.order?.bay?.port?.outputPower ?? controller.chargingStats?.order?.port?.outputPower ?? 'N/A'} kW',
+                                    '${(controller.chargingStats?.meter?.power ?? 0) / 1000} kWh',
                               ),
                             ),
                           ],
