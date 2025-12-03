@@ -139,13 +139,44 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Select Charging Bay Section
-                      const Text(
-                        'Select Charging Bay',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Select Charging Bay',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          // Refresh bays list
+                          controller.isRefreshing
+                              ? SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              : SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    iconSize: 20,
+                                    onPressed: () async {
+                                      await controller.initStation();
+                                      controller.update();
+                                    },
+                                    icon: const Icon(
+                                      Icons.refresh,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                        ],
                       ),
                       const SizedBox(height: 12),
 
@@ -235,14 +266,14 @@ class _StationScreenViewState extends State<StationScreenView> {
                               style: TextStyle(color: Colors.red),
                             ),
                             TextButton(
-                              onPressed: ()async {
+                              onPressed: () async {
                                 await Get.toNamed(AppRoutes.car);
                                 controller.initCar();
                               },
                               child: const Text(
                                 'Add car here',
                                 style: TextStyle(
-                                  color: Colors.red,  
+                                  color: Colors.red,
                                   decoration: TextDecoration.underline,
                                   decorationColor: Colors.red,
                                 ),
@@ -315,7 +346,10 @@ class _StationScreenViewState extends State<StationScreenView> {
                       // Report Station
                       OutlinedButton.icon(
                         onPressed: () {
-                          Get.toNamed(AppRoutes.report, arguments: controller.station);
+                          Get.toNamed(
+                            AppRoutes.report,
+                            arguments: controller.station,
+                          );
                         },
                         icon: const Icon(Icons.flag),
                         label: const Text('Report this station'),
@@ -468,7 +502,9 @@ class _StationScreenViewState extends State<StationScreenView> {
       highlightColor: Colors.transparent,
       hoverColor: Colors.transparent,
       splashColor: Colors.transparent,
-      onTap: () => bay.status == BayStatus.available ? controller.selectBay(bay.id!) : null,
+      onTap: () => bay.status == BayStatus.available
+          ? controller.selectBay(bay.id!)
+          : null,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
