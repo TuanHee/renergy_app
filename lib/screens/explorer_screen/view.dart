@@ -554,8 +554,9 @@ class _StationItem extends StatelessWidget {
                                 color: const Color(0xFF0BB07B),
                               ),
                               const SizedBox(width: 8),
+                              if (station.category != null)
                               MyBadge(
-                                label: 'Showroom',
+                                label: station.category!,
                                 color: Colors.black87,
                                 dark: true,
                               ),
@@ -606,39 +607,7 @@ class _StationItem extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(Icons.route, size: 14, color: muted),
-                              const SizedBox(width: 4),
-                              Text(
-                                '3.9 km',
-                                style: TextStyle(color: muted, fontSize: 12),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(Icons.ev_station, size: 14, color: muted),
-                              const SizedBox(width: 4),
-                              Text(
-                                station.bays!.length.toString(),
-                                style: TextStyle(color: muted, fontSize: 12),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                station.isActive ? 'Available' : 'Unavailable',
-                                style: TextStyle(
-                                  color: Colors.green.shade700,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.bolt,
-                                size: 14,
-                                color: Colors.green,
-                              ),
-                            ],
-                          ),
+                          
                           const SizedBox(height: 4),
                           const SizedBox(height: 8),
                         ],

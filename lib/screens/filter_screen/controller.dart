@@ -101,13 +101,13 @@ class FilterController extends GetxController {
       return hasBayWithinMax && hasBayWithinMin;
     }).toList();
 
-    // returnStations = returnStations
-    //     .where(
-    //       (station) =>
-    //           (selectedTags.isEmpty ||
-    //                   selectedTags.any((tag) => station..contains(tag))),
-    //     )
-    //     .toList();
+    returnStations = returnStations
+        .where(
+          (station) =>
+              (selectedTags.isEmpty ||
+                      selectedTags.any((tag) => station.category?.toLowerCase().contains(tag.toLowerCase()) ?? false)),
+        )
+        .toList();
 
     return returnStations;
   }

@@ -58,7 +58,7 @@ class _CardScreenViewState extends State<CardScreenView> {
     return GetBuilder<CardController>(
       builder: (controller) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey.shade100,
           appBar: AppBar(title: const Text('My Cards'), centerTitle: true),
           body: controller.cards.isEmpty
               ? Center(

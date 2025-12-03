@@ -6,6 +6,7 @@ class Station {
   int? companyId;
   String? name;
   String? type;
+  String? category;
   String? shortDescription;
   String? description;
   bool isActive;
@@ -27,6 +28,7 @@ class Station {
     this.companyId,
     this.name,
     this.type,
+    this.category,
     this.shortDescription,
     this.description,
     this.isActive = false,
@@ -50,6 +52,7 @@ class Station {
       companyId: json['company_id'] == null ? null : int.parse(json['company_id'].toString()),
       name: json['name'],
       type: json['type'],
+      category: json['category'],
       shortDescription: json['short_description'],
       description: json['description'],
       isActive: json['is_active'] == null ? false : bool.parse(json['is_active'].toString()),
@@ -74,6 +77,7 @@ class Station {
       'company_id': companyId,
       'name': name,
       'type': type,
+      'category': category,
       'short_description': shortDescription,
       'description': description,
       'is_active': isActive,
