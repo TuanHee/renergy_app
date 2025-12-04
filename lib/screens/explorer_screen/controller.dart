@@ -60,8 +60,6 @@ class ExplorerController extends GetxController {
 
   @override
   void onClose() {
-    globalApiTimer?.cancel();
-    globalApiTimer = null;
     shouldStopPolling = true;
     if (ExplorerController.globalApiTimer != null) {
       ExplorerController.globalApiTimer!.cancel();
@@ -207,7 +205,6 @@ class ExplorerController extends GetxController {
     }
     // If a global timer is already running, just fetch once and return
     if (ExplorerController.globalApiTimer != null) {
-      await fetchChargingOrder();
       return;
     }
     ExplorerController.globalApiTimer = Timer.periodic(
@@ -352,7 +349,7 @@ class ExplorerController extends GetxController {
     try {
       appMarkerIcon = await BitmapDescriptor.fromAssetImage(
         const ImageConfiguration(),
-        'assets/icons/app_icon.jpg',
+        'assets/images/pin_point.png',
       );
     } catch (_) {
       appMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(
@@ -364,7 +361,10 @@ class ExplorerController extends GetxController {
   Future<void> _loadStationMarkerIcon() async {
     if (stationMarkerIcon != null) return;
     try {
-      stationMarkerIcon = await _createPinIcon('assets/icons/app_icon.jpg');
+      stationMarkerIcon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(),
+        'assets/images/pin_point.png',
+      );
     } catch (_) {
       stationMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(
         BitmapDescriptor.hueRed,

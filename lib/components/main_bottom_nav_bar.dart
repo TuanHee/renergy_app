@@ -29,7 +29,7 @@ class MainBottomNavBar extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           onTap: (index) {
-            if (currentIndex == index || _isNavigating) return;
+            // if (currentIndex == index || _isNavigating) return;
             _isNavigating = true;
             // Navigate to corresponding route
             switch (index) {
@@ -50,9 +50,13 @@ class MainBottomNavBar extends StatelessWidget {
           },
           selectedItemColor: Colors.red,
           unselectedItemColor: Colors.grey,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.explore),
+              icon: Image.asset(
+                'assets/images/pin_point.png',
+                height: 24,
+                fit: BoxFit.contain,
+              ),
               label: 'Explore',
             ),
             BottomNavigationBarItem(
