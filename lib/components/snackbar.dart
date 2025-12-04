@@ -46,7 +46,7 @@ class Snackbar {
               ),
               child: Icon(Icons.close, color: Colors.white),
             ),
-            Expanded(child: Text(message, style: TextStyle(color: Colors.black) ,overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(message, style: TextStyle(color: Colors.black))),
           ],
         ),
       ),
