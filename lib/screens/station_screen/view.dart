@@ -82,17 +82,25 @@ class _StationScreenViewState extends State<StationScreenView> {
                 // Charging station image
                 SizedBox(
                   height: 250,
-                  child: (controller.station.images == null || controller.station.images!.isEmpty)
+                  child:
+                      (controller.station.imageUrls == null ||
+                          controller.station.imageUrls!.isEmpty)
                       ? Image.network(
-                          controller.station.images?.first ?? 'https://picsum.photos/500/300',
+                          controller.station.mainImageUrl ?? '',
                           fit: BoxFit.fill,
                           width: double.infinity,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                width: double.infinity,
+                                height: 250,
+                                color: Colors.grey[300],
+                              ),
                         )
                       : PageView.builder(
-                          itemCount: controller.station.images!.length,
+                          itemCount: controller.station.imageUrls!.length,
                           controller: PageController(viewportFraction: 1.0),
                           itemBuilder: (context, index) {
-                            final img = controller.station.images![index];
+                            final img = controller.station.imageUrls![index];
                             return Image.network(
                               img,
                               fit: BoxFit.fill,
@@ -108,8 +116,16 @@ class _StationScreenViewState extends State<StationScreenView> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _statusItem(Icons.check_circle, 'Open', Colors.green),
-                      _statusItem(Icons.location_on, '${controller.station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km', Colors.black),
-                      _statusItem(Icons.ev_station, '${controller.station.bays!.length}', Colors.black),
+                      _statusItem(
+                        Icons.location_on,
+                        '${controller.station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                        Colors.black,
+                      ),
+                      _statusItem(
+                        Icons.ev_station,
+                        '${controller.station.bays!.length}',
+                        Colors.black,
+                      ),
                       _statusItem(Icons.check, 'Available', Colors.green),
                     ],
                   ),
@@ -457,89 +473,96 @@ class _StationScreenViewState extends State<StationScreenView> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () async {
-                      await showModalBottomSheet(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        builder: (ctx) {
-                          return SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                            await showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Open with',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                              builder: (ctx) {
+                                return SafeArea(
+                                  top: false,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Open with',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ListTile(
+                                          leading: const Icon(
+                                            Icons.map,
+                                            color: Colors.redAccent,
+                                          ),
+                                          title: const Text('Google Maps'),
+                                          onTap: () async {
+                                            Navigator.of(ctx).pop();
+                                            final lat = double.tryParse(
+                                              controller.station.latitude ?? '',
+                                            );
+                                            final lon = double.tryParse(
+                                              controller.station.longitude ??
+                                                  '',
+                                            );
+                                            if (lat == null || lon == null)
+                                              return;
+                                            final url = Uri.parse(
+                                              'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+                                            );
+                                            await launchUrl(
+                                              url,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: const Icon(
+                                            Icons.navigation,
+                                            color: Colors.blueAccent,
+                                          ),
+                                          title: const Text('Waze'),
+                                          onTap: () async {
+                                            Navigator.of(ctx).pop();
+                                            final lat = double.tryParse(
+                                              controller.station.latitude ?? '',
+                                            );
+                                            final lon = double.tryParse(
+                                              controller.station.longitude ??
+                                                  '',
+                                            );
+                                            if (lat == null || lon == null)
+                                              return;
+                                            final url = Uri.parse(
+                                              'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+                                            );
+                                            await launchUrl(
+                                              url,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
-                                  ListTile(
-                                    leading: const Icon(
-                                      Icons.map,
-                                      color: Colors.redAccent,
-                                    ),
-                                    title: const Text('Google Maps'),
-                                    onTap: () async {
-                                      Navigator.of(ctx).pop();
-                                      final lat = double.tryParse(
-                                        controller.station.latitude ?? '',
-                                      );
-                                      final lon = double.tryParse(
-                                        controller.station.longitude ?? '',
-                                      );
-                                      if (lat == null || lon == null) return;
-                                      final url = Uri.parse(
-                                        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
-                                      );
-                                      await launchUrl(
-                                        url,
-                                        mode: LaunchMode.externalApplication,
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(
-                                      Icons.navigation,
-                                      color: Colors.blueAccent,
-                                    ),
-                                    title: const Text('Waze'),
-                                    onTap: () async {
-                                      Navigator.of(ctx).pop();
-                                      final lat = double.tryParse(
-                                        controller.station.latitude ?? '',
-                                      );
-                                      final lon = double.tryParse(
-                                        controller.station.longitude ?? '',
-                                      );
-                                      if (lat == null || lon == null) return;
-                                      final url = Uri.parse(
-                                        'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
-                                      );
-                                      await launchUrl(
-                                        url,
-                                        mode: LaunchMode.externalApplication,
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                                );
+                              },
+                            );
+                          },
                           icon: const Icon(Icons.navigation),
                           label: const Text('Navigate'),
                           style: OutlinedButton.styleFrom(
@@ -656,7 +679,9 @@ class _StationScreenViewState extends State<StationScreenView> {
                 ),
                 child: Text(
                   // bay.status?.value.toUpperCase() ?? '',
-                  bay.status == BayStatus.reserved ? 'OCCUPIED' : bay.status?.value.toUpperCase() ?? '',
+                  bay.status == BayStatus.reserved
+                      ? 'OCCUPIED'
+                      : bay.status?.value.toUpperCase() ?? '',
                   style: TextStyle(
                     color: bay.status == BayStatus.available
                         ? Colors.green.shade700
