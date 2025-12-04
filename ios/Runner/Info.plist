@@ -28,6 +28,8 @@
 	<string>AIzaSyBdc3FvhU0MKS-ZagppELtvPp8L984Lrbg</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to determine your current position.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs background location access to track your location even when closed.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
