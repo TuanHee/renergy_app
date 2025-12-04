@@ -542,7 +542,7 @@ class _StationItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  'https://picsum.photos/500/300',
+                  station.images?.first ?? 'https://picsum.photos/500/300',
                   width: 108,
                   height: 81,
                   fit: BoxFit.cover,

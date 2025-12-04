@@ -12,7 +12,6 @@ import 'package:renergy_app/common/services/api_service.dart';
 class StationController extends GetxController {
   bool isLoading = true;
   bool isRefreshing = false;
-  String? stationImageUrl;
   late Station station;
   int? selectedBay;
   int? selectedCar;
@@ -25,8 +24,6 @@ class StationController extends GetxController {
     super.onInit();
 
     stationId = Get.arguments;
-  
-    stationImageUrl = 'https://picsum.photos/500/300';
     isLoading = true;
   await Future.wait([
       initStation(),

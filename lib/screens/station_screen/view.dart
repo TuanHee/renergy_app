@@ -80,11 +80,26 @@ class _StationScreenViewState extends State<StationScreenView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Charging station image
-                Image.network(
-                  controller.stationImageUrl!,
-                  fit: BoxFit.fill,
+                SizedBox(
                   height: 250,
-                  width: double.infinity,
+                  child: (controller.station.images == null || controller.station.images!.isEmpty)
+                      ? Image.network(
+                          controller.station.images?.first ?? 'https://picsum.photos/500/300',
+                          fit: BoxFit.fill,
+                          width: double.infinity,
+                        )
+                      : PageView.builder(
+                          itemCount: controller.station.images!.length,
+                          controller: PageController(viewportFraction: 1.0),
+                          itemBuilder: (context, index) {
+                            final img = controller.station.images![index];
+                            return Image.network(
+                              img,
+                              fit: BoxFit.fill,
+                              width: double.infinity,
+                            );
+                          },
+                        ),
                 ),
                 // Status bar overlay at bottom of image
                 Container(
