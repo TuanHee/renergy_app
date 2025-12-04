@@ -81,7 +81,7 @@ class ChargeProcessingController extends GetxController {
       if (Get.context == null) {
         return;
       }
-      Snackbar.showError(e.toString(), Get.context!);
+      // Snackbar.showError(e.toString(), Get.context!);
     }
   }
 

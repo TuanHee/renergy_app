@@ -225,7 +225,7 @@ class ExplorerController extends GetxController {
         await c.fetchChargingOrder();
       },
     );
-    await fetchChargingOrder();
+    fetchChargingOrder();
   }
 
   Future<void> fetchChargingOrder({
@@ -257,7 +257,7 @@ class ExplorerController extends GetxController {
       }
     } catch (e) {
       if (Get.context == null) return;
-      Snackbar.showError('Error fetching charging order: $e', Get.context!);
+      // Snackbar.showError('Error fetching charging order: $e', Get.context!);
     } finally {
       isfetching = false;
     }

@@ -134,7 +134,7 @@ class RechargeController extends GetxController {
       if (Get.context == null) {
         return;
       }
-      Snackbar.showError(e.toString(), Get.context!);
+      // Snackbar.showError(e.toString(), Get.context!);
     } finally {
       isfetching = false;
     }
