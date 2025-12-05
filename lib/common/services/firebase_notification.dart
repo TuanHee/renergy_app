@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 
 import '../constants/endpoints.dart';
 import 'api_service.dart';
@@ -9,7 +9,7 @@ import 'api_service.dart';
 class NotificationService {
   static late FirebaseMessaging _firebaseMessaging;
   static final FlutterLocalNotificationsPlugin
-      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   // request notification permission
   static Future<void> init() async {
@@ -26,17 +26,17 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-      // onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+          // onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+        );
 
     const InitializationSettings initializationSettings =
         InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -81,9 +81,9 @@ class NotificationService {
       messageHandlerWhenBackground(message);
     });
 
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? message) {
+    FirebaseMessaging.instance.getInitialMessage().then((
+      RemoteMessage? message,
+    ) {
       if (message != null) {
         messageHandlerWhenBackground(message);
       }
@@ -91,20 +91,26 @@ class NotificationService {
   }
 
   static Future<void> messageHandlerWhenBackground(
-      RemoteMessage message) async {
+    RemoteMessage message,
+  ) async {
     // if (authManager.authenticationToken == null) {
     //   return;
     // }
 
-    // if (message.data['page'] != null) {
-    //   appNavigatorKey.currentState?.context.goNamed('DashboardPage', extra: {
-    //     'page': message.data['page'],
-    //   });
-    // }
+    if (message.data['goto'] != null) {
+      final String? route = message.data['goto'] as String?;
+      if (route != null && AppRoutes.getPages().any((p) => p.name == route)) {
+        Get.toNamed(route);
+      } else {
+        // Unknown route; ignore or log
+        print('Unknown goto route from notification: $route');
+      }
+    }
   }
 
   static Future<void> messageHandlerWhenForeground(
-      RemoteMessage message) async {
+    RemoteMessage message,
+  ) async {
     // if (authManager.authenticationToken == null) {
     //   return;
     // }
@@ -117,11 +123,11 @@ class NotificationService {
   static Future<void> _showLocalNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'important_channel', // Replace with your own channel id
-      'Important Notification', // Replace with your own channel name
-      importance: Importance.max,
-      priority: Priority.high,
-    );
+          'important_channel', // Replace with your own channel id
+          'Important Notification', // Replace with your own channel name
+          importance: Importance.max,
+          priority: Priority.high,
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,

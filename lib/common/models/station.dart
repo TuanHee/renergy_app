@@ -9,6 +9,8 @@ class Station {
   String? category;
   String? shortDescription;
   String? description;
+  String? mainImageUrl;
+  List<String>? imageUrls;
   bool isActive;
   String? address1;
   String? address2;
@@ -31,6 +33,8 @@ class Station {
     this.category,
     this.shortDescription,
     this.description,
+    this.mainImageUrl,
+    this.imageUrls,
     this.isActive = false,
     this.address1,
     this.address2,
@@ -57,6 +61,10 @@ class Station {
       category: json['category'],
       shortDescription: json['short_description'],
       description: json['description'],
+      mainImageUrl: json['main_image_url'],
+      imageUrls: json['image_urls'] == null
+          ? null
+          : List<String>.from(json['image_urls'].map((x) => x.toString())), 
       isActive: json['is_active'] == null
           ? false
           : bool.parse(json['is_active'].toString()),
@@ -90,6 +98,8 @@ class Station {
       'category': category,
       'short_description': shortDescription,
       'description': description,
+      'main_image_url': mainImageUrl,
+      'image_urls': imageUrls,
       'is_active': isActive,
       'address1': address1,
       'address2': address2,

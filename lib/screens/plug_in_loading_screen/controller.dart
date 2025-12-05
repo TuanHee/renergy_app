@@ -126,7 +126,7 @@ class PlugInLoadingController extends GetxController {
       update();
     } catch (e) {
       if(Get.context == null) return;
-      Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
+      // Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
     } finally {
       isfetching = false;
     }

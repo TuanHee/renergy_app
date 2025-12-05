@@ -55,14 +55,11 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text(
-              'RECHARGE',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
-              ),
+            title: Image.asset(
+              'assets/icons/full_logo.png',
+              height: 36,
+              width: 120,
+              fit: BoxFit.fitWidth,
             ),
             actions: [
               if (Global.isLoginValid)
@@ -545,10 +542,20 @@ class _StationItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  'https://picsum.photos/500/300',
+                  station.mainImageUrl ??'',
                   width: 108,
                   height: 81,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => 
+                  Container(
+                    width: 108,
+                    height: 90,
+                    color: Colors.grey.shade200,
+                    child: Image.asset(
+                      'assets/images/image_placeholder.png',
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
                 ),
 
                 const SizedBox(width: 8),
@@ -886,72 +893,6 @@ class _StationCarouselBottomSheetState
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  Future<void> _showNavigationOptions(Station station) async {
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Open with',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: const Icon(Icons.map, color: Colors.redAccent),
-                  title: const Text('Google Maps'),
-                  onTap: () async {
-                    Navigator.of(ctx).pop();
-                    await _openGoogleMaps(station);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.navigation,
-                    color: Colors.blueAccent,
-                  ),
-                  title: const Text('Waze'),
-                  onTap: () async {
-                    Navigator.of(ctx).pop();
-                    await _openWaze(station);
-                  },
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _openGoogleMaps(Station station) async {
-    final lat = double.tryParse(station.latitude ?? '');
-    final lon = double.tryParse(station.longitude ?? '');
-    if (lat == null || lon == null) return;
-    final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
-    );
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  }
-
-  Future<void> _openWaze(Station station) async {
-    final lat = double.tryParse(station.latitude ?? '');
-    final lon = double.tryParse(station.longitude ?? '');
-    if (lat == null || lon == null) return;
-    final url = Uri.parse('https://waze.com/ul?ll=$lat,$lon&navigate=yes');
-    await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
   @override

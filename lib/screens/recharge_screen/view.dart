@@ -45,14 +45,6 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
   }
 
   @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.find<RechargeController>().pollChargingStatus();
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
