@@ -29,12 +29,13 @@ class BookmarkItem extends StatelessWidget {
                   Row(
                     children: [
                       MyBadge(
-                        label: (bookmark?.station?.state ?? 'Public'),
+                        label: bookmark?.station?.type ?? 'Public',
                         color: const Color(0xFF0BB07B),
                       ),
                       const SizedBox(width: 8),
+                      if(bookmark?.station?.category != null)
                       MyBadge(
-                        label: 'Showroom',
+                        label: bookmark!.station!.category!,
                         color: Colors.black87,
                         dark: true,
                       ),

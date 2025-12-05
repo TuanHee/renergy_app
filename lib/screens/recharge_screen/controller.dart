@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/models/charging_stats.dart';
@@ -10,7 +11,7 @@ import 'package:renergy_app/global.dart';
 
 import '../plug_in_loading_screen/controller.dart';
 
-class RechargeController extends GetxController {
+class RechargeController extends GetxController with WidgetsBindingObserver {
   bool isLoading = true;
 
   Timer? apiTimer;
@@ -26,6 +27,7 @@ class RechargeController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     final args = Get.arguments;
     if (args is Order) {
       order = args;
@@ -46,6 +48,18 @@ class RechargeController extends GetxController {
   void onReady() {
     super.onReady();
     pollChargingStatus();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      pollChargingStatus();
+    } else {
+      if (RechargeController.globalApiTimer != null) {
+        RechargeController.globalApiTimer!.cancel();
+        RechargeController.globalApiTimer = null;
+      }
+    }
   }
 
   String secondToMinute(int second) {
@@ -102,6 +116,7 @@ class RechargeController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     countdownTimer?.cancel();
     RechargeController.globalApiTimer?.cancel();
     RechargeController.globalApiTimer = null;
@@ -117,10 +132,10 @@ class RechargeController extends GetxController {
       }
       isfetching = true;
       final res = await Api().get(Endpoints.chargingStats(order!.id!));
-  
+
       if (res.data['status'] >= 200 && res.data['status'] < 300) {
         final data = res.data['data'];
-  
+
         if (data['charging_stats']['status'] is String) {
           chargingStats = ChargingStats.fromJson(data['charging_stats']);
           if (countdownTimer == null) {
@@ -134,11 +149,12 @@ class RechargeController extends GetxController {
       if (Get.context == null) {
         return;
       }
-      // Snackbar.showError(e.toString(), Get.context!);
+      Snackbar.showError(e.toString(), Get.context!);
     } finally {
       isfetching = false;
     }
   }
+
   Future<void> recharge() async {
     if (order?.id == null) {
       return;

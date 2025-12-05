@@ -17,7 +17,7 @@ import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
 
-class ExplorerController extends GetxController {
+class ExplorerController extends GetxController with WidgetsBindingObserver {
   static Timer? globalApiTimer;
   bool isLoading = true;
   List<Station> stations = [];
@@ -27,7 +27,6 @@ class ExplorerController extends GetxController {
   bool isfetching = false;
   List<Station>? filteredList;
   TextEditingController searchController = TextEditingController();
-  BitmapDescriptor? appMarkerIcon;
   BitmapDescriptor? stationMarkerIcon;
   GoogleMapController? mapController;
   int? selectedStationId;
@@ -38,14 +37,12 @@ class ExplorerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     _initAsync();
   }
 
   Future<void> _initAsync() async {
     fetchUnreadNotificationCount();
-
-    await _loadAppMarkerIcon();
-    if (isClosed) return;
 
     await _loadStationMarkerIcon();
     if (isClosed) return;
@@ -60,12 +57,25 @@ class ExplorerController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     shouldStopPolling = true;
     if (ExplorerController.globalApiTimer != null) {
       ExplorerController.globalApiTimer!.cancel();
       ExplorerController.globalApiTimer = null;
     }
     super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      pollChargingOrder();
+    } else {
+      if (ExplorerController.globalApiTimer != null) {
+        ExplorerController.globalApiTimer!.cancel();
+        ExplorerController.globalApiTimer = null;
+      }
+    }
   }
 
   Future<void> fetchStations({Function(String msg)? onErrorCallback}) async {
@@ -254,7 +264,7 @@ class ExplorerController extends GetxController {
       }
     } catch (e) {
       if (Get.context == null) return;
-      // Snackbar.showError('Error fetching charging order: $e', Get.context!);
+      Snackbar.showError('Error fetching charging order: $e', Get.context!);
     } finally {
       isfetching = false;
     }
@@ -344,25 +354,11 @@ class ExplorerController extends GetxController {
     await mapController?.animateCamera(CameraUpdate.newCameraPosition(target));
   }
 
-  Future<void> _loadAppMarkerIcon() async {
-    if (appMarkerIcon != null) return;
-    try {
-      appMarkerIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(),
-        'assets/images/pin_point.png',
-      );
-    } catch (_) {
-      appMarkerIcon = BitmapDescriptor.defaultMarkerWithHue(
-        BitmapDescriptor.hueRed,
-      );
-    }
-  }
-
   Future<void> _loadStationMarkerIcon() async {
     if (stationMarkerIcon != null) return;
     try {
       stationMarkerIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(),
+        const ImageConfiguration(size: Size(100, 100)),
         'assets/images/pin_point.png',
       );
     } catch (_) {
@@ -370,54 +366,6 @@ class ExplorerController extends GetxController {
         BitmapDescriptor.hueRed,
       );
     }
-  }
-
-  Future<BitmapDescriptor> _createPinIcon(String assetPath) async {
-    const width = 120;
-    const height = 140;
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(
-      recorder,
-      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
-    );
-    final pinPaint = Paint()
-      ..color = Colors.red.shade700
-      ..isAntiAlias = true;
-    final tipPaint = Paint()
-      ..color = Colors.red.shade800
-      ..isAntiAlias = true;
-    final center = Offset(width / 2, 60);
-    canvas.drawCircle(center, 40, pinPaint);
-    final path = Path()
-      ..moveTo(width / 2, height.toDouble())
-      ..lineTo((width / 2) - 20, 90)
-      ..lineTo((width / 2) + 20, 90)
-      ..close();
-    canvas.drawPath(path, tipPaint);
-    final innerPaint = Paint()
-      ..color = Colors.white
-      ..isAntiAlias = true;
-    canvas.drawCircle(center, 26, innerPaint);
-    final data = await rootBundle.load(assetPath);
-    final codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: 44,
-      targetHeight: 44,
-    );
-    final frame = await codec.getNextFrame();
-    final img = frame.image;
-    final src = Rect.fromLTWH(
-      0,
-      0,
-      img.width.toDouble(),
-      img.height.toDouble(),
-    );
-    final dst = Rect.fromCenter(center: center, width: 44, height: 44);
-    canvas.drawImageRect(img, src, dst, Paint());
-    final picture = recorder.endRecording();
-    final image = await picture.toImage(width, height);
-    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
   void setSelectedStation(Station station) {

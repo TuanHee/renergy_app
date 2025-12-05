@@ -72,10 +72,7 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                     controller.unreadNotificationCount > 99
                         ? '99'
                         : controller.unreadNotificationCount.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                   child: IconButton(
                     onPressed: () {
@@ -542,12 +539,11 @@ class _StationItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  station.mainImageUrl ??'',
+                  station.mainImageUrl ?? '',
                   width: 108,
                   height: 81,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => 
-                  Container(
+                  errorBuilder: (context, error, stackTrace) => Container(
                     width: 108,
                     height: 90,
                     color: Colors.grey.shade200,
@@ -639,171 +635,190 @@ class _StationItem extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.fromLTRB(24.0, 12.0, 12.0, 0),
+              child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.schedule, size: 16, color: muted),
-                      const SizedBox(width: 4),
-                      Text(
-                        DateTime.now().weekday == DateTime.monday
-                            ? '09:00 am - 11:59 pm'
-                            : '12:00 am - 11:59 pm',
-                        style: TextStyle(color: muted, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.route, size: 16, color: muted),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
-                        style: TextStyle(color: muted, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.ev_station, size: 16, color: muted),
-                      const SizedBox(width: 4),
-                      Text(
-                        station.bays!.length.toString(),
-                        style: TextStyle(color: muted, fontSize: 13),
-                      ),
-                      
-                    ],
-                  ),
-
-                  Row(
-                    children: [
-                      Text(
-                        station.isActive ? 'Available' : 'Unavailable',
-                        style: TextStyle(
-                          color: Colors.green.shade700,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      spacing: 30,
+                      runSpacing: 4,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.route, size: 15, color: muted),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                              style: TextStyle(color: muted, fontSize: 12),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.check, size: 16, color: Colors.green.shade700),
-                    ],
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.ev_station, size: 15, color: muted),
+                            const SizedBox(width: 4),
+                            Text(
+                              station.bays!.length.toString(),
+                              style: TextStyle(color: muted, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              station.isActive ? 'Available' : 'Unavailable',
+                              style: TextStyle(
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.check,
+                              size: 15,
+                              color: Colors.green.shade700,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, size: 15, color: muted),
+                            const SizedBox(width: 4),
+                            Text('Open', style: TextStyle(color: Colors.green.shade700, fontSize: 12),),
+                            const SizedBox(width: 6),
+                            Container(width: 1,height: 15, color: Colors.grey),
+                            const SizedBox(width: 6),
+                            Text(
+                              DateTime.now().weekday == DateTime.monday
+                                  ? '09:00 am - 11:59 pm'
+                                  : '12:00 am - 11:59 pm',
+                              style: TextStyle(color: muted, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      await showModalBottomSheet(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        builder: (ctx) {
-                          return SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Open with',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ListTile(
-                                    leading: const Icon(
-                                      Icons.map,
-                                      color: Colors.redAccent,
-                                    ),
-                                    title: const Text('Google Maps'),
-                                    onTap: () async {
-                                      Navigator.of(ctx).pop();
-                                      final lat = double.tryParse(
-                                        station.latitude ?? '',
-                                      );
-                                      final lon = double.tryParse(
-                                        station.longitude ?? '',
-                                      );
-                                      if (lat == null || lon == null) return;
-                                      final url = Uri.parse(
-                                        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
-                                      );
-                                      await launchUrl(
-                                        url,
-                                        mode: LaunchMode.externalApplication,
-                                      );
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const Icon(
-                                      Icons.navigation,
-                                      color: Colors.blueAccent,
-                                    ),
-                                    title: const Text('Waze'),
-                                    onTap: () async {
-                                      Navigator.of(ctx).pop();
-                                      final lat = double.tryParse(
-                                        station.latitude ?? '',
-                                      );
-                                      final lon = double.tryParse(
-                                        station.longitude ?? '',
-                                      );
-                                      if (lat == null || lon == null) return;
-                                      final url = Uri.parse(
-                                        'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
-                                      );
-                                      await launchUrl(
-                                        url,
-                                        mode: LaunchMode.externalApplication,
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: const Text('Navigate'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.toNamed(
-                        AppRoutes.chargingStation,
-                        arguments: station.id,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade700,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Charge'),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: OutlinedButton(
+            //         onPressed: () async {
+            //           await showModalBottomSheet(
+            //             context: context,
+            //             shape: const RoundedRectangleBorder(
+            //               borderRadius: BorderRadius.vertical(
+            //                 top: Radius.circular(16),
+            //               ),
+            //             ),
+            //             builder: (ctx) {
+            //               return SafeArea(
+            //                 top: false,
+            //                 child: Padding(
+            //                   padding: const EdgeInsets.symmetric(
+            //                     horizontal: 16,
+            //                     vertical: 12,
+            //                   ),
+            //                   child: Column(
+            //                     mainAxisSize: MainAxisSize.min,
+            //                     crossAxisAlignment: CrossAxisAlignment.start,
+            //                     children: [
+            //                       const Text(
+            //                         'Open with',
+            //                         style: TextStyle(
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w600,
+            //                         ),
+            //                       ),
+            //                       const SizedBox(height: 8),
+            //                       ListTile(
+            //                         leading: const Icon(
+            //                           Icons.map,
+            //                           color: Colors.redAccent,
+            //                         ),
+            //                         title: const Text('Google Maps'),
+            //                         onTap: () async {
+            //                           Navigator.of(ctx).pop();
+            //                           final lat = double.tryParse(
+            //                             station.latitude ?? '',
+            //                           );
+            //                           final lon = double.tryParse(
+            //                             station.longitude ?? '',
+            //                           );
+            //                           if (lat == null || lon == null) return;
+            //                           final url = Uri.parse(
+            //                             'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+            //                           );
+            //                           await launchUrl(
+            //                             url,
+            //                             mode: LaunchMode.externalApplication,
+            //                           );
+            //                         },
+            //                       ),
+            //                       ListTile(
+            //                         leading: const Icon(
+            //                           Icons.navigation,
+            //                           color: Colors.blueAccent,
+            //                         ),
+            //                         title: const Text('Waze'),
+            //                         onTap: () async {
+            //                           Navigator.of(ctx).pop();
+            //                           final lat = double.tryParse(
+            //                             station.latitude ?? '',
+            //                           );
+            //                           final lon = double.tryParse(
+            //                             station.longitude ?? '',
+            //                           );
+            //                           if (lat == null || lon == null) return;
+            //                           final url = Uri.parse(
+            //                             'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+            //                           );
+            //                           await launchUrl(
+            //                             url,
+            //                             mode: LaunchMode.externalApplication,
+            //                           );
+            //                         },
+            //                       ),
+            //                       const SizedBox(height: 8),
+            //                     ],
+            //                   ),
+            //                 ),
+            //               );
+            //             },
+            //           );
+            //         },
+            //         child: const Text('Navigate'),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         onPressed: () {
+            //           Get.toNamed(
+            //             AppRoutes.chargingStation,
+            //             arguments: station.id,
+            //           );
+            //         },
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.red.shade700,
+            //           foregroundColor: Colors.white,
+            //         ),
+            //         child: const Text('Charge'),
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

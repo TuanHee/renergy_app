@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
@@ -8,7 +9,7 @@ import 'package:renergy_app/common/services/api_service.dart';
 import 'package:renergy_app/components/snackbar.dart';
 import 'package:renergy_app/global.dart';
 
-class ChargeProcessingController extends GetxController {
+class ChargeProcessingController extends GetxController  with WidgetsBindingObserver {
   static Timer? globalApiTimer;
   bool isLoading = true;
   String status = ChargingStatsStatus.charging.name;
@@ -19,6 +20,7 @@ class ChargeProcessingController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     order = Get.arguments as Order?;
     update();
   }
@@ -27,6 +29,18 @@ class ChargeProcessingController extends GetxController {
   void onReady() {
     super.onReady();
     pollChargingStatus();
+  }
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      pollChargingStatus();
+    } else {
+      if (ChargeProcessingController.globalApiTimer != null) {
+        ChargeProcessingController.globalApiTimer!.cancel();
+        ChargeProcessingController.globalApiTimer = null;
+      }
+    }
   }
 
   void pollChargingStatus() async {
@@ -81,7 +95,7 @@ class ChargeProcessingController extends GetxController {
       if (Get.context == null) {
         return;
       }
-      // Snackbar.showError(e.toString(), Get.context!);
+      Snackbar.showError(e.toString(), Get.context!);
     }
   }
 
@@ -98,6 +112,7 @@ class ChargeProcessingController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     ChargeProcessingController.globalApiTimer?.cancel();
       ChargeProcessingController.globalApiTimer = null;
     super.onClose();

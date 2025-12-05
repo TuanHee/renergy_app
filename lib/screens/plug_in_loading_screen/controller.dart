@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/constants/enums.dart';
@@ -10,7 +11,7 @@ import 'package:renergy_app/global.dart';
 
 const int waitingTime = 15 * 60;
 
-class PlugInLoadingController extends GetxController {
+class PlugInLoadingController extends GetxController with WidgetsBindingObserver {
   Order? order;
   ChargingStats? chargingStats;
 
@@ -23,6 +24,7 @@ class PlugInLoadingController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     order = Get.arguments as Order?;
     update();
   }
@@ -31,6 +33,18 @@ class PlugInLoadingController extends GetxController {
   void onReady() {
     super.onReady();
     pollChargingStatus();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      pollChargingStatus();
+    } else {
+      if (PlugInLoadingController.globalApiTimer != null) {
+        PlugInLoadingController.globalApiTimer!.cancel();
+        PlugInLoadingController.globalApiTimer = null;
+      }
+    }
   }
 
   Future<void> pollChargingStatus() async {
@@ -126,7 +140,7 @@ class PlugInLoadingController extends GetxController {
       update();
     } catch (e) {
       if(Get.context == null) return;
-      // Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
+      Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
     } finally {
       isfetching = false;
     }
@@ -146,6 +160,7 @@ class PlugInLoadingController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     countdownTimer?.cancel();
     PlugInLoadingController.globalApiTimer?.cancel();
     PlugInLoadingController.globalApiTimer = null;
