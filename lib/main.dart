@@ -14,18 +14,13 @@ import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platf
 import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 
 void main() async {
-  await Global.init();
   WidgetsFlutterBinding.ensureInitialized();
-  final mapsImpl = GoogleMapsFlutterPlatform.instance;
-  if (mapsImpl is GoogleMapsFlutterAndroid) {
-    mapsImpl.useAndroidViewSurface = false;
-  }
+
+  await Global.init();
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp();
     }
-    await Future.delayed(Duration(milliseconds: 1000));
-
     await NotificationService.init();
   } catch (e, st) {
     print('Firebase initializeApp error: $e\n$st');

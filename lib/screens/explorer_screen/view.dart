@@ -644,66 +644,94 @@ class _StationItem extends StatelessWidget {
                     width: double.infinity,
                     child: Wrap(
                       direction: Axis.horizontal,
-                      spacing: 30,
-                      runSpacing: 4,
+                      spacing: 12,
+                      runSpacing: 8,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.route, size: 15, color: muted),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
-                              style: TextStyle(color: muted, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.ev_station, size: 15, color: muted),
-                            const SizedBox(width: 4),
-                            Text(
-                              station.bays!.length.toString(),
-                              style: TextStyle(color: muted, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              station.isActive ? 'Available' : 'Unavailable',
-                              style: TextStyle(
-                                color: Colors.green.shade700,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
+                        // Distance
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.route, size: 14, color: muted),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.check,
-                              size: 15,
-                              color: Colors.green.shade700,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.schedule, size: 15, color: muted),
-                            const SizedBox(width: 4),
-                            Text('Open', style: TextStyle(color: Colors.green.shade700, fontSize: 12),),
-                            const SizedBox(width: 6),
-                            Container(width: 1,height: 15, color: Colors.grey),
-                            const SizedBox(width: 6),
-                            Text(
-                              DateTime.now().weekday == DateTime.monday
-                                  ? '09:00 am - 11:59 pm'
-                                  : '12:00 am - 11:59 pm',
-                              style: TextStyle(color: muted, fontSize: 13),
-                            ),
-                          ],
+                        // Bays count
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.ev_station, size: 14, color: muted),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${station.bays?.length ?? 0} bays',
+                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Availability
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                station.isActive ? Icons.check_circle : Icons.cancel,
+                                size: 14,
+                                color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                station.isActive ? 'Available' : 'Unavailable',
+                                style: TextStyle(
+                                  color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Schedule (simplified)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.schedule, size: 14, color: muted),
+                              const SizedBox(width: 6),
+                              Text(
+                                DateTime.now().weekday == DateTime.monday
+                                    ? 'Open • 09:00–23:59'
+                                    : 'Open • 00:00–23:59',
+                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
