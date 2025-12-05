@@ -55,12 +55,14 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
+            centerTitle: false,
             title: Image.asset(
               'assets/icons/full_logo.png',
               height: 36,
               width: 120,
               fit: BoxFit.fitWidth,
             ),
+
             actions: [
               if (Global.isLoginValid)
                 Badge(

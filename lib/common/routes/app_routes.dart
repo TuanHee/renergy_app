@@ -30,6 +30,7 @@ class AppRoutes {
   static const String filter = '/filter';
   static const String report = '/report';
   static const String notification = '/notification';
+  static const String priceList = '/price-list';
 
   // Initial route
   static const String initial = splash;
@@ -208,6 +209,12 @@ class AppRoutes {
         page: () => const RegisterScreenView(),
         transition: Transition.fadeIn,
         binding: RegisterBinding()
+      ),
+      GetPage(
+        name: priceList,
+        page: () => const PriceListScreenView(),
+        transition: Transition.fadeIn,
+        binding: PriceListBinding(),
       ),
     ];
   }

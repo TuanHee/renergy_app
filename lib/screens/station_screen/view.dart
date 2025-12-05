@@ -332,7 +332,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(height: 12),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () => Get.toNamed(AppRoutes.priceList),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           side: const BorderSide(color: Colors.red),
