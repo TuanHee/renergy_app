@@ -197,10 +197,6 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         : status == 'Pending' || status == 'Open'
                         ? Colors.orange.shade600
                         : Colors.grey.shade600;
-                    final title =
-                        order.invoiceNo ??
-                        order.id?.toString().padLeft(4, '0') ??
-                        '-';
                     final carPlate = order.customer?.vehiclePlate ?? '-';
                     return Card(
                       color: Colors.white,
@@ -235,23 +231,26 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                             children: [
                               Row(
                                 children: [
-                                  if (order.invoiceNo == null)
-                                    Text(
-                                      'Transaction Id: ',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
                                   Expanded(
-                                    child: Text(
-                                      title,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.black,
-                                      ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          order.invoiceNo ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Ref Id: ${order.id?.toString().padLeft(4, '0') ?? ''}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   // Text(
