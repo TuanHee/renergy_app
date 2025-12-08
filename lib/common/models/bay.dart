@@ -60,4 +60,6 @@ class Bay {
   static List<Bay> listFromJson(dynamic json) {
     return json == null ? [] : List<Bay>.from(json.map((x) => Bay.fromJson(x)));
   }
+
+  bool get isAvailable => status == BayStatus.available;
 }

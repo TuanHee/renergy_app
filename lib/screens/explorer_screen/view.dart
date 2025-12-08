@@ -696,15 +696,15 @@ class _StationItem extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                station.isActive ? Icons.check_circle : Icons.cancel,
+                                station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Icons.check_circle : Icons.cancel,
                                 size: 14,
-                                color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                                color: station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Colors.green.shade700 : Colors.red.shade700,
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                station.isActive ? 'Available' : 'Unavailable',
+                                station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true ? 'Available' : 'Unavailable',
                                 style: TextStyle(
-                                  color: station.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                                  color: station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Colors.green.shade700 : Colors.red.shade700,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -728,7 +728,13 @@ class _StationItem extends StatelessWidget {
                                 DateTime.now().weekday == DateTime.monday
                                     ? 'Open • 09:00–23:59'
                                     : 'Open • 00:00–23:59',
-                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                                style: TextStyle(
+                                  color: (DateTime.now().weekday == DateTime.monday && DateTime.now().hour < 9)
+                                      ? Colors.red.shade700
+                                      : Colors.green.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
