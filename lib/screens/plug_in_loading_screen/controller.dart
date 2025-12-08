@@ -20,6 +20,7 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
   Timer? apiTimer;
   bool isfetching = false;
   static Timer? globalApiTimer;
+  int consecutiveErrorCount = 0;
 
   @override
   void onInit() async {
@@ -124,6 +125,8 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
             pollWaitingTime();
           }
         }
+        // Reset error counter on success
+        consecutiveErrorCount = 0;
       }
 
       if (chargingStats?.status != null) {
@@ -139,6 +142,15 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
 
       update();
     } catch (e) {
+      // Increment error count and stop timer after 5 consecutive errors
+      consecutiveErrorCount++;
+      if (consecutiveErrorCount >= 5) {
+        if (PlugInLoadingController.globalApiTimer != null) {
+          PlugInLoadingController.globalApiTimer!.cancel();
+          PlugInLoadingController.globalApiTimer = null;
+          print('Stopped Plug-In polling after 5 consecutive errors');
+        }
+      }
       if(Get.context == null) return;
       Snackbar.showError('Failed to fetch charging status: $e', Get.context!);
     } finally {

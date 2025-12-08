@@ -21,6 +21,7 @@ class RechargeController extends GetxController with WidgetsBindingObserver {
   bool canRecharge = true;
   bool isfetching = false;
   static Timer? globalApiTimer;
+  int consecutiveErrorCount = 0;
 
   Order? order;
 
@@ -142,10 +143,21 @@ class RechargeController extends GetxController with WidgetsBindingObserver {
             pollWaitingTime();
           }
         }
+        // Reset error counter on success
+        consecutiveErrorCount = 0;
       }
       ChargingStatsStatus.page(chargingStats!, chargingProcessPage.recharge);
       update();
     } catch (e) {
+      // Increment error count and stop timer after 5 consecutive errors
+      consecutiveErrorCount++;
+      if (consecutiveErrorCount >= 5) {
+        if (RechargeController.globalApiTimer != null) {
+          RechargeController.globalApiTimer!.cancel();
+          RechargeController.globalApiTimer = null;
+          print('Stopped Recharge polling after 5 consecutive errors');
+        }
+      }
       if (Get.context == null) {
         return;
       }

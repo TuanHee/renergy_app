@@ -33,6 +33,7 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
   bool showCarousel = false;
   bool shouldStopPolling = false;
   int unreadNotificationCount = 0;
+  int consecutiveErrorCount = 0;
 
   @override
   void onInit() {
@@ -261,8 +262,19 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
 
           update();
         }
+        // Reset error counter on success
+        consecutiveErrorCount = 0;
       }
     } catch (e) {
+      // Increment error count and stop timer after 5 consecutive errors
+      consecutiveErrorCount++;
+      if (consecutiveErrorCount >= 5) {
+        if (ExplorerController.globalApiTimer != null) {
+          ExplorerController.globalApiTimer!.cancel();
+          ExplorerController.globalApiTimer = null;
+          print('Stopped polling charging order after 5 consecutive errors');
+        }
+      }
       if (Get.context == null) return;
       Snackbar.showError('Error fetching charging order: $e', Get.context!);
     } finally {

@@ -181,8 +181,8 @@ class _BottomSheetPanel extends StatefulWidget {
 }
 
 class _BottomSheetPanelState extends State<_BottomSheetPanel> {
-  static const double _collapsedSize = 0.35;
-  static const double _expandedSize = 0.80;
+  static const double _collapsedSize = 0.50;
+  static const double _expandedSize = 0.90;
 
   late final DraggableScrollableController _sheetController;
   double _currentSize = _collapsedSize;
@@ -282,8 +282,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                         SliverPersistentHeader(
                           pinned: true,
                           delegate: _FixedHeaderDelegate(
-                            minHeight: 150,
-                            maxHeight: 150,
+                            minHeight: 134,
+                            maxHeight: 134,
                             builder: (context) {
                               return Container(
                                 color: Colors.white,
@@ -299,8 +299,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                       },
                                       child: Container(
                                         margin: const EdgeInsets.only(
-                                          top: 8,
-                                          bottom: 6,
+                                          bottom: 2,
                                         ),
                                         child: Center(
                                           child: Icon(
@@ -534,7 +533,7 @@ class _StationItem extends StatelessWidget {
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.only(bottom: 14, top: 6),
         child: Column(
           children: [
             Row(

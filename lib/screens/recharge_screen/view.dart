@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
@@ -96,12 +97,54 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
                   ),
                   const SizedBox(height: 24),
         
-                  if(controller.remainSecond != null)
                   GetBuilder<RechargeController>(
-                    builder: (controller) => Text(
-                      '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
+                    builder: (controller) => controller.remainSecond != null
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: controller.remainSecond! <= 0
+                                  ? Colors.red.shade50
+                                  : Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: controller.remainSecond! <= 0
+                                    ? Colors.red.shade300
+                                    : Colors.green.shade300,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  controller.remainSecond! <= 0
+                                      ? Icons.schedule
+                                      : Icons.timer,
+                                  size: 18,
+                                  color: controller.remainSecond! <= 0
+                                      ? Colors.red.shade700
+                                      : Colors.green.shade700,
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: AutoSizeText(
+                                    '${controller.remainSecond! <= 0 ? 'Idle Time' : 'Remaining Time'}: ${controller.secondToMinute(controller.remainSecond!.abs())}${controller.remainSecond! <= 0 ? ' (RM 1 per 5 Minute)' : ''}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: controller.remainSecond! <= 0
+                                          ? Colors.red.shade700
+                                          : Colors.green.shade700,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
         
                   const SizedBox(height: 4),

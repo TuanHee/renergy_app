@@ -16,6 +16,7 @@ class ChargeProcessingController extends GetxController  with WidgetsBindingObse
   Order? order;
   ChargingStats? chargingStats;
   bool isfetching = false;
+  int consecutiveErrorCount = 0;
 
   @override
   void onInit() async {
@@ -90,12 +91,23 @@ class ChargeProcessingController extends GetxController  with WidgetsBindingObse
           chargingProcessPage.chargingProcessing,
         );
         update();
+        // Reset error counter on success
+        consecutiveErrorCount = 0;
       }
     } catch (e) {
-      if (Get.context == null) {
-        return;
+      // Increment error count and stop timer after 5 consecutive errors
+      consecutiveErrorCount++;
+      if (consecutiveErrorCount >= 5) {
+        if (ChargeProcessingController.globalApiTimer != null) {
+          ChargeProcessingController.globalApiTimer!.cancel();
+          ChargeProcessingController.globalApiTimer = null;
+          debugPrint('Stopped polling after 5 consecutive errors');
+        }
       }
-      Snackbar.showError(e.toString(), Get.context!);
+      if (Get.context != null) {
+        Snackbar.showError(e.toString(), Get.context!);
+      }
+      
     }
   }
 

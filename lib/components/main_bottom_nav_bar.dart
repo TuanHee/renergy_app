@@ -29,7 +29,7 @@ class MainBottomNavBar extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           onTap: (index) {
-            if (currentIndex == index || _isNavigating) return;
+            if ((currentIndex == index && index!= 1) || _isNavigating) return;
             _isNavigating = true;
             // Navigate to corresponding route
             switch (index) {
@@ -37,7 +37,8 @@ class MainBottomNavBar extends StatelessWidget {
                 Get.offAllNamed(AppRoutes.explorer);
                 break;
               case 1:
-                Get.offAllNamed(AppRoutes.charging);
+                // Get.offAllNamed(AppRoutes.charging);
+                Get.offAllNamed(AppRoutes.recharge);
                 break;
               case 2:
                 Get.offAllNamed(AppRoutes.bookmark);
