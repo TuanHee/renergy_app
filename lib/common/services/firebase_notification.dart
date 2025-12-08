@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
@@ -46,7 +48,9 @@ class NotificationService {
       badge: true,
       sound: true,
     );
-    await initializeToken();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      await initializeToken();
+    }
     _setupForegroundNotificationListener();
 
     // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
@@ -57,6 +61,16 @@ class NotificationService {
 
   static Future<void> initializeToken() async {
     try {
+      if (Platform.isIOS) {
+        String? apnsToken = await _firebaseMessaging.getAPNSToken();
+          if (apnsToken != null) {
+            // Then get FCM token
+            String? fcmToken = await _firebaseMessaging.getToken();
+            print("FCM Token: $fcmToken");
+          } else {
+            print("APNs token not available yet.");
+          }
+      }
       final token = await _firebaseMessaging.getToken();
       print('FCM token: $token');
       await Api().post(Endpoints.fcmToken, data: {'token': token});

@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/app_theme.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/firebase_options.dart';
 import 'package:renergy_app/global.dart';
 
 import 'common/constants/server.dart';
@@ -19,8 +20,11 @@ void main() async {
   await Global.init();
   try {
     if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
     }
+
     await NotificationService.init();
   } catch (e, st) {
     print('Firebase initializeApp error: $e\n$st');
