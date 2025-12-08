@@ -25,11 +25,10 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         controller.fetchChargingOrder(),
       ]);
 
-      if(!mounted){
+      if (!mounted) {
         return;
       }
 
-      
       if (!isStayPage && controller.chargingStats != null) {
         await ChargingStatsStatus.page(
           controller.chargingStats,
@@ -42,6 +41,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 246, 245, 251),
       appBar: AppBar(title: const Text('Charging History'), centerTitle: true),
@@ -97,12 +97,11 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         ),
                         const SizedBox(height: 48),
                         // "No charging session yet" heading
-                        const Text(
+                        Text(
                           'No charging session yet',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -110,10 +109,10 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         // Explanatory text
                         Text(
                           'Let\'s search a charging station that suits you and charge via Recharge now.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade700,
-                            height: 1.5,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.black54,
+                            height: 1.4,
+                            fontSize: 14,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -198,9 +197,11 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                         : status == 'Pending' || status == 'Open'
                         ? Colors.orange.shade600
                         : Colors.grey.shade600;
-                    final title = order.invoiceNo ?? order.id?.toString().padLeft(4, '0') ?? '-';
-                    final carPlate =
-                        order.customer?.vehiclePlate ?? '-';
+                    final title =
+                        order.invoiceNo ??
+                        order.id?.toString().padLeft(4, '0') ??
+                        '-';
+                    final carPlate = order.customer?.vehiclePlate ?? '-';
                     return Card(
                       color: Colors.white,
                       elevation: 0,
@@ -211,12 +212,17 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          if(order.id == controller.chargingStats?.order?.id && order.id != null)
-                          ChargingStatsStatus.page(controller.chargingStats,
-                            chargingProcessPage.charging,
-                          );
-                          else{
-                             Get.toNamed(AppRoutes.paymentResult, arguments: order);
+                          if (order.id == controller.chargingStats?.order?.id &&
+                              order.id != null)
+                            ChargingStatsStatus.page(
+                              controller.chargingStats,
+                              chargingProcessPage.charging,
+                            );
+                          else {
+                            Get.toNamed(
+                              AppRoutes.paymentResult,
+                              arguments: order,
+                            );
                           }
                         },
                         child: Padding(
@@ -229,8 +235,8 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                             children: [
                               Row(
                                 children: [
-                                  if(order.invoiceNo == null)
-                                  Text(
+                                  if (order.invoiceNo == null)
+                                    Text(
                                       'Transaction Id: ',
                                       style: const TextStyle(
                                         fontSize: 16,

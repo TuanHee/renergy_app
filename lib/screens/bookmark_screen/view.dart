@@ -72,60 +72,64 @@ class _BookmarkScreenViewState extends State<BookmarkScreenView> {
                     },
                   ),
               )
-              : SizedBox(    
-                width: double.infinity,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Spacer(),
-                      SizedBox(
-                        height: 160,
-                        width: 120,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              Icons.bookmark,
-                              size: 140,
-                              color: Colors.grey.shade400,
-                            ),
-                            Positioned(
-                              top: 36,
-                              right: 10,
-                              child: CircleAvatar(
-                                radius: 22,
-                                backgroundColor: Colors.black87,
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 24,
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(    
+                  width: double.infinity,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Spacer(),
+                        SizedBox(
+                          height: 160,
+                          width: 120,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Icon(
+                                Icons.bookmark,
+                                size: 140,
+                                color: Colors.grey.shade400,
+                              ),
+                              Positioned(
+                                top: 36,
+                                right: 10,
+                                child: CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor: Colors.black87,
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'No bookmark yet',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                        const SizedBox(height: 24),
+                        Text(
+                          'No bookmark yet',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Tap the bookmark icon besides the station to keep it here.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.black54,
-                          height: 1.4,
+                        const SizedBox(height: 12),
+                        Text(
+                          'Tap the bookmark icon besides the station to keep it here.',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: Colors.black54,
+                            height: 1.4,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
+                        const Spacer(),
+                      ],
+                    ),
+                ),
               );
         },
       ),

@@ -458,7 +458,9 @@ class _StationScreenViewState extends State<StationScreenView> {
                     children: [
                       Text(
                         'Add card to proceed with payment.',
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: TextStyle(color: Colors.grey.shade600,
+                        fontSize: 12),
+                        
                       ),
                       TextButton(
                         onPressed: () {

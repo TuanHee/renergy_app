@@ -54,8 +54,8 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
     return GetBuilder<ExplorerController>(
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            centerTitle: false,
+            appBar: AppBar(
+              centerTitle: false,
             title: Image.asset(
               'assets/icons/full_logo.png',
               height: 36,
@@ -344,7 +344,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                       style: theme.textTheme.bodyMedium
                                           ?.copyWith(
                                             color: Colors.black54,
-                                            fontSize: 14,
+                                            fontSize: 12,
                                           ),
                                     ),
                                     const SizedBox(height: 12),

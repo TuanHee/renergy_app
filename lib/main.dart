@@ -61,11 +61,15 @@ class DebugWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: Stack(
-        children: [
-          child,
-          if (kDebugMode || serverApiUrl != "https://zeropowerstation.my")
-            Positioned(
+      child: MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaleFactor: MediaQuery.of(context).textScaleFactor * 1.08,
+        ),
+        child: Stack(
+          children: [
+            child,
+            if (kDebugMode || serverApiUrl != "https://zeropowerstation.my")
+              Positioned(
               top: 20,
               right: 20,
               child: Container(
@@ -74,9 +78,9 @@ class DebugWrapper extends StatelessWidget {
                   vertical: 7,
                 ),
                 color: Colors.red.withOpacity(0.7),
-                child: const Text(
+                child: Text(
                   kDebugMode ? "DEBUG MODE" : "STAGING MODE",
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
@@ -85,6 +89,7 @@ class DebugWrapper extends StatelessWidget {
               ),
             ),
         ],
+        ),
       ),
     );
   }
