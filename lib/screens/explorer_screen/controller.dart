@@ -358,7 +358,7 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
     if (stationMarkerIcon != null) return;
     try {
       stationMarkerIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(100, 100)),
+        const ImageConfiguration(),
         'assets/images/pin_point.png',
       );
     } catch (_) {
