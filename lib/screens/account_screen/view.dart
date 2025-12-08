@@ -23,20 +23,19 @@ class AccountScreenView extends StatelessWidget {
                 )
               : SafeArea(
                   top: false,
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.zero,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _AccountHeader(
-                          onProfileTap: () {
-                            Get.toNamed(AppRoutes.editProfile);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Padding(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _AccountHeader(
+                        onProfileTap: () {
+                          Get.toNamed(AppRoutes.editProfile);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
+                          child: ListView(
                             children: [
                               _AccountActionTile(
                                 icon: Icons.credit_card,
@@ -118,19 +117,21 @@ class AccountScreenView extends StatelessWidget {
                               //   ),
                               // ),
                               // const SizedBox(height: 24),
-                              Text(
-                                'Renergy Version ${controller.appVersion}',
-                                style: const TextStyle(
-                                  color: Color(0xFF999999),
-                                  fontSize: 12,
+                              Center(
+                                child: Text(
+                                  'Renergy Version ${controller.appVersion}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF999999),
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 24),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
           bottomNavigationBar: const MainBottomNavBar(
