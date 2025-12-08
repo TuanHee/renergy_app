@@ -656,7 +656,7 @@ class _StationItem extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.route, size: 14, color: muted),
+                              Icon(Icons.location_on, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
                                 '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
@@ -675,10 +675,14 @@ class _StationItem extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.ev_station, size: 14, color: muted),
+                              Image.asset(
+                                'assets/images/plug.png',
+                                width: 13,
+                                height: 13,
+                              ),
                               const SizedBox(width: 6),
                               Text(
-                                '${station.bays?.length ?? 0} bays',
+                                '${station.bays?.length ?? 0}',
                                 style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
                             ],

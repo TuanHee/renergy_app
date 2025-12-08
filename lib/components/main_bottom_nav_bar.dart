@@ -37,8 +37,7 @@ class MainBottomNavBar extends StatelessWidget {
                 Get.offAllNamed(AppRoutes.explorer);
                 break;
               case 1:
-                // Get.offAllNamed(AppRoutes.charging);
-                Get.offAllNamed(AppRoutes.recharge);
+                Get.offAllNamed(AppRoutes.charging);
                 break;
               case 2:
                 Get.offAllNamed(AppRoutes.bookmark);

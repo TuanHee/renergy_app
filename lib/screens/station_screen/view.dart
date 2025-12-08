@@ -121,12 +121,22 @@ class _StationScreenViewState extends State<StationScreenView> {
                         '${controller.station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
                         Colors.black,
                       ),
-                      _statusItem(
-                        Icons.ev_station,
+                      _statusItemImage(
+                        'assets/images/plug.png',
                         '${controller.station.bays!.length}',
                         Colors.black,
                       ),
-                      _statusItem(Icons.check, 'Available', Colors.green),
+                      _statusItem(
+                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                            ? 'Available'
+                            : 'Unavailable',
+                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                            ? Colors.green
+                            : Colors.red,
+                      ),
                     ],
                   ),
                 ),
@@ -614,6 +624,16 @@ class _StationScreenViewState extends State<StationScreenView> {
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: TextStyle(color: color, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _statusItemImage(String assetPath, String label, Color color) {
+    return Row(
+      children: [
+        Image.asset(assetPath, width: 16, height: 16),
         const SizedBox(width: 4),
         Text(label, style: TextStyle(color: color, fontSize: 12)),
       ],
