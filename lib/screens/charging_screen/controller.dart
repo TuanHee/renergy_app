@@ -7,6 +7,7 @@ import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 
 class ChargingController extends GetxController {
+  bool isLoading = true;
   ChargingStats? chargingStats;
   Order? currentOrder;
   List<Order> orderHistories = [];

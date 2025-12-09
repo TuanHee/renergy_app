@@ -8,21 +8,20 @@ import 'package:renergy_app/components/snackbar.dart';
 class CardController extends GetxController {
   bool isLoading = true;
   bool isSettingDefault = false;
+  bool isSelectingCard = false;
 
   List<CreditCard> cards = [];
 
   @override
   void onInit() async {
     super.onInit();
-    // cards = [
-    //   CreditCard(
-    //     cardNumber: '**** **** **** 9010',
-    //     cardHolder: 'John Doe',
-    //     expiryDate: '12/25',
-    //     cvv: '123',
-    //     cardType: CardType.visa,
-    //   ),
-    // ];
+    final args = Get.arguments;
+    if (args is bool && args) {
+      isSelectingCard = args;
+    } else if (args is Map && args['isSelectingCard'] != null) {
+      isSelectingCard = args['isSelectingCard'];
+    }
+
     await fetchCardIndex();
   }
 
@@ -58,9 +57,9 @@ class CardController extends GetxController {
       final Map<String, dynamic> params = data is Map<String, dynamic>
           ? data
           : {};
-      print('param: $params');
       final String? result = await MobileXDK.start(params);
-      print('result: $result');
+
+      await fetchCardIndex();
     } catch (e) {
       rethrow;
     }

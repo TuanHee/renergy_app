@@ -50,6 +50,8 @@ class ChargeProcessingController extends GetxController  with WidgetsBindingObse
     }
     if (ChargeProcessingController.globalApiTimer != null) {
       await fetchChargingStatus();
+    isLoading = false;
+    update();
       return;
     }
     ChargeProcessingController.globalApiTimer = Timer.periodic(
@@ -67,6 +69,8 @@ class ChargeProcessingController extends GetxController  with WidgetsBindingObse
       },
     );
     await fetchChargingStatus();
+    isLoading = false;
+    update();
   }
 
   Future<void> fetchChargingStatus() async {

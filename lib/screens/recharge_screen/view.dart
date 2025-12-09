@@ -59,7 +59,9 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
       ),
       bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: GetBuilder<RechargeController>(
-        builder: (controller) => Center(
+        builder: (controller) => controller.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Container(

@@ -25,6 +25,9 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
         controller.fetchChargingOrder(),
       ]);
 
+      controller.isLoading = false;
+      controller.update();
+
       if (!mounted) {
         return;
       }
@@ -47,6 +50,9 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
       appBar: AppBar(title: const Text('Charging History'), centerTitle: true),
       body: GetBuilder<ChargingController>(
         builder: (controller) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return controller.orderHistories.isEmpty
               ? Center(
                   child: Padding(

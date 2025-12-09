@@ -19,6 +19,7 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
   Timer? countdownTimer;
   Timer? apiTimer;
   bool isfetching = false;
+  bool isLoading = true;
   static Timer? globalApiTimer;
   int consecutiveErrorCount = 0;
 
@@ -55,6 +56,8 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
     if (PlugInLoadingController.globalApiTimer != null) {
       print('PlugInLoading polling already active');
       await fetchChargingStats();
+    isLoading = false;
+    update();
       return;
     }
     PlugInLoadingController.globalApiTimer = Timer.periodic(
@@ -72,6 +75,8 @@ class PlugInLoadingController extends GetxController with WidgetsBindingObserver
       },
     );
     await fetchChargingStats();
+    isLoading = false;
+    update();
   }
 
   void pollWaitingTime() {

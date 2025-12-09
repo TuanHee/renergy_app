@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/endpoints.dart';
 import 'package:renergy_app/common/models/car.dart';
+import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:renergy_app/common/models/order.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/components.dart';
 
 class StationController extends GetxController {
   bool isLoading = true;
@@ -18,6 +20,7 @@ class StationController extends GetxController {
   late int stationId;
   bool unlockable = false;
   List<Car> vehicles = [];
+  CreditCard? selectedCard;
 
   @override
   void onInit() async {
@@ -28,6 +31,7 @@ class StationController extends GetxController {
   await Future.wait([
       initStation(),
       initCar(),
+      initCard(),
     ]);
     
     isLoading = false;
@@ -43,6 +47,8 @@ class StationController extends GetxController {
       
       if (res.data['status'] == 200) {
         unlockable = res.data['data']['unlockable'];
+        print('res.data: ${res.data}');
+        print('unlockable: $unlockable');
         station = Station.fromJson(res.data['data']['station']);
       }
     } catch (e) {
@@ -71,6 +77,26 @@ class StationController extends GetxController {
     }
   }
 
+  Future<void> initCard() async {
+    try {
+      final res = await Api().get(Endpoints.paymentMethods);
+      List<CreditCard> cards = [];
+      print('res: $res');
+      
+      if (res.data['status'] == 200) {
+        cards = (res.data['data']['cards'] as List)
+            .map((e) => CreditCard.fromJson(e))
+            .toList();
+      }
+      if(cards.isNotEmpty){
+      selectedCard = (cards.firstWhere((card) => card.isDefault == true, orElse: () => cards.first));
+    }
+      update();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void selectBay(int bayId) {
     selectedBay = bayId;
     update();
@@ -83,10 +109,21 @@ class StationController extends GetxController {
 
   Future<void> unlockBay() async {
     try {
-      if(unlockable){
-        false;
+      // if(!unlockable){
+      //   Snackbar.showError('This station is not unlockable', Get.context!);
+      //   return;
+      // }
+
+      if(selectedBay == null){
+        Snackbar.showError('Please select a bay.', Get.context!);
+        return;
       }
-      
+
+      if(selectedCar == null){
+        Snackbar.showError('Please select a car.', Get.context!);
+        return;
+      }
+
       final res = await Api().post(
         Endpoints.orders, 
         data:{
@@ -102,15 +139,7 @@ class StationController extends GetxController {
         throw Exception(res.data['message'] ?? 'Failed to unlock bay');
       }
     } catch (e) {
-      print('Error in unlockBay: $e');
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      log('Error in unlockBay: $e');
+      Snackbar.showError(e.toString(), Get.context!);
     }
   }
 }

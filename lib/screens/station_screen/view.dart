@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bay.dart';
+import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/main.dart';
@@ -463,6 +464,7 @@ class _StationScreenViewState extends State<StationScreenView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  controller.selectedCard == null ?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -477,6 +479,41 @@ class _StationScreenViewState extends State<StationScreenView> {
                           Get.toNamed(AppRoutes.card);
                         },
                         child: const Text('+ Add Card'),
+                      ),
+                    ],
+                  ):Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Pay with Card ',
+                        style: TextStyle(color: Colors.grey.shade800,
+                        fontSize: 13),
+                        
+                      ),
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '**** **** **** ${controller.selectedCard?.last4 ?? 'Unknown'}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async{
+                          final result = await Get.toNamed(AppRoutes.card, arguments: {'isSelectingCard': true});
+                          if(result != null && result is CreditCard){
+                            controller.selectedCard = result;
+                            controller.update();
+                          }
+                        },
+                        child: const Text('Change'),
                       ),
                     ],
                   ),
@@ -590,11 +627,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed:
-                              controller.unlockable &&
-                                  controller.selectedBay != null &&
-                                  controller.selectedCar != null
-                              ? controller.unlockBay
-                              : null,
+                              controller.unlockBay,
                           icon: const Icon(Icons.lock_open),
                           label: const Text('Unlock Now'),
                           style: ElevatedButton.styleFrom(

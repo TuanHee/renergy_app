@@ -95,7 +95,9 @@ class _ChargeProcessingScreenState extends State<ChargeProcessingScreenView>
         ),
         child: SafeArea(
           child: GetBuilder<ChargeProcessingController>(
-            builder: (controller) => Column(
+            builder: (controller) => controller.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
               children: [
                 // Header
                 Padding(

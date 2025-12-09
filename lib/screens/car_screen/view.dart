@@ -45,7 +45,9 @@ class _CarScreenViewState extends State<CarScreenView> {
             ),
             centerTitle: true,
           ),
-          body: controller.cars.isEmpty
+          body: controller.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : controller.cars.isEmpty
               ? Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),

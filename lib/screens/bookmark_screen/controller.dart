@@ -4,9 +4,12 @@ import 'package:renergy_app/common/models/bookmark.dart';
 import 'package:renergy_app/common/services/api_service.dart';
 
 class BookmarkController extends GetxController {
+  bool isLoading = true;
   List<Bookmark> bookmarks = [];
 
   Future<void> fetchBookmark() async {
+    isLoading = true;
+    update();
     try{
       final res = await Api().get(Endpoints.bookmarks);
 
@@ -27,6 +30,7 @@ class BookmarkController extends GetxController {
       rethrow;
     }
     finally{
+      isLoading = false;
       update();
     }
     

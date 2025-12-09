@@ -93,10 +93,12 @@ class _PlugInLoadingScreenState extends State<PlugInLoadingScreenView>
       bottomNavigationBar: const MainBottomNavBar(currentIndex: 1),
       body: SafeArea(
         child: GetBuilder<PlugInLoadingController>(
-          builder: (controller) => Container(
-            decoration: BoxDecoration(color: Colors.white),
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: SingleChildScrollView(
+          builder: (controller) => controller.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Container(
+                  decoration: BoxDecoration(color: Colors.white),
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

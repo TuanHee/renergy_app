@@ -60,8 +60,10 @@ class _CardScreenViewState extends State<CardScreenView> {
         return Scaffold(
           backgroundColor: Colors.grey.shade100,
           appBar: AppBar(title: const Text('My Cards'), centerTitle: true),
-          body: controller.cards.isEmpty
-              ? Center(
+          body: controller.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : controller.cards.isEmpty
+                  ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
@@ -141,6 +143,7 @@ class _CardScreenViewState extends State<CardScreenView> {
                             Snackbar.showError(e.toString(), context);
                           }
                         },
+                        isSelectingCard: controller.isSelectingCard,
                       ),
                     );
                   },

@@ -36,6 +36,9 @@ class _BookmarkScreenViewState extends State<BookmarkScreenView> {
       appBar: AppBar(title: const Text('Bookmark'), centerTitle: true),
       body: GetBuilder<BookmarkController>(
         builder: (controller) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return controller.bookmarks.isNotEmpty
               ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),

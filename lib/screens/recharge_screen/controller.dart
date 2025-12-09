@@ -164,17 +164,19 @@ class RechargeController extends GetxController with WidgetsBindingObserver {
       Snackbar.showError(e.toString(), Get.context!);
     } finally {
       isfetching = false;
+      isLoading = false;
+      update();
     }
   }
 
   Future<void> recharge() async {
-    if (order?.id == null) {
-      return;
-    }
-    final res = await Api().post(Endpoints.restart(order!.id!));
+      if (order?.id == null) {
+        return;
+      }
+      final res = await Api().post(Endpoints.restart(order!.id!));
 
-    if (res.data['status'] != 200) {
-      throw 'Stop Charging Error: ${res.data['status']}';
+      if (res.data['status'] != 200) {
+        throw 'Stop Charging Error: ${res.data['status']}';
+      }
     }
-  }
 }
