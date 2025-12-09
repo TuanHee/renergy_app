@@ -183,15 +183,15 @@ class BookmarkItem extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                bookmark!.station!.isActive ? Icons.check_circle : Icons.cancel,
+                                bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Icons.check_circle : Icons.cancel,
                                 size: 14,
-                                color: bookmark!.station!.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                                color: bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Colors.green.shade700 : Colors.red.shade700,
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                bookmark!.station!.isActive ? 'Available' : 'Unavailable',
+                                bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? 'Available' : 'Unavailable',
                                 style: TextStyle(
-                                  color: bookmark!.station!.isActive ? Colors.green.shade700 : Colors.red.shade700,
+                                  color: bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Colors.green.shade700 : Colors.red.shade700,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),

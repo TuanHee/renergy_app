@@ -27,7 +27,7 @@ class MyBadge extends StatelessWidget {
         label,
         style: TextStyle(
           color: dark ? Colors.white : color,
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
       ),

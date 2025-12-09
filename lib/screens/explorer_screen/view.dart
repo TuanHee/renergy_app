@@ -574,7 +574,7 @@ class _StationItem extends StatelessWidget {
                                     '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
                                 color: const Color(0xFF0BB07B),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               if (station.category != null)
                                 MyBadge(
                                   label: station.category!,

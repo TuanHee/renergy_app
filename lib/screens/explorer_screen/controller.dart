@@ -296,7 +296,14 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
     final position = Get.find<MainController>().position;
     if (position != null) {
       returnStations.sort(
-        (a, b) => a.distanceTo(position).compareTo(b.distanceTo(position)),
+        (a, b) {
+          final aPreferred = a.isActive && getAvailableBayCount(a) > 0;
+          final bPreferred = b.isActive && getAvailableBayCount(b) > 0;
+          if (aPreferred != bPreferred) {
+            return aPreferred ? -1 : 1; // preferred first
+          }
+          return a.distanceTo(position).compareTo(b.distanceTo(position));
+        },
       );
     }
 
