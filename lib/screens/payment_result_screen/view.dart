@@ -61,7 +61,7 @@ class PaymentResultScreenView extends StatelessWidget {
           backgroundColor: const Color(0xFFF3F6FA),
           appBar: AppBar(
             centerTitle: true,
-            title: const Text('Payment Result'),
+            title: const Text('Completed'),
             leading: IconButton(
               onPressed: () => Get.back(),
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -87,107 +87,221 @@ class PaymentResultScreenView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     CircleAvatar(
-                  //       radius: 18,
-                  //       backgroundColor: Colors.green.shade100,
-                  //       child: Icon(Icons.check, color: Colors.green.shade700),
-                  //     ),
-                  //   ],
-                  // ),
-                  const SizedBox(height: 12),
-                  Text(
-                    controller.order!.invoiceNo ?? '',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                  // Header image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: (controller.order?.station?.mainImageUrl != null
+                        ? Image.network(
+                            controller.order!.station!.mainImageUrl!,
+                            height: 180,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            'assets/images/image_placeholder.png',
+                            height: 180,
+                            fit: BoxFit.cover,
+                          )),
                   ),
-                  Text(
-                    completedText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: muted,
+
+                  const SizedBox(height: 12),
+
+                  // Reference ID and date row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Reference ID ',
+                            style: TextStyle(
+                              color: muted,
+                              fontSize: 14
+                            ),
+                          ),
+                          Text(
+                            controller.order?.id?.toString().padLeft(4, '0') ?? '',
+                            style: TextStyle(
+                              color:Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        (() {
+                          final raw = controller.order?.createdAt;
+                          if (raw == null || raw.isEmpty) return '-';
+                          final dt = DateTime.tryParse(raw);
+                          if (dt == null) return raw;
+                          final local = dt.toLocal();
+                          const monthsFull = [
+                            'January',
+                            'February',
+                            'March',
+                            'April',
+                            'May',
+                            'June',
+                            'July',
+                            'August',
+                            'September',
+                            'October',
+                            'November',
+                            'December',
+                          ];
+                          final day = local.day.toString().padLeft(2, '0');
+                          final monthName = monthsFull[local.month - 1];
+                          final year = local.year.toString();
+                          final hh = local.hour.toString().padLeft(2, '0');
+                          final mm = local.minute.toString().padLeft(2, '0');
+                          return '$day $monthName $year, $hh:$mm';
+                        })(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 13
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+                  _dashedDivider(),
+
+                  const SizedBox(height: 12),
+
+                  // Station name and bay chip
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          controller.order?.stationName ?? controller.order?.station?.name ?? '-',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if ((controller.order?.bay?.name ?? '').isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            controller.order!.bay!.name!,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          controller.order?.bayName ?? '-',
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  _dashedDivider(),
+
+                  const SizedBox(height: 12),
+
+                  // Details section mimicking the screenshot
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildKeyValueRow('Port Type', controller.order?.port?.portType ?? '-'),
+                        _buildKeyValueRow('Port Voltage', controller.order?.port?.outputPower ?? '-'),
+                        _buildKeyValueRow(
+                          'Total kWh Usage',
+                          '${((controller.order?.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh',
+                        ),
+                        _buildKeyValueRow(
+                          'Duration',
+                          (() {
+                            final m = (controller.order?.totalChargingTimeMinutes ?? 0).toInt();
+                            final hh = (m ~/ 60).toString().padLeft(2, '0');
+                            final mm = (m % 60).toString().padLeft(2, '0');
+                            return '$hh:$mm:00';
+                          })(),
+                        ),
+                        const SizedBox(height: 8),
+                        _dashedDivider(),
+                        const SizedBox(height: 8),
+                        _buildKeyValueRow('Payment Method', '-'),
+                        _buildKeyValueRow(
+                          'Charging Fee',
+                          controller.order?.charging_price == null
+                              ? '-'
+                              : 'RM${controller.order!.charging_price!.toStringAsFixed(2)}',
+                        ),
+                        _buildKeyValueRow(
+                          'Subtotal',
+                          controller.order?.subtotalAmount == null
+                              ? '-'
+                              : 'RM${controller.order!.subtotalAmount!.toStringAsFixed(2)}',
+                        ),
+                        _buildKeyValueRow(
+                          'Discount',
+                          controller.order?.discountAmount != null
+                              ? 'RM${controller.order!.discountAmount!.toStringAsFixed(2)}'
+                              : (controller.order?.discountPercentage != null
+                                  ? '${controller.order!.discountPercentage!.toStringAsFixed(2)}%'
+                                  : '-'),
+                        ),
+                        _buildKeyValueRow(
+                          'Total Paid',
+                          controller.order?.netAmount == null
+                              ? '-'
+                              : 'RM${controller.order!.netAmount!.toStringAsFixed(2)}',
+                          highlightValue: true,
+                        ),
+                      ],
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  Divider(color: Colors.grey.shade300),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                  // Action button
+                  OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      side: BorderSide(color: Colors.grey.shade700),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Payment Summary',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ...moneyItems.map((e) {
-                          final label = e['label'] ?? '';
-                          final value = e['value'] ?? '';
-                          final isTotal =
-                              label == 'Net Amount' || label == 'Amount';
-                          return _buildKeyValueRow(
-                            label,
-                            value,
-                            highlightValue: isTotal,
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          'Details',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ...otherItems.map((e) {
-                          final label = e['label'] ?? '';
-                          final value = e['value'] ?? '';
-                          return _buildKeyValueRow(label, value);
-                        }).toList(),
-                      ],
+                    child: const Text(
+                      'See Less Details',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -208,18 +322,50 @@ Widget _buildKeyValueRow(
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: Text(label, style: const TextStyle(color: Colors.black54)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         Text(
           value,
           style: TextStyle(
-            color: highlightValue ? const Color(0xFFD32F2F) : Colors.black87,
-            fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w400,
+            fontSize: 14,
+            fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ],
     ),
+  );
+}
+
+// New dashed divider helper used in the redesigned layout
+Widget _dashedDivider({
+  Color? color,
+  double dashWidth = 6,
+  double dashSpace = 4,
+  double height = 1,
+}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final effectiveColor = color ?? Colors.grey.shade300;
+      final dashCount = (constraints.maxWidth / (dashWidth + dashSpace)).floor();
+      return Row(
+        children: List.generate(dashCount, (index) {
+          return Padding(
+            padding: EdgeInsets.only(right: index == dashCount - 1 ? 0 : dashSpace),
+            child: Container(
+              width: dashWidth,
+              height: height,
+              color: effectiveColor,
+            ),
+          );
+        }),
+      );
+    },
   );
 }

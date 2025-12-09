@@ -20,6 +20,7 @@ class Order {
   String? updatedAt;
   List<OrderLine>? lines;
   Bay? bay;
+  String? bayName;
   double? totalUsage; 
   double? totalChargeableIdleTimeMinutes;
   double? totalChargingTimeMinutes;
@@ -51,6 +52,7 @@ class Order {
     this.updatedAt,
     this.lines,
     this.bay,
+    this.bayName,
     this.totalUsage,
     this.totalChargeableIdleTimeMinutes,
     this.totalChargingTimeMinutes,
@@ -84,6 +86,7 @@ class Order {
       updatedAt: json['updated_at'],
       lines: json['lines'] == null ? null : OrderLine.listFromJson(json['lines']),
       bay: json['bay'] == null ? null : Bay.fromJson(json['bay']),
+      bayName: json['bay_name'],
       totalUsage: json['total_usage'] == null ? null : double.parse(json['total_usage'].toString()),
       totalChargeableIdleTimeMinutes: json['total_chargeable_idle_time_minutes'] == null
           ? null
@@ -135,6 +138,7 @@ class Order {
       'updated_at': updatedAt,
       'lines': lines?.map((line) => line.toJson()).toList(),
       'bay': bay?.toJson(),
+      'bay_name': bayName,
       'total_usage': totalUsage,
       'total_chargeable_idle_time_minutes': totalChargeableIdleTimeMinutes,
       'total_charging_time_minutes': totalChargingTimeMinutes,

@@ -9,7 +9,6 @@ class CardWidget extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback? onSetDefault;
   final bool isSelectingCard;
-  final CreditCard? selectedCard;
 
   const CardWidget({
     super.key,
@@ -17,7 +16,6 @@ class CardWidget extends StatelessWidget {
     required this.onDelete,
     this.onSetDefault,
     this.isSelectingCard = false,
-    this.selectedCard,
   });
 
   @override
@@ -27,9 +25,9 @@ class CardWidget extends StatelessWidget {
         return Stack(
           children: [
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 if (isSelectingCard) {
-                  Get.back(result: card);
+                  onSetDefault?.call();
                 }
               },
               child: Card(
@@ -64,20 +62,24 @@ class CardWidget extends StatelessWidget {
                                 ),
                               ),
                             ),
-              
-                            
+
                             const SizedBox(width: 8),
                             PopupMenuButton(
-                              icon: const Icon(Icons.more_vert, color: Colors.black),
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Colors.black,
+                              ),
                               itemBuilder: (context) => [
                                 if (isSelectingCard)
                                   PopupMenuItem(
-                                    onTap: (){
-                                      Get.back(result: card);
-                                    },
+                                    onTap: onSetDefault,
                                     child: const Row(
                                       children: [
-                                        Icon(Icons.check_circle, size: 20, color: Colors.green),
+                                        Icon(
+                                          Icons.check_circle,
+                                          size: 20,
+                                          color: Colors.green,
+                                        ),
                                         SizedBox(width: 8),
                                         Text(
                                           'Select this card to pay',
@@ -88,38 +90,43 @@ class CardWidget extends StatelessWidget {
                                   ),
                                 if (!isSelectingCard) ...[
                                   PopupMenuItem(
-                                    enabled: !card.isDefault && onSetDefault != null,
+                                    enabled:
+                                        !card.isDefault && onSetDefault != null,
                                     onTap: onSetDefault,
                                     child: Row(
                                       children: [
                                         Icon(
                                           card.isDefault
-                                            ? Icons.check_circle
-                                            : Icons.star,
-                                        size: 20,
-                                        color: card.isDefault
-                                            ? Colors.green
-                                            : Colors.black,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        card.isDefault
-                                            ? 'Default card'
-                                            : 'Set as default',
-                                        style: TextStyle(
+                                              ? Icons.check_circle
+                                              : Icons.star,
+                                          size: 20,
                                           color: card.isDefault
                                               ? Colors.green
                                               : Colors.black,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          card.isDefault
+                                              ? 'Default card'
+                                              : 'Set as default',
+                                          style: TextStyle(
+                                            color: card.isDefault
+                                                ? Colors.green
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   PopupMenuItem(
                                     onTap: onDelete,
                                     child: const Row(
                                       children: [
-                                        Icon(Icons.delete, size: 20, color: Colors.red),
+                                        Icon(
+                                          Icons.delete,
+                                          size: 20,
+                                          color: Colors.red,
+                                        ),
                                         SizedBox(width: 8),
                                         Text(
                                           'Delete',
@@ -128,7 +135,7 @@ class CardWidget extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                ]
+                                ],
                               ],
                             ),
                           ],
@@ -157,52 +164,45 @@ class CardWidget extends StatelessWidget {
             Positioned(
               top: 0,
               right: 0,
-              child: (((selectedCard == null ? card.isDefault : selectedCard!.id == card.id) && isSelectingCard) || (card.isDefault && !isSelectingCard))
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade100,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.green.shade300,
+              child: card.isDefault
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.green.shade300),
+                      ),
+                      child: controller.isSettingDefault
+                          ? const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.green,
                                 ),
                               ),
-                              child: controller.isSettingDefault
-                                  ? const SizedBox(
-                                      width: 12,
-                                      height: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.green,
-                                            ),
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.check,
-                                          size: 8,
-                                          color: Colors.green,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          isSelectingCard ? 'Selected' : 'Default',
-                                          style: TextStyle(
-                                            color: Colors.green,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                             )
-                          : const SizedBox.shrink(),
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check, size: 8, color: Colors.green),
+                                SizedBox(width: 4),
+                                Text(
+                                  isSelectingCard ? 'Selected' : 'Default',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         );

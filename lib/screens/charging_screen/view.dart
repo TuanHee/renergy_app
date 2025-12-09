@@ -239,6 +239,7 @@ class _ChargingScreenViewState extends State<ChargingScreenView> {
                                 children: [
                                   Expanded(
                                     child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           order.invoiceNo ?? '',

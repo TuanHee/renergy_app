@@ -139,6 +139,9 @@ class _CardScreenViewState extends State<CardScreenView> {
                         onSetDefault: () async {
                           try {
                             await Get.find<CardController>().setDefaultCard(card);
+                            if(mounted && controller.isSelectingCard) {
+                              Get.back(result: card);
+                            }
                           } catch (e) {
                             Snackbar.showError(e.toString(), context);
                           }
