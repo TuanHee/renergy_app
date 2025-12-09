@@ -247,9 +247,9 @@ class PaymentResultScreenView extends StatelessWidget {
 
                         if(!controller.isSeeLess) ...[
                           _buildKeyValueRow('Port Type', controller.order?.port?.portType ?? '-'),
-                          _buildKeyValueRow('Port Voltage', controller.order?.port?.outputPower ?? '-'),
+                          _buildKeyValueRow('Port Voltage','${controller.order?.port?.outputPower ?? '-'} kWh'  ),
                           _buildKeyValueRow(
-                            'Total kWh Usage',
+                            'Total Usage',
                             '${((controller.order?.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh',
                         ),
                         _buildKeyValueRow(
@@ -277,13 +277,14 @@ class PaymentResultScreenView extends StatelessWidget {
                           'Charging Fee',
                           controller.order?.charging_price == null
                               ? '-'
-                              : 'RM${(controller.order!.charging_price! * controller.order!.totalUsage!).toStringAsFixed(2)}',
+                              : 'RM${(controller.order!.charging_price! * (controller.order!.totalUsage! / 1000)).toStringAsFixed(2)}',
                         ),
                         _buildKeyValueRow(
                           'Subtotal',
                           controller.order?.subtotalAmount == null
                               ? '-'
                               : 'RM${controller.order!.subtotalAmount!.toStringAsFixed(2)}',
+                        tooltip: 'minimum charge amount is RM 5.00',
                         ),
                         _buildKeyValueRow(
                           'Discount',
@@ -336,6 +337,7 @@ Widget _buildKeyValueRow(
   String label,
   String value, {
   bool highlightValue = false,
+  String? tooltip,
 }) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -349,12 +351,31 @@ Widget _buildKeyValueRow(
             fontWeight: FontWeight.w500,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w500,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (tooltip != null && tooltip.isNotEmpty) ...[
+              Tooltip(
+                message: tooltip,
+                triggerMode: TooltipTriggerMode.tap,
+                waitDuration: const Duration(milliseconds: 250),
+                showDuration: const Duration(seconds: 3),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: highlightValue ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ],
     ),
