@@ -61,7 +61,7 @@ class PaymentResultScreenView extends StatelessWidget {
           backgroundColor: const Color(0xFFF3F6FA),
           appBar: AppBar(
             centerTitle: true,
-            title: const Text('Completed'),
+            title: Text(controller.order?.status ?? ''),
             leading: IconButton(
               onPressed: () => Get.back(),
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -90,17 +90,22 @@ class PaymentResultScreenView extends StatelessWidget {
                   // Header image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: (controller.order?.station?.mainImageUrl != null
+                    child: (controller.order?.station?.mainImageUrl != null || controller.order?.mainImageUrl != null
                         ? Image.network(
-                            controller.order!.station!.mainImageUrl!,
+                            controller.order?.station?.mainImageUrl ?? controller.order!.mainImageUrl!,
                             height: 180,
                             fit: BoxFit.cover,
                           )
-                        : Image.asset(
-                            'assets/images/image_placeholder.png',
-                            height: 180,
-                            fit: BoxFit.cover,
-                          )),
+                        : Container(
+                          width: double.infinity,
+                          height: 180,
+                          color: Colors.grey.shade400,
+                          child: Image.asset(
+                              'assets/images/image_placeholder.png',
+                              height: 180,
+                              fit: BoxFit.contain,
+                            ),
+                        )),
                   ),
 
                   const SizedBox(height: 12),
@@ -239,11 +244,13 @@ class PaymentResultScreenView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildKeyValueRow('Port Type', controller.order?.port?.portType ?? '-'),
-                        _buildKeyValueRow('Port Voltage', controller.order?.port?.outputPower ?? '-'),
-                        _buildKeyValueRow(
-                          'Total kWh Usage',
-                          '${((controller.order?.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh',
+
+                        if(!controller.isSeeLess) ...[
+                          _buildKeyValueRow('Port Type', controller.order?.port?.portType ?? '-'),
+                          _buildKeyValueRow('Port Voltage', controller.order?.port?.outputPower ?? '-'),
+                          _buildKeyValueRow(
+                            'Total kWh Usage',
+                            '${((controller.order?.totalUsage ?? 0) / 1000).toStringAsFixed(1)} kWh',
                         ),
                         _buildKeyValueRow(
                           'Duration',
@@ -256,13 +263,21 @@ class PaymentResultScreenView extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         _dashedDivider(),
+                        ],
                         const SizedBox(height: 8),
-                        _buildKeyValueRow('Payment Method', '-'),
+                        _buildKeyValueRow('Payment Method', 'Card'),
+                        if(controller.order?.totalChargeableIdleTimeMinutes != null && controller.order!.totalChargeableIdleTimeMinutes! > 0)
+                        _buildKeyValueRow(
+                          'Idle Fee',
+                          controller.order?.charging_price == null || controller.order?.totalChargeableIdleTimeMinutes == null
+                              ? '-'
+                              : 'RM${(controller.order!.idle_price! * controller.order!.totalChargeableIdleTimeMinutes!).toStringAsFixed(2)}',
+                        ),
                         _buildKeyValueRow(
                           'Charging Fee',
                           controller.order?.charging_price == null
                               ? '-'
-                              : 'RM${controller.order!.charging_price!.toStringAsFixed(2)}',
+                              : 'RM${(controller.order!.charging_price! * controller.order!.totalUsage!).toStringAsFixed(2)}',
                         ),
                         _buildKeyValueRow(
                           'Subtotal',
@@ -293,14 +308,17 @@ class PaymentResultScreenView extends StatelessWidget {
 
                   // Action button
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.isSeeLess = !controller.isSeeLess;
+                      controller.update();
+                    },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                       side: BorderSide(color: Colors.grey.shade700),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(
-                      'See Less Details',
+                    child: Text(
+                      controller.isSeeLess ? 'See More Details' : 'See Less Details',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),

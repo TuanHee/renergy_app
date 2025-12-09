@@ -7,6 +7,7 @@ import 'port.dart';
 
 class Order {
   int? id;
+  String? mainImageUrl;
   int? stationId;
   Station? station;
   String? stationName;
@@ -39,6 +40,7 @@ class Order {
 
   Order({
     this.id,
+    this.mainImageUrl,
     this.stationId,
     this.station,
     this.stationName,
@@ -73,6 +75,7 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: json['id'] == null ? null : int.parse(json['id'].toString()),
+      mainImageUrl: json['main_image_url'],
       stationId: json['station_id'] == null ? null : int.parse(json['station_id'].toString()),
       stationName: json['station_name'],
       station: json['station'] == null ? null : Station.fromJson(json['station']),
@@ -125,6 +128,7 @@ class Order {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'main_image_url': mainImageUrl,
       'station_id': stationId,
       'station': station?.toJson(),
       'station_name': stationName,

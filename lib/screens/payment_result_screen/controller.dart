@@ -10,6 +10,7 @@ class PaymentResultController extends GetxController {
   Order? order;
   List<Map<String, String>> items = [];
   bool isDownloading = false;
+  bool isSeeLess = true;
 
   @override
   void onInit() async{
