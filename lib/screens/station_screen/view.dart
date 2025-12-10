@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:renergy_app/common/constants/enums.dart';
 import 'package:renergy_app/common/models/bay.dart';
 import 'package:renergy_app/common/models/credit_card.dart';
+import 'package:renergy_app/common/models/idle_times.dart';
+import 'package:renergy_app/common/models/operation_times.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/main.dart';
@@ -20,7 +22,9 @@ class _StationScreenViewState extends State<StationScreenView> {
   final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
   // PageView controller and index for image carousel dots
-  final PageController _imagePageController = PageController(viewportFraction: 1.0);
+  final PageController _imagePageController = PageController(
+    viewportFraction: 1.0,
+  );
   int _imagePageIndex = 0;
 
   @override
@@ -111,7 +115,8 @@ class _StationScreenViewState extends State<StationScreenView> {
                                 });
                               },
                               itemBuilder: (context, index) {
-                                final img = controller.station.imageUrls![index];
+                                final img =
+                                    controller.station.imageUrls![index];
                                 return Image.network(
                                   img,
                                   fit: BoxFit.fitHeight,
@@ -129,7 +134,9 @@ class _StationScreenViewState extends State<StationScreenView> {
                             children: List.generate(
                               controller.station.imageUrls!.length,
                               (i) => Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
                                 width: 8,
                                 height: 8,
                                 decoration: BoxDecoration(
@@ -170,13 +177,25 @@ class _StationScreenViewState extends State<StationScreenView> {
                         Colors.black,
                       ),
                       _statusItem(
-                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                        controller.station.isActive &&
+                                controller.station.bays?.any(
+                                      (bay) => bay.isAvailable == true,
+                                    ) ==
+                                    true
                             ? Icons.check_circle
                             : Icons.cancel,
-                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                        controller.station.isActive &&
+                                controller.station.bays?.any(
+                                      (bay) => bay.isAvailable == true,
+                                    ) ==
+                                    true
                             ? 'Available'
                             : 'Unavailable',
-                        controller.station.isActive && controller.station.bays?.any((bay) => bay.isAvailable == true) == true
+                        controller.station.isActive &&
+                                controller.station.bays?.any(
+                                      (bay) => bay.isAvailable == true,
+                                    ) ==
+                                    true
                             ? Colors.green
                             : Colors.red,
                       ),
@@ -411,7 +430,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 12),
-                      _scheduleDays(),
+                      _scheduleIdle(controller.station.idleTimes),
                       const SizedBox(height: 24),
 
                       // Operation Info Section
@@ -426,7 +445,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       _infoItem(Icons.phone, 'Hotline'),
                       const SizedBox(height: 12),
                       _infoItem(Icons.schedule, 'Business Hour'),
-                      _scheduleDays(),
+                      _scheduleOperation(controller.station.operationTimes),
                       const SizedBox(height: 24),
 
                       // Report Station
@@ -506,59 +525,68 @@ class _StationScreenViewState extends State<StationScreenView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  controller.selectedCard == null ?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Add card to proceed with payment.',
-                        style: TextStyle(color: Colors.grey.shade600,
-                        fontSize: 12),
-                        
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Get.toNamed(AppRoutes.card);
-                        },
-                        child: const Text('+ Add Card'),
-                      ),
-                    ],
-                  ):Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Pay with Card ',
-                        style: TextStyle(color: Colors.grey.shade800,
-                        fontSize: 13),
-                        
-                      ),
+                  controller.selectedCard == null
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Add card to proceed with payment.',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Get.toNamed(AppRoutes.card);
+                              },
+                              child: const Text('+ Add Card'),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Pay with Card ',
+                              style: TextStyle(
+                                color: Colors.grey.shade800,
+                                fontSize: 13,
+                              ),
+                            ),
 
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '**** **** **** ${controller.selectedCard?.last4 ?? 'Unknown'}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final result = await Get.toNamed(
+                                  AppRoutes.card,
+                                  arguments: {'isSelectingCard': true},
+                                );
+                                if (result != null && result is CreditCard) {
+                                  controller.selectedCard = result;
+                                  controller.update();
+                                }
+                              },
+                              child: const Text('Change'),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          '**** **** **** ${controller.selectedCard?.last4 ?? 'Unknown'}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () async{
-                          final result = await Get.toNamed(AppRoutes.card, arguments: {'isSelectingCard': true});
-                          if(result != null && result is CreditCard){
-                            controller.selectedCard = result;
-                            controller.update();
-                          }
-                        },
-                        child: const Text('Change'),
-                      ),
-                    ],
-                  ),
                   Row(
                     children: [
                       Expanded(
@@ -668,8 +696,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed:
-                              controller.unlockBay,
+                          onPressed: controller.unlockBay,
                           icon: const Icon(Icons.lock_open),
                           label: const Text('Unlock Now'),
                           style: ElevatedButton.styleFrom(
@@ -795,7 +822,7 @@ class _StationScreenViewState extends State<StationScreenView> {
     );
   }
 
-  Widget _scheduleDays() {
+  Widget _scheduleIdle(List<IdleTimes>? idleTimes) {
     final days = [
       'Monday',
       'Tuesday',
@@ -819,6 +846,10 @@ class _StationScreenViewState extends State<StationScreenView> {
         separatorBuilder: (_, __) =>
             Divider(height: 1, color: Colors.grey.shade200),
         itemBuilder: (context, index) {
+          final idleTime = idleTimes?.firstWhere(
+            (element) => element.getDay() - 1 == index,
+            orElse: () => IdleTimes(),
+          );
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
@@ -829,8 +860,72 @@ class _StationScreenViewState extends State<StationScreenView> {
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  index == 0 ? '09:00 am - 11:59 pm' : '12:00 am - 11:59 pm',
-                  style: TextStyle(color: Colors.grey.shade600),
+                  idleTime!.idleStart != null && idleTime.idleEnd != null
+                      ? '${idleTime.idleStart ?? 'N/A'} - ${idleTime.idleEnd ?? 'N/A'}'
+                      : '-',
+                  style: TextStyle(
+                    color: idleTime.getDay() == DateTime.now().weekday
+                        ? Colors.black
+                        : Colors.grey.shade500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _scheduleOperation(List<OperationTimes>? operationTimes) {
+    final days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: ListView.separated(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: days.length,
+        separatorBuilder: (_, __) =>
+            Divider(height: 1, color: Colors.grey.shade200),
+        itemBuilder: (context, index) {
+          final operationTime = operationTimes?.firstWhere(
+            (element) => element.getDay() - 1 == index,
+            orElse: () => OperationTimes(),
+          );
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  days[index],
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  operationTime!.operationStart != null &&
+                          operationTime.operationEnd != null
+                      ? '${operationTime.operationStart ?? 'N/A'} - ${operationTime.operationEnd ?? 'N/A'}'
+                      : '-',
+                  style: TextStyle(
+                    color: operationTime.getDay() == DateTime.now().weekday
+                        ? Colors.black
+                        : Colors.grey.shade500,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

@@ -729,7 +729,7 @@ class _StationItem extends StatelessWidget {
                               Icon(Icons.schedule, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
-                                '${operationTime?.operationStart ?? 'N/A'}–${operationTime?.operationEnd ?? 'N/A'}',
+                                '${operationTime?.operationStatus} | ${operationTime?.operationStart ?? 'N/A'}–${operationTime?.operationEnd ?? 'N/A'}',
                                 style: TextStyle(
                                   color: (DateTime.now().weekday == DateTime.monday && DateTime.now().hour < 9)
                                       ? Colors.red.shade700

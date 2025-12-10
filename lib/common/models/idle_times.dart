@@ -44,4 +44,25 @@ class IdleTimes {
   static List<IdleTimes> listFromJson(dynamic json) {
     return json == null ? [] : List<IdleTimes>.from(json.map((x) => IdleTimes.fromJson(x)));
   }
+
+  int getDay() {
+    switch (day?.toLowerCase()) {
+      case 'monday':
+        return DateTime.monday;
+      case 'tuesday':
+        return DateTime.tuesday;
+      case 'wednesday':
+        return DateTime.wednesday;
+      case 'thursday':
+        return DateTime.thursday;
+      case 'friday':
+        return DateTime.friday;
+      case 'saturday': 
+        return DateTime.saturday;
+      case 'sunday':
+        return DateTime.sunday;
+      default:
+        return DateTime.monday;
+    }
+  }
 }

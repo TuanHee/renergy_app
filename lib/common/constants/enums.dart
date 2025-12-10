@@ -113,11 +113,12 @@ enum ChargingStatsStatus {
     return null;
   }
 
-  static Future<void> page(ChargingStats? chargingStat, chargingProcessPage page) async {
+  static Future<void> page(
+    ChargingStats? chargingStat,
+    chargingProcessPage page,
+  ) async {
     if (chargingStat?.status == null && chargingStat?.order == null) {
-      await Get.offNamed(
-          AppRoutes.charging,
-        );
+      await Get.offNamed(AppRoutes.charging);
     }
 
     switch (chargingStat?.status) {
@@ -126,7 +127,10 @@ enum ChargingStatsStatus {
           return;
         }
 
-        await Get.offNamed(AppRoutes.plugInLoading, arguments: chargingStat!.order!);
+        await Get.offNamed(
+          AppRoutes.plugInLoading,
+          arguments: chargingStat!.order!,
+        );
         break;
       case ChargingStatsStatus.charging:
         if (page == chargingProcessPage.chargingProcessing) {
@@ -141,7 +145,10 @@ enum ChargingStatsStatus {
 
       case ChargingStatsStatus.completed:
         if (chargingStat!.order!.status == OrderStatus.completed.value) {
-          await Get.offNamed(AppRoutes.paymentResult, arguments: chargingStat.order!);
+          await Get.offNamed(
+            AppRoutes.paymentResult,
+            arguments: chargingStat.order!,
+          );
         }
         if (page == chargingProcessPage.recharge) {
           return;
@@ -164,7 +171,7 @@ enum ChargingStatsStatus {
   }
 }
 
-enum chargingProcessPage { charging,plugIn, chargingProcessing, recharge }
+enum chargingProcessPage { charging, plugIn, chargingProcessing, recharge }
 
 enum ParkingStatus {
   available('Available'),
@@ -177,6 +184,24 @@ enum ParkingStatus {
   static ParkingStatus? fromString(String? value) {
     if (value == null) return null;
     for (ParkingStatus status in ParkingStatus.values) {
+      if (status.value == value) {
+        return status;
+      }
+    }
+    return null;
+  }
+}
+
+enum OperationStatus {
+  open('Open'),
+  close('Close');
+
+  const OperationStatus(this.value);
+  final String value;
+
+  static OperationStatus? fromString(String? value) {
+    if (value == null) return null;
+    for (OperationStatus status in OperationStatus.values) {
       if (status.value == value) {
         return status;
       }
