@@ -147,7 +147,7 @@ enum ChargingStatsStatus {
         break;
 
       case ChargingStatsStatus.completed:
-        if (chargingStat!.order!.status == OrderStatus.completed.value) {
+        if (OrderStatus.fromString(chargingStat!.order!.status) == OrderStatus.completed) {
           await Get.offNamed(
             AppRoutes.paymentResult,
             arguments: chargingStat.order!,
@@ -159,12 +159,11 @@ enum ChargingStatsStatus {
         await Get.offNamed(AppRoutes.recharge, arguments: chargingStat.order!);
         break;
       case ChargingStatsStatus.cancelled:
-        if (chargingStat!.order!.status == OrderStatus.cancelled ||
-            chargingStat.order!.status == OrderStatus.unpaid) {
-          print('calledddddd');
+        if (OrderStatus.fromString(chargingStat!.order!.status) == OrderStatus.cancelled ||
+            OrderStatus.fromString(chargingStat.order!.status) == OrderStatus.unpaid) {
           await Get.offAllNamed(AppRoutes.charging);
-        } else if (chargingStat.order!.status == OrderStatus.restarting.value ||
-            chargingStat.order!.status == OrderStatus.pending.value) {
+        } else if (OrderStatus.fromString(chargingStat.order!.status) == OrderStatus.restarting ||
+            OrderStatus.fromString(chargingStat.order!.status) == OrderStatus.pending) {
           await Get.offNamed(
             AppRoutes.recharge,
             arguments: {'order': chargingStat.order, 'canRecharge': false},

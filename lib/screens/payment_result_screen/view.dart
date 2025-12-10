@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 
 import 'controller.dart';
 
@@ -63,7 +64,16 @@ class PaymentResultScreenView extends StatelessWidget {
             centerTitle: true,
             title: Text(controller.order?.status ?? ''),
             leading: IconButton(
-              onPressed: () => Get.back(),
+              onPressed: () {
+                if(!Navigator.of(context).canPop()){
+                  Get.offAllNamed(AppRoutes.charging, arguments: {'isStayPage': true});
+                }
+                else{
+                  Get.back();
+                }
+              },
+
+
               icon: const Icon(Icons.arrow_back, color: Colors.white),
             ),
             actions: [

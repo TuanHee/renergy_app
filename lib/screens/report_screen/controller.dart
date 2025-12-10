@@ -16,6 +16,8 @@ class ReportController extends GetxController {
 
   List<String> reasons = [];
   bool isLoadingReasons = false;
+  // add submit loading flag
+  bool isSubmitting = false;
 
   @override
   void onInit() async {
@@ -103,15 +105,8 @@ class ReportController extends GetxController {
   List<String> get portOptions {
     final port = selectedBay?.port;
     if (port == null) return [];
-    final current = port.currentType ?? '';
-    final output = port.outputCurrent ?? '';
     final type = port.portType ?? '';
-    final status = port.status ?? '';
-    return [
-      [current, output].where((e) => e.isNotEmpty).join(' '),
-      type.isNotEmpty ? type : null,
-      status.isNotEmpty ? status : null,
-    ].whereType<String>().where((e) => e.trim().isNotEmpty).toList();
+    return type.isNotEmpty ? [type] : [];
   }
 
   void setBay(Bay? bay) {
@@ -132,12 +127,40 @@ class ReportController extends GetxController {
   }
 
   Future<void> submit(BuildContext context) async {
-    if (selectedBay == null || selectedReason == null) {
+    if (selectedBay == null || selectedReason == null || selectedPort == null) {
       Snackbar.showError('Please select required fields', context);
       return;
     }
-    // TODO: Hook to backend service to submit report.
-    Snackbar.showSuccess('Report submitted. Thank you!', context);
-    Get.back();
+    // show submitting overlay
+    isSubmitting = true;
+    update();
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+    try {
+      final payload = {
+        'station_id': station.id,
+        'bay_id': selectedBay!.id,
+        'charger_port_id': selectedPort!.id,
+        'reason': selectedReason,
+      };
+      final res = await Api().post(Endpoints.stationReports, data: payload);
+      if (res.data['status'] == 200 || res.statusCode == 200) {
+        if (Get.isDialogOpen == true) Get.back(); // close loading
+        Snackbar.showSuccess('Report submitted. Thank you!', context);
+        Get.back(); // navigate back
+      } else {
+        final msg = res.data['message']?.toString() ?? 'Failed to submit report';
+        if (Get.isDialogOpen == true) Get.back(); // close loading
+        Snackbar.showError(msg, context);
+      }
+    } catch (e) {
+      if (Get.isDialogOpen == true) Get.back(); // close loading
+      Snackbar.showError(e.toString(), context);
+    } finally {
+      isSubmitting = false;
+      update();
+    }
   }
 }

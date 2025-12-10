@@ -20,6 +20,7 @@ class Endpoints {
   static String profile = 'my-profile';
   static String updateProfile = 'update-profile';
   static String reportReasons = 'station-reports/reasons';
-  static String notifications = 'notifications';
   static String unreadNotificationCount = 'notifications/unread-count';
+  static String notifications = 'notifications';
+  static const String stationReports = 'station-reports';
 }
