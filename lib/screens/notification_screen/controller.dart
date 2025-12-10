@@ -7,12 +7,15 @@ import '../../common/services/api_service.dart';
 
 class NotificationController extends GetxController {
   List<AppNotification> notifications = [];
+  bool isLoading = true;
 
   int get unreadCount => 0;
 
   @override
   void onInit() {
     super.onInit();
+    isLoading = true;
+    update();
     fetchNotification();
   }
 
@@ -35,6 +38,8 @@ class NotificationController extends GetxController {
   Future<void> fetchNotification({
     Function(String msg)? onErrorCallback,
   }) async {
+    isLoading = true;
+    update();
     try {
       final res = await Api().get(Endpoints.notifications);
 
@@ -44,6 +49,8 @@ class NotificationController extends GetxController {
 
         if (data['notifications'] is List && data['notifications'].isNotEmpty) {
           notifications = AppNotification.listFromJson(data['notifications']);
+        } else {
+          notifications = [];
         }
       } else {
         throw res.data['message'] ??
@@ -55,6 +62,7 @@ class NotificationController extends GetxController {
       }
       Snackbar.showError(e.toString(), Get.context!);
     } finally {
+      isLoading = false;
       update();
     }
   }

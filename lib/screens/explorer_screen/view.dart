@@ -77,6 +77,7 @@ class _ExplorerScreenViewState extends State<ExplorerScreenView> {
                   ),
                   child: IconButton(
                     onPressed: () {
+                      controller.unreadNotificationCount = 0;
                       Get.toNamed(AppRoutes.notification);
                     },
                     icon: const Icon(

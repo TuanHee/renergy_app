@@ -24,6 +24,10 @@ class _NotificationScreenViewState extends State<NotificationScreenView> {
       ),
       body: GetBuilder<NotificationController>(
         builder: (controller) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (controller.notifications.isEmpty) {
             return SizedBox(
               width: double.infinity,
