@@ -19,6 +19,9 @@ class StationScreenView extends StatefulWidget {
 class _StationScreenViewState extends State<StationScreenView> {
   final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
+  // PageView controller and index for image carousel dots
+  final PageController _imagePageController = PageController(viewportFraction: 1.0);
+  int _imagePageIndex = 0;
 
   @override
   void initState() {
@@ -30,6 +33,7 @@ class _StationScreenViewState extends State<StationScreenView> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _imagePageController.dispose();
     super.dispose();
   }
 
@@ -83,32 +87,70 @@ class _StationScreenViewState extends State<StationScreenView> {
                 // Charging station image
                 SizedBox(
                   height: 250,
-                  child:
+                  child: Stack(
+                    children: [
                       (controller.station.imageUrls == null ||
-                          controller.station.imageUrls!.isEmpty)
-                      ? Image.network(
-                          controller.station.mainImageUrl ?? '',
-                          fit: BoxFit.fill,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                width: double.infinity,
-                                height: 250,
-                                color: Colors.grey[300],
-                              ),
-                        )
-                      : PageView.builder(
-                          itemCount: controller.station.imageUrls!.length,
-                          controller: PageController(viewportFraction: 1.0),
-                          itemBuilder: (context, index) {
-                            final img = controller.station.imageUrls![index];
-                            return Image.network(
-                              img,
+                              controller.station.imageUrls!.isEmpty)
+                          ? Image.network(
+                              controller.station.mainImageUrl ?? '',
                               fit: BoxFit.fill,
                               width: double.infinity,
-                            );
-                          },
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    width: double.infinity,
+                                    height: 250,
+                                    color: Colors.grey[300],
+                                  ),
+                            )
+                          : PageView.builder(
+                              itemCount: controller.station.imageUrls!.length,
+                              controller: _imagePageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _imagePageIndex = index;
+                                });
+                              },
+                              itemBuilder: (context, index) {
+                                final img = controller.station.imageUrls![index];
+                                return Image.network(
+                                  img,
+                                  fit: BoxFit.fitHeight,
+                                  width: double.infinity,
+                                );
+                              },
+                            ),
+                      if ((controller.station.imageUrls?.length ?? 0) > 1)
+                        Positioned(
+                          bottom: 10,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              controller.station.imageUrls!.length,
+                              (i) => Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: i == _imagePageIndex
+                                      ? Colors.white
+                                      : Colors.white.withOpacity(0.5),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
+                    ],
+                  ),
                 ),
                 // Status bar overlay at bottom of image
                 Container(
