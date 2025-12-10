@@ -279,6 +279,9 @@ class PaymentResultScreenView extends StatelessWidget {
                               ? '-'
                               : 'RM${(controller.order!.charging_price! * (controller.order!.totalUsage! / 1000)).toStringAsFixed(2)}',
                         ),
+                        const SizedBox(height: 8),
+                        _dashedDivider(),
+                        const SizedBox(height: 8),
                         _buildKeyValueRow(
                           'Subtotal',
                           controller.order?.subtotalAmount == null

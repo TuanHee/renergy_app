@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/snackbar.dart';
+import 'package:renergy_app/common/constants/enums.dart';
 
 import '../../components/main_bottom_nav_bar.dart';
 import 'controller.dart';
@@ -97,8 +98,54 @@ class _RechargeScreenViewState extends State<RechargeScreenView> {
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                     textAlign: TextAlign.center,
                   ),
+
+                  const SizedBox(height: 16),
+                  // Waiting for payment successful animation banner
+                  Builder(
+                    builder: (_) {
+                      final isCompleted = controller.chargingStats?.status == ChargingStatsStatus.completed;
+                      final orderStatus = controller.chargingStats?.order?.status ?? controller.order?.status;
+                      final isPaymentPending = orderStatus == OrderStatus.paymentPending.value;
+                      if (isCompleted && isPaymentPending) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.amber.shade300),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.amber.shade700,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: AutoSizeText(
+                                  'Waiting for payment confirmation...',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.amber.shade700,
+                                  ),
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+
                   const SizedBox(height: 24),
-        
                   GetBuilder<RechargeController>(
                     builder: (controller) => controller.remainSecond != null
                         ? Container(

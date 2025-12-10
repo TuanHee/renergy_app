@@ -117,6 +117,9 @@ enum ChargingStatsStatus {
     ChargingStats? chargingStat,
     chargingProcessPage page,
   ) async {
+    print('chargingStat?.status: ${chargingStat?.status}');
+    print('chargingStat?.order?.status: ${chargingStat?.order?.status}');
+
     if (chargingStat?.status == null && chargingStat?.order == null) {
       await Get.offNamed(AppRoutes.charging);
     }
@@ -156,7 +159,9 @@ enum ChargingStatsStatus {
         await Get.offNamed(AppRoutes.recharge, arguments: chargingStat.order!);
         break;
       case ChargingStatsStatus.cancelled:
-        if (chargingStat!.order!.status == OrderStatus.cancelled) {
+        if (chargingStat!.order!.status == OrderStatus.cancelled ||
+            chargingStat.order!.status == OrderStatus.unpaid) {
+          print('calledddddd');
           await Get.offAllNamed(AppRoutes.charging);
         } else if (chargingStat.order!.status == OrderStatus.restarting.value ||
             chargingStat.order!.status == OrderStatus.pending.value) {
