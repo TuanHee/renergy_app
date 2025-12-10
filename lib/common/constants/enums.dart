@@ -114,8 +114,11 @@ enum ChargingStatsStatus {
   }
 
   static Future<void> page(ChargingStats? chargingStat, chargingProcessPage page) async {
-    if (chargingStat?.status == null) throw 'Charging stats status is null';
-    if (chargingStat?.order == null) throw 'Charging stats order is null';
+    if (chargingStat?.status == null && chargingStat?.order == null) {
+      await Get.offNamed(
+          AppRoutes.charging,
+        );
+    }
 
     switch (chargingStat?.status) {
       case ChargingStatsStatus.open:

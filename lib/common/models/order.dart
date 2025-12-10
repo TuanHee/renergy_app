@@ -3,6 +3,8 @@ import 'package:renergy_app/common/models/order_line.dart';
 import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/models/order_customer.dart';
 
+import 'idle_times.dart';
+import 'operation_times.dart';
 import 'port.dart';
 
 class Order {

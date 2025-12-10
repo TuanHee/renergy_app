@@ -1,6 +1,9 @@
 import 'package:renergy_app/common/models/bay.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'idle_times.dart';
+import 'operation_times.dart';
+
 class Station {
   int? id;
   int? companyId;
@@ -24,6 +27,8 @@ class Station {
   String? createdAt;
   String? updatedAt;
   List<Bay>? bays;
+  List<IdleTimes>? idleTimes;
+  List<OperationTimes>? operationTimes;
 
   Station({
     this.id,
@@ -48,6 +53,8 @@ class Station {
     this.createdAt,
     this.updatedAt,
     this.bays,
+    this.idleTimes,
+    this.operationTimes,
   });
 
   factory Station.fromJson(Map<String, dynamic> json) {
@@ -86,6 +93,12 @@ class Station {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       bays: json['bays'] == null ? null : Bay.listFromJson(json['bays']),
+      idleTimes: json['idle_times'] == null
+          ? null
+          : IdleTimes.listFromJson(json['idle_times']),
+      operationTimes: json['operation_times'] == null
+          ? null
+          : OperationTimes.listFromJson(json['operation_times']),
     );
   }
 
@@ -113,6 +126,8 @@ class Station {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'bays': bays?.map((b) => b.toJson()).toList(),
+      'idle_times': idleTimes?.map((i) => i.toJson()).toList(),
+      'operation_times': operationTimes?.map((o) => o.toJson()).toList(),
     };
   }
 

@@ -11,7 +11,6 @@ import 'package:renergy_app/components/float_bar.dart';
 import 'package:renergy_app/global.dart';
 import 'package:renergy_app/main.dart';
 import 'package:renergy_app/screens/explorer_screen/explorer_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ExplorerScreenView extends StatefulWidget {
   const ExplorerScreenView({super.key});
@@ -527,6 +526,8 @@ class _StationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final muted = Colors.grey.shade600;
 
+    final operationTime = station.operationTimes != null && station.operationTimes!.isNotEmpty ? station.operationTimes!.firstWhere((ot) => ot.getDay() == DateTime.now().weekday ) : null;
+
     return InkWell(
       onTap: () {
         Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
@@ -728,9 +729,7 @@ class _StationItem extends StatelessWidget {
                               Icon(Icons.schedule, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
-                                DateTime.now().weekday == DateTime.monday
-                                    ? 'Open • 09:00–23:59'
-                                    : 'Open • 00:00–23:59',
+                                '${operationTime?.operationStart ?? 'N/A'}–${operationTime?.operationEnd ?? 'N/A'}',
                                 style: TextStyle(
                                   color: (DateTime.now().weekday == DateTime.monday && DateTime.now().hour < 9)
                                       ? Colors.red.shade700
