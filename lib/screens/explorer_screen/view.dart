@@ -525,7 +525,6 @@ class _StationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muted = Colors.grey.shade600;
-
     final operationTime = station.operationTimes != null && station.operationTimes!.isNotEmpty ? station.operationTimes!.firstWhere((ot) => ot.getDay() == DateTime.now().weekday ) : null;
 
     return InkWell(

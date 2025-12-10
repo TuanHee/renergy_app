@@ -17,6 +17,8 @@ class BookmarkItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muted = Colors.grey.shade600;
+    final operationTime = bookmark?.station?.operationTimes != null && bookmark!.station!.operationTimes!.isNotEmpty ? bookmark?.station?.operationTimes!.firstWhere((ot) => ot.getDay() == DateTime.now().weekday ) : null;
+
     return InkWell(
       onTap: () => onTap?.call(),
       borderRadius: BorderRadius.circular(12),
@@ -124,104 +126,105 @@ class BookmarkItem extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24.0, 12.0, 12.0, 0),
+              padding: const EdgeInsets.only(top: 12),
               child: Column(
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      direction: Axis.horizontal,
-                      spacing: 12,
-                      runSpacing: 8,
-                      children: [
-                        // Distance
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.route, size: 14, color: muted),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${bookmark!.station!.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
-                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                  Wrap(
+                    direction: Axis.horizontal,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      // Distance
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        // Bays count
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.ev_station, size: 14, color: muted),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${bookmark!.station!.bays?.length ?? 0} bays',
-                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.route, size: 14, color: muted),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${bookmark!.station!.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                              style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ],
                         ),
-                        // Availability
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Icons.check_circle : Icons.cancel,
-                                size: 14,
+                      ),
+                      // Bays count
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.ev_station, size: 14, color: muted),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${bookmark!.station!.bays?.length ?? 0} bays',
+                              style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Availability
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Icons.check_circle : Icons.cancel,
+                              size: 14,
+                              color: bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Colors.green.shade700 : Colors.red.shade700,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? 'Available' : 'Unavailable',
+                              style: TextStyle(
                                 color: bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Colors.green.shade700 : Colors.red.shade700,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? 'Available' : 'Unavailable',
-                                style: TextStyle(
-                                  color: bookmark!.station!.isActive && bookmark!.station!.bays?.any((bay) => bay.isAvailable == true) == true ? Colors.green.shade700 : Colors.red.shade700,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        // Schedule (simplified)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.schedule, size: 14, color: muted),
-                              const SizedBox(width: 6),
-                              Text(
-                                DateTime.now().weekday == DateTime.monday
-                                    ? 'Open • 09:00–23:59'
-                                    : 'Open • 00:00–23:59',
-                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                      ),
+                      // Schedule (simplified)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, size: 14, color: muted),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${operationTime?.operationStatus} | ${operationTime?.operationStart ?? 'N/A'}–${operationTime?.operationEnd ?? 'N/A'}',
+                              style: TextStyle(
+                                color: (DateTime.now().weekday == DateTime.monday && DateTime.now().hour < 9)
+                                    ? Colors.red.shade700
+                                    : Colors.green.shade700,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
