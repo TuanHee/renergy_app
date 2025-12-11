@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:fiuu_mobile_xdk_flutter/fiuu_mobile_xdk_flutter.dart';
@@ -49,15 +51,22 @@ class CardController extends GetxController {
 
   Future<void> addCard() async {
     try {
-      final res = await Api().post(Endpoints.paymentMethods);
-      if (res.data['status'] != 200) {
-        throw res.data['message'] ?? 'Failed to init payment method';
+      final initPaymentRes = await Api().post(Endpoints.paymentMethods);
+      if (initPaymentRes.data['status'] != 200) {
+        throw initPaymentRes.data['message'] ?? 'Failed to init payment method';
       }
-      final data = res.data['data']['params'];
+      final data = initPaymentRes.data['data']['params'];
       final Map<String, dynamic> params = data is Map<String, dynamic>
           ? data
           : {};
       final String? result = await MobileXDK.start(params);
+      print(result);
+
+      if (result == null) throw 'Failed to add card: no return from XDK';
+      final handleRes = await Api().post(Endpoints.handlePayment, data: jsonDecode(result));
+      if (handleRes.data['status'] != 200) {
+        throw handleRes.data['message'] ?? 'Failed to handle Payment';
+      }
 
       await fetchCardIndex();
     } catch (e) {

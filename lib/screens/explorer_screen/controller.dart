@@ -302,7 +302,7 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
           if (aPreferred != bPreferred) {
             return aPreferred ? -1 : 1; // preferred first
           }
-          return a.distanceTo(position).compareTo(b.distanceTo(position));
+          return a.distanceTo(position: position)?.compareTo(b.distanceTo(position:  position) ?? double.maxFinite) ?? 0;
         },
       );
     }

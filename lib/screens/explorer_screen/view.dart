@@ -480,6 +480,7 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
                                     station: widget
                                         .controller
                                         .filteredStations[index],
+                                    stations: widget.controller.stations,
                                   ),
                                   Divider(
                                     height: 1,
@@ -521,7 +522,8 @@ class _BottomSheetPanelState extends State<_BottomSheetPanel> {
 
 class _StationItem extends StatelessWidget {
   final Station station;
-  const _StationItem({required this.station});
+  final List<Station> stations;
+  const _StationItem({required this.station, required this.stations});
 
   @override
   Widget build(BuildContext context) {
@@ -529,8 +531,8 @@ class _StationItem extends StatelessWidget {
     final operationTime = station.operationTimes != null && station.operationTimes!.isNotEmpty ? station.operationTimes!.firstWhere((ot) => ot.getDay() == DateTime.now().weekday ) : null;
 
     return InkWell(
-      onTap: () {
-        Get.toNamed(AppRoutes.chargingStation, arguments: station.id);
+      onTap: () async{
+        Get.toNamed(AppRoutes.chargingStation, arguments: {'stationId': station.id, 'stations': stations});
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -660,7 +662,7 @@ class _StationItem extends StatelessWidget {
                               Icon(Icons.location_on, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
-                                '${station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                                '${station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
                                 style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
                             ],
@@ -1030,7 +1032,7 @@ class _StationCarouselBottomSheetState
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: _StationItem(station: station),
+                          child: _StationItem(station: station, stations: stations),
                         ),
                       ),
                     );

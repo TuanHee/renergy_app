@@ -137,13 +137,16 @@ class Station {
         : List<Station>.from(json.map((x) => Station.fromJson(x)));
   }
 
-  double distanceTo(Position position) {
-    final lat = double.tryParse(latitude ?? '');
-    final lon = double.tryParse(longitude ?? '');
-    if (lat == null || lon == null) return double.maxFinite;
+  double? distanceTo({Position? position, double? latitude, double? longitude}) {
+    final lat = double.tryParse(this.latitude ?? '');
+    final lon = double.tryParse(this.longitude ?? '');
+    final targetLat = position?.latitude ?? latitude;
+    final targetLon = position?.longitude ?? longitude;
+
+    if (lat == null || lon == null || targetLat == null || targetLon == null) return null;
     return Geolocator.distanceBetween(
-          position.latitude,
-          position.longitude,
+          targetLat,
+          targetLon,
           lat,
           lon,
         ) /

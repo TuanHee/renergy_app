@@ -152,9 +152,9 @@ class _CardScreenViewState extends State<CardScreenView> {
                   },
                 ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () {
+            onPressed: () async{
               try {
-                controller.addCard();
+                await controller.addCard();
               } catch (e) {
                 Snackbar.showError(e.toString(), context);
               }

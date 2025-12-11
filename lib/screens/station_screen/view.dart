@@ -5,6 +5,7 @@ import 'package:renergy_app/common/models/bay.dart';
 import 'package:renergy_app/common/models/credit_card.dart';
 import 'package:renergy_app/common/models/idle_times.dart';
 import 'package:renergy_app/common/models/operation_times.dart';
+import 'package:renergy_app/common/models/station.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/components/components.dart';
 import 'package:renergy_app/main.dart';
@@ -168,7 +169,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                       _statusItem(Icons.check_circle, 'Open', Colors.green),
                       _statusItem(
                         Icons.location_on,
-                        '${controller.station.distanceTo(Get.find<MainController>().position!).toStringAsFixed(2)} km',
+                        '${controller.station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
                         Colors.black,
                       ),
                       _statusItemImage(
@@ -225,6 +226,7 @@ class _StationScreenViewState extends State<StationScreenView> {
 
                       // Title
                       Text(
+                        key: controller.stationNameKey,
                         controller.station.name!,
                         style: TextStyle(
                           fontSize: 24,
@@ -469,6 +471,38 @@ class _StationScreenViewState extends State<StationScreenView> {
                       const SizedBox(height: 24),
 
                       // Nearby Station Section
+                      controller.nearbyStations.isNotEmpty?
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Nearby Station',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                  controller.nearbyStations.length,
+                                  (index) => SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.8,
+                                    child: _nearbyStationItem(
+                                      station: controller.nearbyStations[index],
+                                      stations: controller.stations,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                      :
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
@@ -945,6 +979,321 @@ class _StationScreenViewState extends State<StationScreenView> {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
+    );
+  }
+}
+
+class _nearbyStationItem extends StatelessWidget {
+  final Station station;
+  final List<Station> stations;
+  const _nearbyStationItem({required this.station, required this.stations});
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = Colors.grey.shade600;
+    final operationTime = station.operationTimes != null && station.operationTimes!.isNotEmpty ? station.operationTimes!.firstWhere((ot) => ot.getDay() == DateTime.now().weekday ) : null;
+
+    return InkWell(
+      onTap: () async{
+        Get.back();
+        await Future.delayed(const Duration(milliseconds: 400));
+        Get.toNamed(AppRoutes.chargingStation, arguments: {'stationId': station.id, 'stations': stations});
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 14, top: 6),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  station.mainImageUrl ?? '',
+                  width: 108,
+                  height: 81,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 108,
+                    height: 90,
+                    color: Colors.grey.shade200,
+                    child: Image.asset(
+                      'assets/images/image_placeholder.png',
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          MyBadge(
+                            label:
+                                '${station.type![0].toUpperCase()}${station.type!.substring(1)}',
+                            color: const Color(0xFF0BB07B),
+                          ),
+                          const SizedBox(width: 6),
+                          if (station.category != null)
+                            MyBadge(
+                              label: station.category!,
+                              color: Colors.black87,
+                              dark: true,
+                            ),
+                          const Spacer(),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        station.name ?? '',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (station.description != null &&
+                          station.description!.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          station.description!,
+                          style: TextStyle(color: muted, fontSize: 12),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24.0, 12.0, 12.0, 0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        // Distance
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.location_on, size: 14, color: muted),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
+                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Bays count
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/images/plug.png',
+                                width: 13,
+                                height: 13,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${station.bays?.where((bay) => bay.isAvailable == true).length ?? 0}',
+                                style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Availability
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Icons.check_circle : Icons.cancel,
+                                size: 14,
+                                color: station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Colors.green.shade700 : Colors.red.shade700,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true ? 'Available' : 'Unavailable',
+                                style: TextStyle(
+                                  color: station.isActive && station.bays?.any((bay) => bay.isAvailable == true) == true  ? Colors.green.shade700 : Colors.red.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Schedule (simplified)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.schedule, size: 14, color: muted),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${operationTime?.operationStatus} | ${operationTime?.operationStart ?? 'N/A'}–${operationTime?.operationEnd ?? 'N/A'}',
+                                style: TextStyle(
+                                  color: (DateTime.now().weekday == DateTime.monday && DateTime.now().hour < 9)
+                                      ? Colors.red.shade700
+                                      : Colors.green.shade700,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: OutlinedButton(
+            //         onPressed: () async {
+            //           await showModalBottomSheet(
+            //             context: context,
+            //             shape: const RoundedRectangleBorder(
+            //               borderRadius: BorderRadius.vertical(
+            //                 top: Radius.circular(16),
+            //               ),
+            //             ),
+            //             builder: (ctx) {
+            //               return SafeArea(
+            //                 top: false,
+            //                 child: Padding(
+            //                   padding: const EdgeInsets.symmetric(
+            //                     horizontal: 16,
+            //                     vertical: 12,
+            //                   ),
+            //                   child: Column(
+            //                     mainAxisSize: MainAxisSize.min,
+            //                     crossAxisAlignment: CrossAxisAlignment.start,
+            //                     children: [
+            //                       const Text(
+            //                         'Open with',
+            //                         style: TextStyle(
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w600,
+            //                         ),
+            //                       ),
+            //                       const SizedBox(height: 8),
+            //                       ListTile(
+            //                         leading: const Icon(
+            //                           Icons.map,
+            //                           color: Colors.redAccent,
+            //                         ),
+            //                         title: const Text('Google Maps'),
+            //                         onTap: () async {
+            //                           Navigator.of(ctx).pop();
+            //                           final lat = double.tryParse(
+            //                             station.latitude ?? '',
+            //                           );
+            //                           final lon = double.tryParse(
+            //                             station.longitude ?? '',
+            //                           );
+            //                           if (lat == null || lon == null) return;
+            //                           final url = Uri.parse(
+            //                             'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+            //                           );
+            //                           await launchUrl(
+            //                             url,
+            //                             mode: LaunchMode.externalApplication,
+            //                           );
+            //                         },
+            //                       ),
+            //                       ListTile(
+            //                         leading: const Icon(
+            //                           Icons.navigation,
+            //                           color: Colors.blueAccent,
+            //                         ),
+            //                         title: const Text('Waze'),
+            //                         onTap: () async {
+            //                           Navigator.of(ctx).pop();
+            //                           final lat = double.tryParse(
+            //                             station.latitude ?? '',
+            //                           );
+            //                           final lon = double.tryParse(
+            //                             station.longitude ?? '',
+            //                           );
+            //                           if (lat == null || lon == null) return;
+            //                           final url = Uri.parse(
+            //                             'https://waze.com/ul?ll=$lat,$lon&navigate=yes',
+            //                           );
+            //                           await launchUrl(
+            //                             url,
+            //                             mode: LaunchMode.externalApplication,
+            //                           );
+            //                         },
+            //                       ),
+            //                       const SizedBox(height: 8),
+            //                     ],
+            //                   ),
+            //                 ),
+            //               );
+            //             },
+            //           );
+            //         },
+            //         child: const Text('Navigate'),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         onPressed: () {
+            //           Get.toNamed(
+            //             AppRoutes.chargingStation,
+            //             arguments: station.id,
+            //           );
+            //         },
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.red.shade700,
+            //           foregroundColor: Colors.white,
+            //         ),
+            //         child: const Text('Charge'),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+          ],
+        ),
+      ),
     );
   }
 }

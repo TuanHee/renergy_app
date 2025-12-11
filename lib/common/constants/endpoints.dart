@@ -23,4 +23,6 @@ class Endpoints {
   static String unreadNotificationCount = 'notifications/unread-count';
   static String notifications = 'notifications';
   static const String stationReports = 'station-reports';
+  static String stationReport(int id) => '$stationReports/$id';
+  static String handlePayment = 'payment-methods/handle-xdk-result';
 }
