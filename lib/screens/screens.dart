@@ -25,3 +25,4 @@ export 'register_screen/register_screen.dart';
 export 'report_screen/report_screen.dart';
 export 'notification_screen/notification_screen.dart';
 export 'price_list_screen/price_list_screen.dart';
+export 'report_history_screen/report_history_screen.dart';

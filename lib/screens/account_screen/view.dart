@@ -13,14 +13,9 @@ class AccountScreenView extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            title: const Text('Account'),
-            centerTitle: true,
-          ),
+          appBar: AppBar(title: const Text('Account'), centerTitle: true),
           body: controller.isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : SafeArea(
                   top: false,
                   child: Column(
@@ -53,9 +48,11 @@ class AccountScreenView extends StatelessWidget {
                                 },
                               ),
                               const SizedBox(height: 12),
-                              const _AccountActionTile(
+                              _AccountActionTile(
                                 icon: Icons.assignment,
                                 label: 'Report History',
+                                onTap: () =>
+                                    Get.toNamed(AppRoutes.reportHistory),
                               ),
                               const SizedBox(height: 12),
                               _AccountActionTile(
@@ -89,8 +86,12 @@ class AccountScreenView extends StatelessWidget {
                                     controller.logout();
                                   },
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    side: BorderSide(color: Colors.grey.shade300),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.grey.shade300,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -134,9 +135,7 @@ class AccountScreenView extends StatelessWidget {
                     ],
                   ),
                 ),
-          bottomNavigationBar: const MainBottomNavBar(
-            currentIndex: 3,
-          ),
+          bottomNavigationBar: const MainBottomNavBar(currentIndex: 3),
         );
       },
     );
@@ -144,9 +143,7 @@ class AccountScreenView extends StatelessWidget {
 }
 
 class _AccountHeader extends StatelessWidget {
-  const _AccountHeader({
-    required this.onProfileTap,
-  });
+  const _AccountHeader({required this.onProfileTap});
 
   final VoidCallback onProfileTap;
 
@@ -171,11 +168,7 @@ class _AccountHeader extends StatelessWidget {
               const CircleAvatar(
                 radius: 28,
                 backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: Color(0xFFE60012),
-                ),
+                child: Icon(Icons.person, size: 32, color: Color(0xFFE60012)),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -197,7 +190,10 @@ class _AccountHeader extends StatelessWidget {
                 onPressed: onProfileTap,
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -234,7 +230,7 @@ class _AccountHeader extends StatelessWidget {
                 _MetricDivider(),
                 _AccountMetric(
                   label: 'CO2 (g)',
-                  value:  '${controller.customer?.totalC02 ?? 0}',
+                  value: '${controller.customer?.totalC02 ?? 0}',
                 ),
               ],
             ),
@@ -246,10 +242,7 @@ class _AccountHeader extends StatelessWidget {
 }
 
 class _AccountMetric extends StatelessWidget {
-  const _AccountMetric({
-    required this.label,
-    required this.value,
-  });
+  const _AccountMetric({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -270,10 +263,7 @@ class _AccountMetric extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-          ),
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
         ),
       ],
     );
@@ -285,11 +275,7 @@ class _MetricDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 32,
-      color: Colors.white24,
-    );
+    return Container(width: 1, height: 32, color: Colors.white24);
   }
 }
 

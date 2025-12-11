@@ -683,7 +683,7 @@ class _StationItem extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                '${station.bays?.length ?? 0}',
+                                '${station.bays?.where((bay) => bay.isAvailable == true).length ?? 0}',
                                 style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
                             ],

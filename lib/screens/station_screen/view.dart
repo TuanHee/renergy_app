@@ -97,7 +97,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                               controller.station.imageUrls!.isEmpty)
                           ? Image.network(
                               controller.station.mainImageUrl ?? '',
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                               width: double.infinity,
                               errorBuilder: (context, error, stackTrace) =>
                                   Container(
@@ -119,7 +119,7 @@ class _StationScreenViewState extends State<StationScreenView> {
                                     controller.station.imageUrls![index];
                                 return Image.network(
                                   img,
-                                  fit: BoxFit.fitHeight,
+                                  fit: BoxFit.cover,
                                   width: double.infinity,
                                 );
                               },
