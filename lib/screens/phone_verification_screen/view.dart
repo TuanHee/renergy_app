@@ -108,6 +108,11 @@ class PhoneVerificationScreenView extends StatelessWidget {
                               validator: controller.validateTac,
                               keyboardType: TextInputType.number,
                               maxLength: 6,
+                              buildCounter: (
+                                BuildContext context,
+                                {required int currentLength,
+                                required bool isFocused,
+                                required int? maxLength}) => null,
                               decoration: InputDecoration(
                                 hintText: 'Enter TAC Number',
                                 filled: true,
@@ -125,6 +130,7 @@ class PhoneVerificationScreenView extends StatelessWidget {
                                     color: Colors.grey.shade300,
                                   ),
                                 ),
+                                counterText: '',
                               ),
                             ),
                           ),

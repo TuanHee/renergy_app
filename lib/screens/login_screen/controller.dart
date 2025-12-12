@@ -18,6 +18,13 @@ class LoginController extends GetxController {
   bool isLoading = false;
   bool showPassword = false;
   String? errorMessage;
+  bool isGoogleOnly = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    isGoogleOnly = Global.isGoogleLoginOnly;
+  }
 
   @override
   void onClose() {
@@ -46,6 +53,11 @@ class LoginController extends GetxController {
   }
 
   Future<void> login() async {
+    if (isGoogleOnly) {
+      errorMessage = 'Google login is required.';
+      update();
+      return;
+    }
     final valid = formKey.currentState?.validate() ?? false;
     if (!valid) return;
     isLoading = true;
@@ -95,7 +107,8 @@ class LoginController extends GetxController {
       if (googleUser == null) return null; // User canceled
 
       // 2. Retrieve authentication details
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // 3. Create the Firebase Credential using idToken and/or accessToken
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -103,12 +116,11 @@ class LoginController extends GetxController {
       );
 
       // 4. Sign in to Firebase
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
 
       // ... rest of the logic
       final User? user = userCredential.user;
-      print('Signed in user: ${user?.displayName}');
       if (user != null) {
         try {
           await Api().post(
@@ -123,20 +135,7 @@ class LoginController extends GetxController {
         } catch (e) {
           print(e);
         }
-
-        debugPrint('User details:\n'
-            '  uid: ${user.uid}\n'
-            '  displayName: ${user.displayName}\n'
-            '  email: ${user.email}\n'
-            '  phoneNumber: ${user.phoneNumber}\n'
-            '  photoURL: ${user.photoURL}\n'
-            '  isAnonymous: ${user.isAnonymous}\n'
-            '  emailVerified: ${user.emailVerified}\n'
-            '  providerData: ${user.providerData.map((p) => p.providerId).toList()}');
-      } else {
-        debugPrint('User is null after Google sign-in');
       }
-
     } catch (e) {
       print('Google Sign-In Failed: $e');
       return null;

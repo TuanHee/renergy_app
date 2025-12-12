@@ -98,4 +98,26 @@ class EditProfileController extends GetxController {
     emailController.dispose();
     super.onClose();
   }
+
+  Future<bool> deleteAccount() async {
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+    try {
+      final res = await Api().delete(Endpoints.profile);
+      if (res.data['status'] != 200) {
+        throw res.data['message'] ?? 'Failed to delete account';
+      }
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      update();
+      return false;
+    } finally {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+    }
+  }
 }

@@ -6,6 +6,7 @@ import 'package:renergy_app/common/services/storage_service.dart';
 
 class Global {
   static bool isLoginValid = false;
+  static bool isGoogleLoginOnly = false;
 
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();

@@ -82,7 +82,6 @@ class ExplorerController extends GetxController with WidgetsBindingObserver {
   Future<void> fetchStations({Function(String msg)? onErrorCallback}) async {
     try {
       final res = await Api().get(Endpoints.stations);
-      print('res: $res');
 
       if (res.data['status'] == 200) {
         final data = res.data['data'];

@@ -28,4 +28,5 @@ class Endpoints {
   static String handlePayment = 'payment-methods/handle-xdk-result';
   static String updatePhoneNumber = 'update-phone-number';
   static String sendOtp = 'send-otp';
+  static const String loginMethod = 'login-method';
 }

@@ -51,68 +51,78 @@ class LoginScreenView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Phone Number',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: controller.phoneController,
-                        validator: controller.validatePhone,
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          hintText: 'e.g. 0123456789',
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+
+                      if (!controller.isGoogleOnly) ...[
+                        const Text(
+                          'Phone Number',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Password',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: controller.passwordController,
-                        validator: controller.validatePassword,
-                        obscureText: !controller.showPassword,
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          hintText: 'Enter password',
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              controller.showPassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: controller.phoneController,
+                          validator: controller.validatePhone,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.telephoneNumber],
+                          decoration: InputDecoration(
+                            hintText: 'e.g. 0123456789',
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            onPressed: controller.toggleShowPassword,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Password',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: controller.passwordController,
+                          validator: controller.validatePassword,
+                          obscureText: !controller.showPassword,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          decoration: InputDecoration(
+                            hintText: 'Enter password',
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                controller.showPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: controller.toggleShowPassword,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
                       if (controller.errorMessage != null) ...[
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -138,121 +148,104 @@ class LoginScreenView extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                       ],
-                      SizedBox(
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: controller.isLoading
-                              ? null
-                              : controller.login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+
+                      if (!controller.isGoogleOnly) ...[
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: controller.isLoading
+                                ? null
+                                : controller.login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: controller.isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Login'),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                      ],
+
+                      if (controller.isGoogleOnly) ...[
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Only Google sign-in is available for your account.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 12),
+
+                        SizedBox(
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: controller.signInWithGoogle,
+                            icon: Image.asset(
+                              'assets/images/google.png',
+                              width: 20,
+                              height: 20,
+                            ),
+                            label: const Text('Continue with Google'),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.red.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              foregroundColor: Colors.red,
                             ),
                           ),
-                          child: controller.isLoading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text('Login'),
                         ),
-                      ),
-
-                      const SizedBox(height: 18),
-                      Center(
-                        child: GestureDetector(
-                          onTap: controller.signInWithGoogle,
-                          child: Image.asset(
-                            'assets/images/google.png',
-                            width: 28,
-                            height: 28,
-                          ),
-                        ),
-                      ),
+                      ],
 
                       const SizedBox(height: 32),
 
-                      // Divider
-                      const Row(
-                        children: [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'Login or Sign up',
-                              style: TextStyle(color: Colors.grey),
+                      if (!controller.isGoogleOnly) ...[
+                        const Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'Don’t have an account?',
+                                style: TextStyle(color: Colors.grey),
+                              ),
                             ),
-                          ),
-                          Expanded(child: Divider()),
-                        ],
-                      ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
 
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                      SizedBox(
-                        height: 44,
-                        child: OutlinedButton(
-                          onPressed: () => Get.toNamed(AppRoutes.register),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.red.shade300),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        SizedBox(
+                          height: 44,
+                          child: OutlinedButton(
+                            onPressed: () => Get.toNamed(AppRoutes.register),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.red.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            'Register Now',
-                            style: TextStyle(color: Colors.red),
+                            child: const Text(
+                              'Register Now',
+                              style: TextStyle(color: Colors.red),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 32),
+                      ],
 
-                      // Google Sign-In Button
-                      // ElevatedButton.icon(
-                      //   onPressed: () {
-                      //     // TODO: Implement Google Sign-In
-                      //   },
-                      //   icon: const Icon(Icons.login, color: Colors.white),
-                      //   label: const Text(
-                      //     'Sign in with Google',
-                      //     style: TextStyle(fontSize: 16),
-                      //   ),
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: Colors.red.shade600,
-                      //     foregroundColor: Colors.white,
-                      //     padding: const EdgeInsets.symmetric(
-                      //       horizontal: 32,
-                      //       vertical: 16,
-                      //     ),
-                      //     minimumSize: const Size(double.infinity, 50),
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.circular(8),
-                      //     ),
-                      //   ),
-                      // ),
-
-                      // const SizedBox(height: 16),
-
-                      // // Apple Sign-In Button (iOS only)
-                      // if (Platform.isIOS)
-                      //   SignInWithAppleButton(
-                      //     onPressed: () {
-                      //       // TODO: Implement Apple Sign-In
-                      //     },
-                      //     height: 50,
-                      //     text: 'Sign in with Apple',
-                      //     style: SignInWithAppleButtonStyle.black,
-                      //   ),
-
-                      // if (Platform.isIOS) const SizedBox(height: 32),
-                      const SizedBox(height: 32),
-
-                      // Terms and Privacy Text
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(

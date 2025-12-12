@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/common/constants/endpoints.dart';
+import 'package:renergy_app/common/services/api_service.dart';
+import 'package:renergy_app/components/snackbar.dart';
+import 'package:renergy_app/screens/account_screen/account_screen.dart';
 import 'controller.dart';
 
 class EditProfileScreenView extends StatelessWidget {
@@ -41,19 +45,34 @@ class EditProfileScreenView extends StatelessWidget {
                                 CircleAvatar(
                                   radius: 40,
                                   backgroundColor: Colors.black12,
-                                  backgroundImage: controller.avatar != null ? FileImage(controller.avatar!) : null,
+                                  backgroundImage: controller.avatar != null
+                                      ? FileImage(controller.avatar!)
+                                      : null,
                                   child: controller.avatar == null
-                                      ? const Icon(Icons.person, size: 40, color: Colors.black54)
+                                      ? const Icon(
+                                          Icons.person,
+                                          size: 40,
+                                          color: Colors.black54,
+                                        )
                                       : null,
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(14),
-                                    boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                      ),
+                                    ],
                                   ),
                                   padding: const EdgeInsets.all(4),
-                                  child: const Icon(Icons.camera_alt, size: 16, color: Colors.black87),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 16,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                               ],
                             ),
@@ -138,6 +157,7 @@ class EditProfileScreenView extends StatelessWidget {
                               controller: controller.phoneController,
                               validator: controller.validatePhone,
                               keyboardType: TextInputType.phone,
+                              enabled: false,
                               decoration: InputDecoration(
                                 hintText: '167743923',
                                 filled: true,
@@ -158,16 +178,15 @@ class EditProfileScreenView extends StatelessWidget {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () =>
+                                Get.toNamed(AppRoutes.phoneVerification),
+                            child: const Text('Edit'),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: () => Get.toNamed(AppRoutes.phoneVerification),
-                          child: const Text('Change Mobile Number'),
-                        ),
-                      ),
                       // const Text(
                       //   'Email',
                       //   style: TextStyle(
@@ -283,6 +302,69 @@ class EditProfileScreenView extends StatelessWidget {
                                 )
                               : const Text('Save'),
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton(
+                        onPressed: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) {
+                              return AlertDialog(
+                                title: const Text('Delete Account'),
+                                content: const Text(
+                                  'This action is irreversible. Do you want to proceed?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(true),
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          if (confirmed == true) {
+                            try {
+                              final res = await Api().delete(Endpoints.profile);
+                              if (res.data['status'] != 200) {
+                                throw res.data['message'] ??
+                                    'Failed to delete account';
+                              }
+                              if (Get.context != null) {
+                                Snackbar.showSuccess(
+                                  'The account was deleted',
+                                  Get.context!,
+                                );
+                              }
+                              await controller.deleteAccount();
+                              Get.offAllNamed(AppRoutes.explorer);
+                            } catch (e) {
+                              if (Get.context != null) {
+                                Snackbar.showError(
+                                  'Delete Account: ${e.toString()}',
+                                  Get.context!,
+                                );
+                              }
+                            }
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.red),
+                          foregroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text('Delete Account'),
                       ),
                     ],
                   ),
