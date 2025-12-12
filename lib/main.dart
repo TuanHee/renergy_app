@@ -3,22 +3,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:renergy_app/common/constants/app_theme.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/common/services/firebase_notification.dart';
 import 'package:renergy_app/firebase_options.dart';
 import 'package:renergy_app/global.dart';
+import 'package:upgrader/upgrader.dart';
 
 import 'common/constants/server.dart';
-import 'common/services/firebase_notification.dart';
 import 'common/services/location_handler.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
-import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
+  await Upgrader.clearSavedSettings();
   await Global.init();
   try {
     if (Firebase.apps.isEmpty) {
@@ -26,15 +24,33 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
-    // await NotificationService.init();
+    await NotificationService.init();
   } catch (e, st) {
     print('Firebase initializeApp error: $e\n$st');
   }
 
   final mainController = Get.put(MainController());
   mainController.position = await LocationHandler.getCurrentLocation();
-
+  printLocalVersion();
+  printStoreVersion();
   runApp(const MyApp());
+}
+
+Future<void> printLocalVersion() async {
+  final info = await PackageInfo.fromPlatform();
+
+  print("Local versionName: ${info.version}");
+  print("Local versionCode (build number): ${info.buildNumber}");
+}
+
+Future<void> printStoreVersion() async {
+  final upgrader = Upgrader();
+
+  // Load store info
+  await upgrader.initialize();
+
+  print("Store version: ${upgrader.currentAppStoreVersion}");
+  // print("Store release notes: ${upgrader.}");
 }
 
 class MyApp extends StatelessWidget {
@@ -71,25 +87,25 @@ class DebugWrapper extends StatelessWidget {
             child,
             if (kDebugMode || serverApiUrl != "https://zeropowerstation.my")
               Positioned(
-              top: 20,
-              right: 20,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 7,
-                ),
-                color: Colors.red.withOpacity(0.7),
-                child: Text(
-                  kDebugMode ? "DEBUG MODE" : "STAGING MODE",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                top: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
+                  color: Colors.red.withOpacity(0.7),
+                  child: Text(
+                    kDebugMode ? "DEBUG MODE" : "STAGING MODE",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
         ),
       ),
     );

@@ -1,17 +1,52 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:upgrader/upgrader.dart';
 import '../../common/routes/app_routes.dart';
 
 class SplashScreenController extends GetxController {
+  Timer? _timer;
+  bool shouldPauseNavigation = false;
+
   @override
   void onInit() {
     super.onInit();
+    _checkUpgradeAndMaybeNavigate();
+  }
+
+  Future<void> _checkUpgradeAndMaybeNavigate() async {
+    // Ensure upgrader checks immediately without delay
+    final upgrader = Upgrader(durationUntilAlertAgain: Duration.zero);
+    // Initialize to fetch store version and decision flags
+    await upgrader.initialize();
+
+    // If an upgrade should be displayed, pause navigation
+    final showUpgrade = upgrader.shouldDisplayUpgrade();
+    if (showUpgrade) {
+      shouldPauseNavigation = true;
+      update();
+      return;
+    }
+
+    // Otherwise proceed with normal splash navigation
     _navigateToHome();
   }
 
   void _navigateToHome() {
-    Timer(const Duration(seconds: 3), () {
-      Get.offNamed(AppRoutes.explorer);
+    _timer?.cancel();
+    _timer = Timer(const Duration(seconds: 3), () {
+      Get.offAllNamed(AppRoutes.explorer);
+    });
+  }
+
+  // Call this after the upgrade dialog is dismissed with Ignore/Later
+  void resumeAfterUpgradeDismissed() {
+    if (!shouldPauseNavigation) return;
+    shouldPauseNavigation = false;
+    update();
+    // Schedule navigation shortly after the dialog dismisses
+    Future.delayed(const Duration(milliseconds: 50), () {
+      Get.offAllNamed(AppRoutes.explorer);
     });
   }
 }

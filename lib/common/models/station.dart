@@ -18,7 +18,7 @@ class Station {
   String? address1;
   String? address2;
   String? state;
-  int? countryId;
+  String? countryId;
   String? latitude;
   String? longitude;
   String? maxCurrent;
@@ -80,7 +80,7 @@ class Station {
       state: json['state'],
       countryId: json['country_id'] == null
           ? null
-          : int.parse(json['country_id'].toString()),
+          : json['country_id'].toString(),
       latitude: json['latitude'],
       longitude: json['longitude'],
       maxCurrent: json['max_current'],
