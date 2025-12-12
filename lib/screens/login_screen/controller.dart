@@ -86,7 +86,7 @@ class LoginController extends GetxController {
     update();
   }
 
-  Future<User?> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
     try {
@@ -109,8 +109,22 @@ class LoginController extends GetxController {
       // ... rest of the logic
       final User? user = userCredential.user;
       print('Signed in user: ${user?.displayName}');
+      if (user != null) {
+        debugPrint('User details:\n'
+            '  uid: ${user.uid}\n'
+            '  displayName: ${user.displayName}\n'
+            '  email: ${user.email}\n'
+            '  phoneNumber: ${user.phoneNumber}\n'
+            '  photoURL: ${user.photoURL}\n'
+            '  isAnonymous: ${user.isAnonymous}\n'
+            '  emailVerified: ${user.emailVerified}\n'
+            '  providerData: ${user.providerData.map((p) => p.providerId).toList()}');
+      } else {
+        debugPrint('User is null after Google sign-in');
+      }
 
-      return user;
+      // called api
+
     } catch (e) {
       print('Google Sign-In Failed: $e');
       return null;

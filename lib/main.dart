@@ -32,7 +32,7 @@ void main() async {
   }
 
   final mainController = Get.put(MainController());
-  // mainController.position = await LocationHandler.getCurrentLocation();
+  mainController.position = await LocationHandler.getCurrentLocation();
 
   runApp(const MyApp());
 }

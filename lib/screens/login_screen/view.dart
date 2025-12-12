@@ -164,6 +164,18 @@ class LoginScreenView extends StatelessWidget {
                         ),
                       ),
 
+                      const SizedBox(height: 18),
+                      Center(
+                        child: GestureDetector(
+                          onTap: controller.signInWithGoogle,
+                          child: Image.asset(
+                            'assets/images/google.png',
+                            width: 28,
+                            height: 28,
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: 32),
 
                       // Divider
@@ -186,8 +198,7 @@ class LoginScreenView extends StatelessWidget {
                       SizedBox(
                         height: 44,
                         child: OutlinedButton(
-                          onPressed: controller.signInWithGoogle,
-                          // onPressed: () => Get.toNamed(AppRoutes.register),
+                          onPressed: () => Get.toNamed(AppRoutes.register),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.red.shade300),
                             shape: RoundedRectangleBorder(
