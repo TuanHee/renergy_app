@@ -186,7 +186,8 @@ class LoginScreenView extends StatelessWidget {
                       SizedBox(
                         height: 44,
                         child: OutlinedButton(
-                          onPressed: () => Get.toNamed(AppRoutes.register),
+                          onPressed: controller.signInWithGoogle,
+                          // onPressed: () => Get.toNamed(AppRoutes.register),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.red.shade300),
                             shape: RoundedRectangleBorder(

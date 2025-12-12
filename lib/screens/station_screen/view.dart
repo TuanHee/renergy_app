@@ -169,12 +169,12 @@ class _StationScreenViewState extends State<StationScreenView> {
                       _statusItem(Icons.check_circle, 'Open', Colors.green),
                       _statusItem(
                         Icons.location_on,
-                        '${controller.station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
+                        '${Get.find<MainController>().position != null ? controller.station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A': 'N/A'} km',
                         Colors.black,
                       ),
                       _statusItemImage(
                         'assets/images/plug.png',
-                        '${controller.station.bays!.length}',
+                        '${controller.station.bays?.where((bay) => bay.isAvailable == true).length ?? 0}',
                         Colors.black,
                       ),
                       _statusItem(
@@ -1094,7 +1094,7 @@ class _nearbyStationItem extends StatelessWidget {
                               Icon(Icons.location_on, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
-                                '${station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
+                                '${Get.find<MainController>().position != null ? station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A': 'N/A'} km',
                                 style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
                             ],

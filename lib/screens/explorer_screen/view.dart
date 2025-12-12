@@ -662,7 +662,7 @@ class _StationItem extends StatelessWidget {
                               Icon(Icons.location_on, size: 14, color: muted),
                               const SizedBox(width: 6),
                               Text(
-                                '${station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
+                                '${Get.find<MainController>().position != null ? station.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A': 'N/A'} km',
                                 style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                               ),
                             ],

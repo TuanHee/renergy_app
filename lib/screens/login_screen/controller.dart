@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:renergy_app/common/constants/constants.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
 import 'package:renergy_app/common/services/api_service.dart';
@@ -63,12 +65,14 @@ class LoginController extends GetxController {
         throw res.data['message'] ?? 'Failed to login';
       }
 
-      StorageService.to.setString(storageAccessToken, res.data['data']['_token']);
+      StorageService.to.setString(
+        storageAccessToken,
+        res.data['data']['_token'],
+      );
       await NotificationService.initializeToken();
       Global.isLoginValid = true;
-      
-      Get.offAllNamed(AppRoutes.explorer);
 
+      Get.offAllNamed(AppRoutes.explorer);
     } catch (e) {
       errorMessage = e.toString();
       if (Get.context != null) {
@@ -80,5 +84,36 @@ class LoginController extends GetxController {
     }
 
     update();
+  }
+
+  Future<User?> signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+
+    try {
+      // 1. Trigger the sign-in flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.authenticate();
+      if (googleUser == null) return null; // User canceled
+
+      // 2. Retrieve authentication details
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // 3. Create the Firebase Credential using idToken and/or accessToken
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      // 4. Sign in to Firebase
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // ... rest of the logic
+      final User? user = userCredential.user;
+      print('Signed in user: ${user?.displayName}');
+
+      return user;
+    } catch (e) {
+      print('Google Sign-In Failed: $e');
+      return null;
+    }
   }
 }

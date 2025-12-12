@@ -147,7 +147,7 @@ class BookmarkItem extends StatelessWidget {
                             Icon(Icons.route, size: 14, color: muted),
                             const SizedBox(width: 6),
                             Text(
-                              '${bookmark!.station!.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A'} km',
+                              '${Get.find<MainController>().position != null ? bookmark!.station!.distanceTo(position: Get.find<MainController>().position!)?.toStringAsFixed(2) ?? 'N/A': 'N/A'} km',
                               style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w500),
                             ),
                           ],

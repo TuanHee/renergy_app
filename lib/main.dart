@@ -14,8 +14,10 @@ import 'common/services/location_handler.dart';
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
 
   await Global.init();
   try {
@@ -24,14 +26,13 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
-
-    await NotificationService.init();
+    // await NotificationService.init();
   } catch (e, st) {
     print('Firebase initializeApp error: $e\n$st');
   }
 
   final mainController = Get.put(MainController());
-  mainController.position = await LocationHandler.getCurrentLocation();
+  // mainController.position = await LocationHandler.getCurrentLocation();
 
   runApp(const MyApp());
 }
