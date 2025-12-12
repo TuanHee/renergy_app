@@ -33,6 +33,7 @@ class AppRoutes {
   static const String reportDetail = '/report-detail';
   static const String notification = '/notification';
   static const String priceList = '/price-list';
+static const String phoneVerification = '/phone-verification';
 
   // Initial route
   static const String initial = splash;
@@ -231,6 +232,13 @@ class AppRoutes {
         page: () => const PriceListScreenView(),
         transition: Transition.fadeIn,
         binding: PriceListBinding(),
+      ),
+      GetPage(
+        name: phoneVerification,
+        page: () => const PhoneVerificationScreenView(),
+        transition: Transition.fadeIn,
+        binding: PhoneVerificationBinding(),
+        middlewares: authMiddleware,
       ),
     ];
   }

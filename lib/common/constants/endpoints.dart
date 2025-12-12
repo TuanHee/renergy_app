@@ -26,4 +26,6 @@ class Endpoints {
   static String stationReport(int id) => '$stationReports/$id';
   static String reports = 'reports';
   static String handlePayment = 'payment-methods/handle-xdk-result';
+  static String updatePhoneNumber = 'update-phone-number';
+  static String sendOtp = 'send-otp';
 }

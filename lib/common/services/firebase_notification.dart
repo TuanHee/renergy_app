@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:renergy_app/common/routes/app_routes.dart';
+import 'package:renergy_app/components/snackbar.dart';
 
 import '../constants/endpoints.dart';
 import 'api_service.dart';
@@ -63,13 +64,14 @@ class NotificationService {
     try {
       if (Platform.isIOS) {
         String? apnsToken = await _firebaseMessaging.getAPNSToken();
-          if (apnsToken != null) {
-            // Then get FCM token
-            String? fcmToken = await _firebaseMessaging.getToken();
-            print("FCM Token: $fcmToken");
-          } else {
-            print("APNs token not available yet.");
-          }
+        if (apnsToken != null) {
+          // Then get FCM token
+          String? fcmToken = await _firebaseMessaging.getToken();
+          print("FCM Token: $fcmToken");
+        } else {
+          if (Get.context != null)
+            Snackbar.showError("APNs token not available yet.", Get.context!);
+        }
       }
       final token = await _firebaseMessaging.getToken();
       print('FCM token: $token');

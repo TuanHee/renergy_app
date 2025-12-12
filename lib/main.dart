@@ -85,7 +85,7 @@ class DebugWrapper extends StatelessWidget {
         child: Stack(
           children: [
             child,
-            if (kDebugMode || serverApiUrl != "https://zeropowerstation.my")
+            if (kDebugMode || serverApiUrl == "https://ocpp.marslab.com.my")
               Positioned(
                 top: 20,
                 right: 20,

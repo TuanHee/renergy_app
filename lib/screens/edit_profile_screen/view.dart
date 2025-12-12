@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:renergy_app/common/routes/app_routes.dart';
 import 'controller.dart';
 
 class EditProfileScreenView extends StatelessWidget {
@@ -160,6 +161,13 @@ class EditProfileScreenView extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () => Get.toNamed(AppRoutes.phoneVerification),
+                          child: const Text('Change Mobile Number'),
+                        ),
+                      ),
                       // const Text(
                       //   'Email',
                       //   style: TextStyle(

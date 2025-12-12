@@ -110,6 +110,20 @@ class LoginController extends GetxController {
       final User? user = userCredential.user;
       print('Signed in user: ${user?.displayName}');
       if (user != null) {
+        try {
+          await Api().post(
+            Endpoints.login,
+            data: {
+              'email': user.email,
+              'name': user.displayName,
+              'phone': user.phoneNumber,
+              'photo': user.photoURL,
+            },
+          );
+        } catch (e) {
+          print(e);
+        }
+
         debugPrint('User details:\n'
             '  uid: ${user.uid}\n'
             '  displayName: ${user.displayName}\n'
