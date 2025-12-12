@@ -24,5 +24,6 @@ class Endpoints {
   static String notifications = 'notifications';
   static const String stationReports = 'station-reports';
   static String stationReport(int id) => '$stationReports/$id';
+  static String reports = 'reports';
   static String handlePayment = 'payment-methods/handle-xdk-result';
 }

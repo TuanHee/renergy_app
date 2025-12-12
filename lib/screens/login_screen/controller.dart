@@ -123,8 +123,6 @@ class LoginController extends GetxController {
         debugPrint('User is null after Google sign-in');
       }
 
-      // called api
-
     } catch (e) {
       print('Google Sign-In Failed: $e');
       return null;

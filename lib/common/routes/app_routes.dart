@@ -30,6 +30,7 @@ class AppRoutes {
   static const String filter = '/filter';
   static const String report = '/report';
   static const String reportHistory = '/report-history';
+  static const String reportDetail = '/report-detail';
   static const String notification = '/notification';
   static const String priceList = '/price-list';
 
@@ -203,6 +204,13 @@ class AppRoutes {
         page: () => const ReportHistoryScreenView(),
         transition: Transition.fadeIn,
         binding: ReportHistoryBinding(),
+        middlewares: authMiddleware,
+      ),
+      GetPage(
+        name: reportDetail,
+        page: () => const ReportDetailScreenView(),
+        transition: Transition.fadeIn,
+        binding: ReportDetailBinding(),
         middlewares: authMiddleware,
       ),
       GetPage(

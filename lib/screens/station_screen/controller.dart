@@ -27,6 +27,7 @@ class StationController extends GetxController {
   CreditCard? selectedCard;
   // Key used to scroll to the car dropdown when validation fails
   final GlobalKey stationNameKey = GlobalKey();
+  final GlobalKey carKey = GlobalKey();
 
   @override
   void onInit() async {
@@ -119,9 +120,9 @@ class StationController extends GetxController {
     update();
   }
 
-  void scrollToStationName() {
+  void scrollToKey(GlobalKey key) {
     try {
-      final ctx = stationNameKey.currentContext;
+      final ctx = key.currentContext;
       if (ctx != null) {
         Scrollable.ensureVisible(
           ctx,
@@ -143,14 +144,14 @@ class StationController extends GetxController {
       // }
 
       if (selectedBay == null) {
-        scrollToStationName();
+        scrollToKey(stationNameKey);
         Snackbar.showError('Please select a bay.', Get.context!);
         return;
       }
 
       if (selectedCar == null) {
         Snackbar.showError('Please select a car.', Get.context!);
-        scrollToStationName();
+        scrollToKey(carKey);
         return;
       }
 

@@ -18,7 +18,7 @@ class ReportHistoryController extends GetxController {
     isLoading = true;
     update();
     try {
-      final res = await Api().get(Endpoints.stationReports);
+      final res = await Api().get(Endpoints.reports);
       // Accept list in various response shapes
       final parsed = StationReport.listFromJson(res.data['data'] ?? res.data);
       reports = parsed;

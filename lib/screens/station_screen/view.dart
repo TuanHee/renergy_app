@@ -333,8 +333,8 @@ class _StationScreenViewState extends State<StationScreenView> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Select My Car Section
-                      const Text(
+                      Text(
+                        key: controller.carKey,
                         'Select My Car',
                         style: TextStyle(
                           fontSize: 18,
